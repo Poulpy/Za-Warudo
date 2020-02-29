@@ -1,3 +1,5 @@
+from random import randint
+
 def mystery_number(n: int):
     """
     2

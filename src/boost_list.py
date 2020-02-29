@@ -1,4 +1,3 @@
-from random import randint
 from math import sqrt
 
 def uniq(l: list) -> list:

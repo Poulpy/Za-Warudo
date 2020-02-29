@@ -1,6 +1,7 @@
 ### Execute the tests
 
 ```
+export PYTHONPATH='src/'
 python3.5 tests/TestListMethods.py
 ```
 

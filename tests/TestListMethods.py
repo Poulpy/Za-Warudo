@@ -30,6 +30,9 @@ class TestListMethods(unittest.TestCase):
     def test_addition(self):
         l1 = addition_table(6)
 
+    def test_erathostenes_sieve(self):
+        print(erathostenes_sieve(50))
+
     def test_switch(self):
         l1 = [11, 33, 11, 33, 3, 0, 5]
         d1 = {"Marie":"3", "Bidule":"4"}

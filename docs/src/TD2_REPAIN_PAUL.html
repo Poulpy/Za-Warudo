@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>src.TD2_REPAIN_PAUL API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.TD2_REPAIN_PAUL</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import unittest
+from random import randint
+
+def uniq(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.1
+    Return a list removed form its duplicates
+    &#34;&#34;&#34;
+    result = []
+    i = 0
+
+    while i != len(l):
+        if result.count(l[i]) == 0:
+            result.append(l[i])
+        i += 1
+
+    return result
+
+def sort_uniq(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.1
+    Remove the duplicates in an sorted list
+    &#34;&#34;&#34;
+    i = 1
+    rst = [l[0]]
+
+    while i != len(l):
+        if l[i - 1] != l[i]:
+            rst.append(l[i])
+        i += 1
+
+    return rst
+
+def flatten(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.2
+    Flatten a multi dimensional list
+    [[1, 2], [2, 4]], gives : [1, 2, 2, 4]
+    &#34;&#34;&#34;
+    flat_list = []
+
+    for el in l:
+        if isinstance(el, list):
+            flat_list.extend(flatten(el))
+        else:
+            flat_list.append(el)
+
+    return flat_list
+
+def successive_ints(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.3
+    Return a list containing the successive integers in the list given in argument
+    &#34;&#34;&#34;
+    rst = []
+
+    for i in range(len(l) - 1):
+        if l[i] == l[i + 1] - 1:
+            rst.append([l[i], l[i + 1]])
+
+    return rst
+
+def occurrences(l: list) -&gt; dict:
+    &#34;&#34;&#34;
+    1.4
+    Return a dictionnary, containing the number of occurrences of an int in the
+    list given in argument
+    &#34;&#34;&#34;
+    d = dict()
+    numbers = uniq(l)
+
+    for el in l:
+        d[el] = l.count(el)
+
+    return d
+
+def addition_table(n: int) -&gt; list:
+    &#34;&#34;&#34;
+    1.5
+    Returns the addition table given a integer
+    &#34;&#34;&#34;
+    rst = [[i for i in range(n)] for j in range(n)]
+
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            rst[i - 1][j - 1] = i + j
+
+    return rst
+
+def switch(d: dict) -&gt; dict:
+    &#34;&#34;&#34;
+    1.7
+    Switch keys and values of a dictionary given in argument
+    &#34;&#34;&#34;
+    rst = dict()
+
+    for k, v in d.items():
+        rst[str(v)] = k
+
+    return rst
+
+def same_elements(l1: list, l2: list) -&gt; bool:
+    &#34;&#34;&#34;
+    1.8
+    Check if two lists have the same elements, regardless of the number
+    of elements
+    &#34;&#34;&#34;
+    return is_anagram(uniq(l1), uniq(l2))
+
+def is_anagram(l1: list, l2: list) -&gt; bool:
+    &#34;&#34;&#34;
+    1.8
+    Check if two lists are anagrams: same elements but in order or in
+    disorder
+    &#34;&#34;&#34;
+    return (sorted(l1) == (sorted(l2)))
+
+def mystery_number(n: int):
+    &#34;&#34;&#34;
+    2
+    Game where the user must guess the number generated [0, 100] by the
+    computer. The user can try n times, n given in argument
+    &#34;&#34;&#34;
+    if n &lt;= 0: return
+
+    number_to_guess = randint(0, 100)
+    i = 0
+    won = False
+
+    while i != n and not won:
+        guess = int(input(&#34;Enter a number : &#34;))
+
+        if guess &lt; number_to_guess:
+            print(&#34;It is superior&#34;)
+        elif guess &gt; number_to_guess:
+            print(&#34;It is inferior&#34;)
+        else:
+            print(&#34;You guessed right!&#34;)
+            won = True
+
+        i += 1
+
+def dice_game(n: int):
+    &#34;&#34;&#34;
+    3
+    Game where each player roll the dice
+    Game stops when a player reached n points
+    A player rolls a dice till he got 1
+    An even number increases the player&#39;s score
+    3, the score is multiplied by 2
+    5, the player loses 2 points
+    &#34;&#34;&#34;
+    if n &lt;= 0: return
+
+    player_points = [0, 0]
+    current = 0
+
+    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
+        turn_end = False
+        print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
+
+        while not turn_end:
+            print(&#34;Press enter to roll the dice&#34;)
+            input()
+            print(&#34;Rolling the dice...&#34;)
+            dice = randint(1, 6)
+            print(&#34;&gt; %d&#34; % (dice))
+
+            if dice == 1:
+                print(&#34;End of turn&#34;)
+                turn_end = True
+            elif dice%2 == 0:
+                print(&#34;%d + %d&#34; % (player_points[current], dice))
+                player_points[current] += dice
+            elif dice == 3:
+                print(&#34;%d * 2&#34; % (player_points[current]))
+                player_points[current] *= 2
+            elif dice == 5:
+                print(&#34;%d - 2&#34; % (player_points[current]))
+                player_points[current] -= 2
+
+            print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
+            if player_points[current] &gt; 50:
+                turn_end = True
+
+        current = (current + 1) % 2
+
+    print(&#34;Player %d won !&#34; % (current))
+    print(&#34;Scores : &#34; + str(player_points))
+
+class TestListMethods(unittest.TestCase):
+
+    def test_sort_uniq(self):
+        l1 = [1, 2, 3, 3, 3, 4, 4, 6]
+        self.assertEqual(sort_uniq(l1), [1, 2, 3, 4, 6])
+
+    def test_uniq(self):
+        l1 = [1, 2, 3, 2, 4, 1, 4, 3]
+        self.assertEqual(uniq(l1), [1, 2, 3, 4])
+
+    def test_flatten(self):
+        l1 = [[1, 2], [2, 4]]# gives : [1, 2, 2, 4]
+        self.assertEqual(flatten(l1), [1, 2, 2, 4])
+        l2 = [[1, [34, [3, 90, 4]]], [2, 4]]
+        self.assertEqual(flatten(l2), [1, 34, 3, 90, 4, 2, 4])
+
+    def test_successive_ints(self):
+        l1 = [1, 2, 3, 4]
+        self.assertEqual(successive_ints(l1), [[1, 2], [2, 3], [3, 4]])
+
+    def test_occurrences(self):
+        l1 = [11, 33, 11, 33, 3, 0, 5]
+        d1 = occurrences(l1)
+        d2 = {3:1, 33: 2, 11: 2, 0: 1, 5: 1}
+        self.assertEqual(occurrences(l1), d2)
+
+    def test_addition(self):
+        l1 = addition_table(6)
+
+    def test_switch(self):
+        l1 = [11, 33, 11, 33, 3, 0, 5]
+        d1 = {&#34;Marie&#34;:&#34;3&#34;, &#34;Bidule&#34;:&#34;4&#34;}
+        d2 = {&#39;3&#39;: &#34;Marie&#34;, &#39;4&#39;: &#34;Bidule&#34;}
+        self.assertEqual(switch(d1), d2)
+
+    def test_same_elements(self):
+        l1 = [1, 1, 2, 4, 5, 4, 3]
+        l2 = [5, 1, 2, 3, 4, 1, 1, 2]
+        self.assertTrue(same_elements(l1, l2))
+        l3 = [1, 1, 2, 4, 5, 4, 6]
+        l4 = [5, 1, 2, 3, 4, 1, 1, 2]
+        self.assertFalse(same_elements(l3, l4))
+
+    def test_is_anagram(self):
+        l1 = &#34;azerty&#34;
+        l2 = &#34;ytreza&#34;
+        self.assertTrue(is_anagram(l1, l2))
+        l1 = &#34;azerty&#34;
+        l2 = &#34;ytrezay&#34;
+        self.assertFalse(is_anagram(l1, l2))
+
+def test_mystery_number():
+    mystery_number(10)
+
+def test_dice_game():
+    dice_game(50)
+
+def main():
+    test_sort_uniq()
+    test_uniq()
+    test_flatten()
+    test_successive_ints()
+    test_occurrences()
+    test_addition()
+    test_switch()
+    test_same_elements()
+    test_is_anagram()
+    test_mystery_number()
+    test_dice_game()
+
+
+#main()
+
+if  __name__ == &#39;__main__&#39;:
+    unittest.main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.TD2_REPAIN_PAUL.addition_table"><code class="name flex">
+<span>def <span class="ident">addition_table</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.5
+Returns the addition table given a integer</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addition_table(n: int) -&gt; list:
+    &#34;&#34;&#34;
+    1.5
+    Returns the addition table given a integer
+    &#34;&#34;&#34;
+    rst = [[i for i in range(n)] for j in range(n)]
+
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            rst[i - 1][j - 1] = i + j
+
+    return rst</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.dice_game"><code class="name flex">
+<span>def <span class="ident">dice_game</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>3
+Game where each player roll the dice
+Game stops when a player reached n points
+A player rolls a dice till he got 1
+An even number increases the player's score
+3, the score is multiplied by 2
+5, the player loses 2 points</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dice_game(n: int):
+    &#34;&#34;&#34;
+    3
+    Game where each player roll the dice
+    Game stops when a player reached n points
+    A player rolls a dice till he got 1
+    An even number increases the player&#39;s score
+    3, the score is multiplied by 2
+    5, the player loses 2 points
+    &#34;&#34;&#34;
+    if n &lt;= 0: return
+
+    player_points = [0, 0]
+    current = 0
+
+    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
+        turn_end = False
+        print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
+
+        while not turn_end:
+            print(&#34;Press enter to roll the dice&#34;)
+            input()
+            print(&#34;Rolling the dice...&#34;)
+            dice = randint(1, 6)
+            print(&#34;&gt; %d&#34; % (dice))
+
+            if dice == 1:
+                print(&#34;End of turn&#34;)
+                turn_end = True
+            elif dice%2 == 0:
+                print(&#34;%d + %d&#34; % (player_points[current], dice))
+                player_points[current] += dice
+            elif dice == 3:
+                print(&#34;%d * 2&#34; % (player_points[current]))
+                player_points[current] *= 2
+            elif dice == 5:
+                print(&#34;%d - 2&#34; % (player_points[current]))
+                player_points[current] -= 2
+
+            print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
+            if player_points[current] &gt; 50:
+                turn_end = True
+
+        current = (current + 1) % 2
+
+    print(&#34;Player %d won !&#34; % (current))
+    print(&#34;Scores : &#34; + str(player_points))</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.flatten"><code class="name flex">
+<span>def <span class="ident">flatten</span></span>(<span>l)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.2
+Flatten a multi dimensional list
+[[1, 2], [2, 4]], gives : [1, 2, 2, 4]</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flatten(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.2
+    Flatten a multi dimensional list
+    [[1, 2], [2, 4]], gives : [1, 2, 2, 4]
+    &#34;&#34;&#34;
+    flat_list = []
+
+    for el in l:
+        if isinstance(el, list):
+            flat_list.extend(flatten(el))
+        else:
+            flat_list.append(el)
+
+    return flat_list</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.is_anagram"><code class="name flex">
+<span>def <span class="ident">is_anagram</span></span>(<span>l1, l2)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.8
+Check if two lists are anagrams: same elements but in order or in
+disorder</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_anagram(l1: list, l2: list) -&gt; bool:
+    &#34;&#34;&#34;
+    1.8
+    Check if two lists are anagrams: same elements but in order or in
+    disorder
+    &#34;&#34;&#34;
+    return (sorted(l1) == (sorted(l2)))</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    test_sort_uniq()
+    test_uniq()
+    test_flatten()
+    test_successive_ints()
+    test_occurrences()
+    test_addition()
+    test_switch()
+    test_same_elements()
+    test_is_anagram()
+    test_mystery_number()
+    test_dice_game()</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.mystery_number"><code class="name flex">
+<span>def <span class="ident">mystery_number</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>2
+Game where the user must guess the number generated [0, 100] by the
+computer. The user can try n times, n given in argument</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mystery_number(n: int):
+    &#34;&#34;&#34;
+    2
+    Game where the user must guess the number generated [0, 100] by the
+    computer. The user can try n times, n given in argument
+    &#34;&#34;&#34;
+    if n &lt;= 0: return
+
+    number_to_guess = randint(0, 100)
+    i = 0
+    won = False
+
+    while i != n and not won:
+        guess = int(input(&#34;Enter a number : &#34;))
+
+        if guess &lt; number_to_guess:
+            print(&#34;It is superior&#34;)
+        elif guess &gt; number_to_guess:
+            print(&#34;It is inferior&#34;)
+        else:
+            print(&#34;You guessed right!&#34;)
+            won = True
+
+        i += 1</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.occurrences"><code class="name flex">
+<span>def <span class="ident">occurrences</span></span>(<span>l)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.4
+Return a dictionnary, containing the number of occurrences of an int in the
+list given in argument</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def occurrences(l: list) -&gt; dict:
+    &#34;&#34;&#34;
+    1.4
+    Return a dictionnary, containing the number of occurrences of an int in the
+    list given in argument
+    &#34;&#34;&#34;
+    d = dict()
+    numbers = uniq(l)
+
+    for el in l:
+        d[el] = l.count(el)
+
+    return d</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.same_elements"><code class="name flex">
+<span>def <span class="ident">same_elements</span></span>(<span>l1, l2)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.8
+Check if two lists have the same elements, regardless of the number
+of elements</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def same_elements(l1: list, l2: list) -&gt; bool:
+    &#34;&#34;&#34;
+    1.8
+    Check if two lists have the same elements, regardless of the number
+    of elements
+    &#34;&#34;&#34;
+    return is_anagram(uniq(l1), uniq(l2))</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.sort_uniq"><code class="name flex">
+<span>def <span class="ident">sort_uniq</span></span>(<span>l)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.1
+Remove the duplicates in an sorted list</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sort_uniq(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.1
+    Remove the duplicates in an sorted list
+    &#34;&#34;&#34;
+    i = 1
+    rst = [l[0]]
+
+    while i != len(l):
+        if l[i - 1] != l[i]:
+            rst.append(l[i])
+        i += 1
+
+    return rst</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.successive_ints"><code class="name flex">
+<span>def <span class="ident">successive_ints</span></span>(<span>l)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.3
+Return a list containing the successive integers in the list given in argument</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def successive_ints(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.3
+    Return a list containing the successive integers in the list given in argument
+    &#34;&#34;&#34;
+    rst = []
+
+    for i in range(len(l) - 1):
+        if l[i] == l[i + 1] - 1:
+            rst.append([l[i], l[i + 1]])
+
+    return rst</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.switch"><code class="name flex">
+<span>def <span class="ident">switch</span></span>(<span>d)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.7
+Switch keys and values of a dictionary given in argument</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def switch(d: dict) -&gt; dict:
+    &#34;&#34;&#34;
+    1.7
+    Switch keys and values of a dictionary given in argument
+    &#34;&#34;&#34;
+    rst = dict()
+
+    for k, v in d.items():
+        rst[str(v)] = k
+
+    return rst</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.test_dice_game"><code class="name flex">
+<span>def <span class="ident">test_dice_game</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_dice_game():
+    dice_game(50)</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.test_mystery_number"><code class="name flex">
+<span>def <span class="ident">test_mystery_number</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_mystery_number():
+    mystery_number(10)</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.uniq"><code class="name flex">
+<span>def <span class="ident">uniq</span></span>(<span>l)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>1.1
+Return a list removed form its duplicates</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def uniq(l: list) -&gt; list:
+    &#34;&#34;&#34;
+    1.1
+    Return a list removed form its duplicates
+    &#34;&#34;&#34;
+    result = []
+    i = 0
+
+    while i != len(l):
+        if result.count(l[i]) == 0:
+            result.append(l[i])
+        i += 1
+
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods"><code class="flex name class">
+<span>class <span class="ident">TestListMethods</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class whose instances are single test cases.</p>
+<p>By default, the test code itself should be placed in a method named
+'runTest'.</p>
+<p>If the fixture may be used for many test cases, create as
+many test methods as are needed. When instantiating such a TestCase
+subclass, specify in the constructor arguments the name of the test method
+that the instance is to execute.</p>
+<p>Test authors should subclass TestCase for their own tests. Construction
+and deconstruction of the test's environment ('fixture') can be
+implemented by overriding the 'setUp' and 'tearDown' methods respectively.</p>
+<p>If it is necessary to override the <strong>init</strong> method, the base class
+<strong>init</strong> method must always be called. It is important that subclasses
+should not change the signature of their <strong>init</strong> method, since instances
+of the classes are instantiated automatically by parts of the framework
+in order to be run.</p>
+<p>When subclassing TestCase, you can set these attributes:
+* failureException: determines which exception will be raised when
+the instance's assertion methods fail; test methods raising this
+exception will be deemed to have 'failed' rather than 'errored'.
+* longMessage: determines whether long messages (including repr of
+objects used in assert methods) will be printed on failure in <em>addition</em>
+to any explicit message passed.
+* maxDiff: sets the maximum length of a diff in failure messages
+by assert methods using difflib. It is looked up as an instance
+attribute so can be configured by individual tests if required.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestListMethods(unittest.TestCase):
+
+    def test_sort_uniq(self):
+        l1 = [1, 2, 3, 3, 3, 4, 4, 6]
+        self.assertEqual(sort_uniq(l1), [1, 2, 3, 4, 6])
+
+    def test_uniq(self):
+        l1 = [1, 2, 3, 2, 4, 1, 4, 3]
+        self.assertEqual(uniq(l1), [1, 2, 3, 4])
+
+    def test_flatten(self):
+        l1 = [[1, 2], [2, 4]]# gives : [1, 2, 2, 4]
+        self.assertEqual(flatten(l1), [1, 2, 2, 4])
+        l2 = [[1, [34, [3, 90, 4]]], [2, 4]]
+        self.assertEqual(flatten(l2), [1, 34, 3, 90, 4, 2, 4])
+
+    def test_successive_ints(self):
+        l1 = [1, 2, 3, 4]
+        self.assertEqual(successive_ints(l1), [[1, 2], [2, 3], [3, 4]])
+
+    def test_occurrences(self):
+        l1 = [11, 33, 11, 33, 3, 0, 5]
+        d1 = occurrences(l1)
+        d2 = {3:1, 33: 2, 11: 2, 0: 1, 5: 1}
+        self.assertEqual(occurrences(l1), d2)
+
+    def test_addition(self):
+        l1 = addition_table(6)
+
+    def test_switch(self):
+        l1 = [11, 33, 11, 33, 3, 0, 5]
+        d1 = {&#34;Marie&#34;:&#34;3&#34;, &#34;Bidule&#34;:&#34;4&#34;}
+        d2 = {&#39;3&#39;: &#34;Marie&#34;, &#39;4&#39;: &#34;Bidule&#34;}
+        self.assertEqual(switch(d1), d2)
+
+    def test_same_elements(self):
+        l1 = [1, 1, 2, 4, 5, 4, 3]
+        l2 = [5, 1, 2, 3, 4, 1, 1, 2]
+        self.assertTrue(same_elements(l1, l2))
+        l3 = [1, 1, 2, 4, 5, 4, 6]
+        l4 = [5, 1, 2, 3, 4, 1, 1, 2]
+        self.assertFalse(same_elements(l3, l4))
+
+    def test_is_anagram(self):
+        l1 = &#34;azerty&#34;
+        l2 = &#34;ytreza&#34;
+        self.assertTrue(is_anagram(l1, l2))
+        l1 = &#34;azerty&#34;
+        l2 = &#34;ytrezay&#34;
+        self.assertFalse(is_anagram(l1, l2))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_addition"><code class="name flex">
+<span>def <span class="ident">test_addition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_addition(self):
+    l1 = addition_table(6)</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_flatten"><code class="name flex">
+<span>def <span class="ident">test_flatten</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_flatten(self):
+    l1 = [[1, 2], [2, 4]]# gives : [1, 2, 2, 4]
+    self.assertEqual(flatten(l1), [1, 2, 2, 4])
+    l2 = [[1, [34, [3, 90, 4]]], [2, 4]]
+    self.assertEqual(flatten(l2), [1, 34, 3, 90, 4, 2, 4])</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_is_anagram"><code class="name flex">
+<span>def <span class="ident">test_is_anagram</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_is_anagram(self):
+    l1 = &#34;azerty&#34;
+    l2 = &#34;ytreza&#34;
+    self.assertTrue(is_anagram(l1, l2))
+    l1 = &#34;azerty&#34;
+    l2 = &#34;ytrezay&#34;
+    self.assertFalse(is_anagram(l1, l2))</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_occurrences"><code class="name flex">
+<span>def <span class="ident">test_occurrences</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_occurrences(self):
+    l1 = [11, 33, 11, 33, 3, 0, 5]
+    d1 = occurrences(l1)
+    d2 = {3:1, 33: 2, 11: 2, 0: 1, 5: 1}
+    self.assertEqual(occurrences(l1), d2)</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_same_elements"><code class="name flex">
+<span>def <span class="ident">test_same_elements</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_same_elements(self):
+    l1 = [1, 1, 2, 4, 5, 4, 3]
+    l2 = [5, 1, 2, 3, 4, 1, 1, 2]
+    self.assertTrue(same_elements(l1, l2))
+    l3 = [1, 1, 2, 4, 5, 4, 6]
+    l4 = [5, 1, 2, 3, 4, 1, 1, 2]
+    self.assertFalse(same_elements(l3, l4))</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_sort_uniq"><code class="name flex">
+<span>def <span class="ident">test_sort_uniq</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_sort_uniq(self):
+    l1 = [1, 2, 3, 3, 3, 4, 4, 6]
+    self.assertEqual(sort_uniq(l1), [1, 2, 3, 4, 6])</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_successive_ints"><code class="name flex">
+<span>def <span class="ident">test_successive_ints</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_successive_ints(self):
+    l1 = [1, 2, 3, 4]
+    self.assertEqual(successive_ints(l1), [[1, 2], [2, 3], [3, 4]])</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_switch"><code class="name flex">
+<span>def <span class="ident">test_switch</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_switch(self):
+    l1 = [11, 33, 11, 33, 3, 0, 5]
+    d1 = {&#34;Marie&#34;:&#34;3&#34;, &#34;Bidule&#34;:&#34;4&#34;}
+    d2 = {&#39;3&#39;: &#34;Marie&#34;, &#39;4&#39;: &#34;Bidule&#34;}
+    self.assertEqual(switch(d1), d2)</code></pre>
+</details>
+</dd>
+<dt id="src.TD2_REPAIN_PAUL.TestListMethods.test_uniq"><code class="name flex">
+<span>def <span class="ident">test_uniq</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_uniq(self):
+    l1 = [1, 2, 3, 2, 4, 1, 4, 3]
+    self.assertEqual(uniq(l1), [1, 2, 3, 4])</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="src.TD2_REPAIN_PAUL.addition_table" href="#src.TD2_REPAIN_PAUL.addition_table">addition_table</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.dice_game" href="#src.TD2_REPAIN_PAUL.dice_game">dice_game</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.flatten" href="#src.TD2_REPAIN_PAUL.flatten">flatten</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.is_anagram" href="#src.TD2_REPAIN_PAUL.is_anagram">is_anagram</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.main" href="#src.TD2_REPAIN_PAUL.main">main</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.mystery_number" href="#src.TD2_REPAIN_PAUL.mystery_number">mystery_number</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.occurrences" href="#src.TD2_REPAIN_PAUL.occurrences">occurrences</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.same_elements" href="#src.TD2_REPAIN_PAUL.same_elements">same_elements</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.sort_uniq" href="#src.TD2_REPAIN_PAUL.sort_uniq">sort_uniq</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.successive_ints" href="#src.TD2_REPAIN_PAUL.successive_ints">successive_ints</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.switch" href="#src.TD2_REPAIN_PAUL.switch">switch</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.test_dice_game" href="#src.TD2_REPAIN_PAUL.test_dice_game">test_dice_game</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.test_mystery_number" href="#src.TD2_REPAIN_PAUL.test_mystery_number">test_mystery_number</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.uniq" href="#src.TD2_REPAIN_PAUL.uniq">uniq</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.TD2_REPAIN_PAUL.TestListMethods" href="#src.TD2_REPAIN_PAUL.TestListMethods">TestListMethods</a></code></h4>
+<ul class="">
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_addition" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_addition">test_addition</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_flatten" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_flatten">test_flatten</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_is_anagram" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_is_anagram">test_is_anagram</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_occurrences" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_occurrences">test_occurrences</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_same_elements" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_same_elements">test_same_elements</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_sort_uniq" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_sort_uniq">test_sort_uniq</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_successive_ints" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_successive_ints">test_successive_ints</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_switch" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_switch">test_switch</a></code></li>
+<li><code><a title="src.TD2_REPAIN_PAUL.TestListMethods.test_uniq" href="#src.TD2_REPAIN_PAUL.TestListMethods.test_uniq">test_uniq</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

@@ -25,6 +25,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from random import randint
+from math import sqrt
 
 def uniq(l: list) -&gt; list:
     &#34;&#34;&#34;
@@ -112,6 +113,24 @@ def addition_table(n: int) -&gt; list:
 
     return rst
 
+def erathostenes_sieve(n: int) -&gt; dict:
+    &#34;&#34;&#34;
+    1.6
+    Returns a dictionary containing prime numbers
+    It is not recommended to use a list (1) because of reallocation
+    and (2) because of index handling (the primes starts at 2, the
+    list, 0)
+    &#34;&#34;&#34;
+    primes = {n:None for n in range(2, n + 1)}
+
+    for prime in list(primes.keys()):
+        for number in list(primes.keys()):
+            if prime != number and number%prime == 0:
+                del primes[number]
+
+    return primes
+
+
 def switch(d: dict) -&gt; dict:
     &#34;&#34;&#34;
     1.7
@@ -138,80 +157,7 @@ def is_anagram(l1: list, l2: list) -&gt; bool:
     Check if two lists are anagrams: same elements but in order or in
     disorder
     &#34;&#34;&#34;
-    return (sorted(l1) == (sorted(l2)))
-
-def mystery_number(n: int):
-    &#34;&#34;&#34;
-    2
-    Game where the user must guess the number generated [0, 100] by the
-    computer. The user can try n times, n given in argument
-    &#34;&#34;&#34;
-    if n &lt;= 0: return
-
-    number_to_guess = randint(0, 100)
-    i = 0
-    won = False
-
-    while i != n and not won:
-        guess = int(input(&#34;Enter a number : &#34;))
-
-        if guess &lt; number_to_guess:
-            print(&#34;It is superior&#34;)
-        elif guess &gt; number_to_guess:
-            print(&#34;It is inferior&#34;)
-        else:
-            print(&#34;You guessed right!&#34;)
-            won = True
-
-        i += 1
-
-def dice_game(n: int):
-    &#34;&#34;&#34;
-    3
-    Game where each player roll the dice
-    Game stops when a player reached n points
-    A player rolls a dice till he got 1
-    An even number increases the player&#39;s score
-    3, the score is multiplied by 2
-    5, the player loses 2 points
-    &#34;&#34;&#34;
-    if n &lt;= 0: return
-
-    player_points = [0, 0]
-    current = 0
-
-    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
-        turn_end = False
-        print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
-
-        while not turn_end:
-            print(&#34;Press enter to roll the dice&#34;)
-            input()
-            print(&#34;Rolling the dice...&#34;)
-            dice = randint(1, 6)
-            print(&#34;&gt; %d&#34; % (dice))
-
-            if dice == 1:
-                print(&#34;End of turn&#34;)
-                turn_end = True
-            elif dice%2 == 0:
-                print(&#34;%d + %d&#34; % (player_points[current], dice))
-                player_points[current] += dice
-            elif dice == 3:
-                print(&#34;%d * 2&#34; % (player_points[current]))
-                player_points[current] *= 2
-            elif dice == 5:
-                print(&#34;%d - 2&#34; % (player_points[current]))
-                player_points[current] -= 2
-
-            print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
-            if player_points[current] &gt; 50:
-                turn_end = True
-
-        current = (current + 1) % 2
-
-    print(&#34;Player %d won !&#34; % (current))
-    print(&#34;Scores : &#34; + str(player_points))</code></pre>
+    return (sorted(l1) == (sorted(l2)))</code></pre>
 </details>
 </section>
 <section>
@@ -245,68 +191,35 @@ Returns the addition table given a integer</p></section>
     return rst</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.dice_game"><code class="name flex">
-<span>def <span class="ident">dice_game</span></span>(<span>n)</span>
+<dt id="src.boost_list.erathostenes_sieve"><code class="name flex">
+<span>def <span class="ident">erathostenes_sieve</span></span>(<span>n)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>3
-Game where each player roll the dice
-Game stops when a player reached n points
-A player rolls a dice till he got 1
-An even number increases the player's score
-3, the score is multiplied by 2
-5, the player loses 2 points</p></section>
+<section class="desc"><p>1.6
+Returns a dictionary containing prime numbers
+It is not recommended to use a list (1) because of reallocation
+and (2) because of index handling (the primes starts at 2, the
+list, 0)</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def dice_game(n: int):
+<pre><code class="python">def erathostenes_sieve(n: int) -&gt; dict:
     &#34;&#34;&#34;
-    3
-    Game where each player roll the dice
-    Game stops when a player reached n points
-    A player rolls a dice till he got 1
-    An even number increases the player&#39;s score
-    3, the score is multiplied by 2
-    5, the player loses 2 points
+    1.6
+    Returns a dictionary containing prime numbers
+    It is not recommended to use a list (1) because of reallocation
+    and (2) because of index handling (the primes starts at 2, the
+    list, 0)
     &#34;&#34;&#34;
-    if n &lt;= 0: return
+    primes = {n:None for n in range(2, n + 1)}
 
-    player_points = [0, 0]
-    current = 0
+    for prime in list(primes.keys()):
+        for number in list(primes.keys()):
+            if prime != number and number%prime == 0:
+                del primes[number]
 
-    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
-        turn_end = False
-        print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
-
-        while not turn_end:
-            print(&#34;Press enter to roll the dice&#34;)
-            input()
-            print(&#34;Rolling the dice...&#34;)
-            dice = randint(1, 6)
-            print(&#34;&gt; %d&#34; % (dice))
-
-            if dice == 1:
-                print(&#34;End of turn&#34;)
-                turn_end = True
-            elif dice%2 == 0:
-                print(&#34;%d + %d&#34; % (player_points[current], dice))
-                player_points[current] += dice
-            elif dice == 3:
-                print(&#34;%d * 2&#34; % (player_points[current]))
-                player_points[current] *= 2
-            elif dice == 5:
-                print(&#34;%d - 2&#34; % (player_points[current]))
-                player_points[current] -= 2
-
-            print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
-            if player_points[current] &gt; 50:
-                turn_end = True
-
-        current = (current + 1) % 2
-
-    print(&#34;Player %d won !&#34; % (current))
-    print(&#34;Scores : &#34; + str(player_points))</code></pre>
+    return primes</code></pre>
 </details>
 </dd>
 <dt id="src.boost_list.flatten"><code class="name flex">
@@ -355,43 +268,6 @@ disorder</p></section>
     disorder
     &#34;&#34;&#34;
     return (sorted(l1) == (sorted(l2)))</code></pre>
-</details>
-</dd>
-<dt id="src.boost_list.mystery_number"><code class="name flex">
-<span>def <span class="ident">mystery_number</span></span>(<span>n)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>2
-Game where the user must guess the number generated [0, 100] by the
-computer. The user can try n times, n given in argument</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def mystery_number(n: int):
-    &#34;&#34;&#34;
-    2
-    Game where the user must guess the number generated [0, 100] by the
-    computer. The user can try n times, n given in argument
-    &#34;&#34;&#34;
-    if n &lt;= 0: return
-
-    number_to_guess = randint(0, 100)
-    i = 0
-    won = False
-
-    while i != n and not won:
-        guess = int(input(&#34;Enter a number : &#34;))
-
-        if guess &lt; number_to_guess:
-            print(&#34;It is superior&#34;)
-        elif guess &gt; number_to_guess:
-            print(&#34;It is inferior&#34;)
-        else:
-            print(&#34;You guessed right!&#34;)
-            won = True
-
-        i += 1</code></pre>
 </details>
 </dd>
 <dt id="src.boost_list.occurrences"><code class="name flex">
@@ -558,10 +434,9 @@ Return a list removed form its duplicates</p></section>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
 <li><code><a title="src.boost_list.addition_table" href="#src.boost_list.addition_table">addition_table</a></code></li>
-<li><code><a title="src.boost_list.dice_game" href="#src.boost_list.dice_game">dice_game</a></code></li>
+<li><code><a title="src.boost_list.erathostenes_sieve" href="#src.boost_list.erathostenes_sieve">erathostenes_sieve</a></code></li>
 <li><code><a title="src.boost_list.flatten" href="#src.boost_list.flatten">flatten</a></code></li>
 <li><code><a title="src.boost_list.is_anagram" href="#src.boost_list.is_anagram">is_anagram</a></code></li>
-<li><code><a title="src.boost_list.mystery_number" href="#src.boost_list.mystery_number">mystery_number</a></code></li>
 <li><code><a title="src.boost_list.occurrences" href="#src.boost_list.occurrences">occurrences</a></code></li>
 <li><code><a title="src.boost_list.same_elements" href="#src.boost_list.same_elements">same_elements</a></code></li>
 <li><code><a title="src.boost_list.sort_uniq" href="#src.boost_list.sort_uniq">sort_uniq</a></code></li>

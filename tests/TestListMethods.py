@@ -31,7 +31,8 @@ class TestListMethods(unittest.TestCase):
         l1 = addition_table(6)
 
     def test_erathostenes_sieve(self):
-        print(erathostenes_sieve(50))
+        primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+        self.assertEqual(list(erathostenes_sieve(29).keys()), primes)
 
     def test_switch(self):
         l1 = [11, 33, 11, 33, 3, 0, 5]

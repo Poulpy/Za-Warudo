@@ -90,8 +90,13 @@ def addition_table(n: int) -> list:
 def erathostenes_sieve(n: int) -> dict:
     """
     1.6
+    Returns a dictionary containing prime numbers
+    It is not recommended to use a list (1) because of reallocation
+    and (2) because of index handling (the primes starts at 2, the
+    list, 0)
     """
     primes = {n:None for n in range(2, n + 1)}
+
     for prime in list(primes.keys()):
         for number in list(primes.keys()):
             if prime != number and number%prime == 0:

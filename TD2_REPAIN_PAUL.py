@@ -1,3 +1,5 @@
+from random import randint
+
 """
 Remove the duplicates in an unsorted list
 """
@@ -111,6 +113,31 @@ disorder
 def is_anagram(l1: list, l2: list) -> bool:
     return (sorted(l1) == (sorted(l2)))
 
+"""
+Game where the user must guess the number generated [0, 100] by the
+computer. The user can try n times, n given in argument
+"""
+def mystery_number(n: int):
+    if n <= 0: return
+
+    number_to_guess = randint(0, 100)
+    i = 0
+    won = False
+
+    while i != n and not won:
+        guess = int(input("Enter a number : "))
+
+        if guess < number_to_guess:
+            print("It is superior")
+        elif guess > number_to_guess:
+            print("It is inferior")
+        else:
+            print("You guessed right!")
+            won = True
+
+        i += 1
+
+
 def test_sort_uniq():
     l1 = [1, 2, 3, 3, 3, 4, 4, 6]
     print(l1)
@@ -167,6 +194,9 @@ def test_is_anagram():
     l2 = "ytrezay"
     print(is_anagram(l1, l2))# False
 
+def test_mystery_number():
+    mystery_number(10)
+
 def main():
     test_sort_uniq()
     test_uniq()
@@ -177,6 +207,7 @@ def main():
     test_switch()
     test_same_elements()
     test_is_anagram()
+    test_mystery_number()
 
 
 main()

@@ -74,19 +74,6 @@ def occurrences(l: list) -> dict:
 
     return d
 
-def addition_table(n: int) -> list:
-    """
-    1.5
-    Returns the addition table given a integer
-    """
-    rst = [[i for i in range(n)] for j in range(n)]
-
-    for i in range(1, n + 1):
-        for j in range(1, n + 1):
-            rst[i - 1][j - 1] = i + j
-
-    return rst
-
 def dice_combinations() -> dict:
     """
     1.5

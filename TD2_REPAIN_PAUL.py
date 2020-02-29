@@ -86,6 +86,9 @@ def addition_table(n: int) -> list:
 
     return rst
 
+"""
+Switch keys and values of a dictionary given in argument
+"""
 def switch(d: dict) -> dict:
     rst = dict()
 

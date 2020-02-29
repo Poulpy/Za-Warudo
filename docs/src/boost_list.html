@@ -113,6 +113,22 @@ def addition_table(n: int) -&gt; list:
 
     return rst
 
+def dice_combinations() -&gt; dict:
+    &#34;&#34;&#34;
+    1.5
+    Returns the combinations of 2 dices. The key is the result, and
+    the value is a 2D list of 2 lengthed list (2 dices)
+    {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
+    &#34;&#34;&#34;
+    combinations = {n:[] for n in range(2, 13)}
+
+    for i in range(1, 6 + 1):
+        for j in range(1, 6 + 1):
+            key = str(i + j)
+            combinations[i + j].append([i, j])
+
+    return combinations
+
 def erathostenes_sieve(n: int) -&gt; dict:
     &#34;&#34;&#34;
     1.6
@@ -189,6 +205,34 @@ Returns the addition table given a integer</p></section>
             rst[i - 1][j - 1] = i + j
 
     return rst</code></pre>
+</details>
+</dd>
+<dt id="src.boost_list.dice_combinations"><code class="name flex">
+<span>def <span class="ident">dice_combinations</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"><p 1: 1_="1]," 2:_2_="2:[[2," 2_="2]]," _1_="[1," class="..">1.5
+Returns the combinations of 2 dices. The key is the result, and
+the value is a 2D list of 2 lengthed list (2 dices)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dice_combinations() -&gt; dict:
+    &#34;&#34;&#34;
+    1.5
+    Returns the combinations of 2 dices. The key is the result, and
+    the value is a 2D list of 2 lengthed list (2 dices)
+    {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
+    &#34;&#34;&#34;
+    combinations = {n:[] for n in range(2, 13)}
+
+    for i in range(1, 6 + 1):
+        for j in range(1, 6 + 1):
+            key = str(i + j)
+            combinations[i + j].append([i, j])
+
+    return combinations</code></pre>
 </details>
 </dd>
 <dt id="src.boost_list.erathostenes_sieve"><code class="name flex">
@@ -434,6 +478,7 @@ Return a list removed form its duplicates</p></section>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
 <li><code><a title="src.boost_list.addition_table" href="#src.boost_list.addition_table">addition_table</a></code></li>
+<li><code><a title="src.boost_list.dice_combinations" href="#src.boost_list.dice_combinations">dice_combinations</a></code></li>
 <li><code><a title="src.boost_list.erathostenes_sieve" href="#src.boost_list.erathostenes_sieve">erathostenes_sieve</a></code></li>
 <li><code><a title="src.boost_list.flatten" href="#src.boost_list.flatten">flatten</a></code></li>
 <li><code><a title="src.boost_list.is_anagram" href="#src.boost_list.is_anagram">is_anagram</a></code></li>

@@ -27,8 +27,11 @@ class TestListMethods(unittest.TestCase):
         d2 = {3:1, 33: 2, 11: 2, 0: 1, 5: 1}
         self.assertEqual(occurrences(l1), d2)
 
-    def test_addition(self):
-        l1 = addition_table(6)
+    def test_dice_combinations(self):
+        d1 = dice_combinations()
+        for result, combinations in d1.items():
+            for dices in combinations:
+                self.assertEqual(result, dices[0] + dices[1])
 
     def test_erathostenes_sieve(self):
         primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]

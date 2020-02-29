@@ -87,6 +87,22 @@ def addition_table(n: int) -> list:
 
     return rst
 
+def dice_combinations() -> dict:
+    """
+    1.5
+    Returns the combinations of 2 dices. The key is the result, and
+    the value is a 2D list of 2 lengthed list (2 dices)
+    {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
+    """
+    combinations = {n:[] for n in range(2, 13)}
+
+    for i in range(1, 6 + 1):
+        for j in range(1, 6 + 1):
+            key = str(i + j)
+            combinations[i + j].append([i, j])
+
+    return combinations
+
 def erathostenes_sieve(n: int) -> dict:
     """
     1.6

@@ -1,11 +1,11 @@
 import unittest
 from random import randint
 
-"""
-1.1
-Return a list removed form its duplicates
-"""
 def uniq(l: list) -> list:
+    """
+    1.1
+    Return a list removed form its duplicates
+    """
     result = []
     i = 0
 
@@ -16,11 +16,11 @@ def uniq(l: list) -> list:
 
     return result
 
-"""
-1.1
-Remove the duplicates in an sorted list
-"""
 def sort_uniq(l: list) -> list:
+    """
+    1.1
+    Remove the duplicates in an sorted list
+    """
     i = 1
     rst = [l[0]]
 
@@ -31,12 +31,12 @@ def sort_uniq(l: list) -> list:
 
     return rst
 
-"""
-1.2
-Flatten a multi dimensional list
-[[1, 2], [2, 4]], gives : [1, 2, 2, 4]
-"""
 def flatten(l: list) -> list:
+    """
+    1.2
+    Flatten a multi dimensional list
+    [[1, 2], [2, 4]], gives : [1, 2, 2, 4]
+    """
     flat_list = []
 
     for el in l:
@@ -47,11 +47,11 @@ def flatten(l: list) -> list:
 
     return flat_list
 
-"""
-1.3
-Return a list containing the successive integers in the list given in argument
-"""
 def successive_ints(l: list) -> list:
+    """
+    1.3
+    Return a list containing the successive integers in the list given in argument
+    """
     rst = []
 
     for i in range(len(l) - 1):
@@ -60,12 +60,12 @@ def successive_ints(l: list) -> list:
 
     return rst
 
-"""
-1.4
-Return a dictionnary, containing the number of occurrences of an int in the
-list given in argument
-"""
 def occurrences(l: list) -> dict:
+    """
+    1.4
+    Return a dictionnary, containing the number of occurrences of an int in the
+    list given in argument
+    """
     d = dict()
     numbers = uniq(l)
 
@@ -74,11 +74,11 @@ def occurrences(l: list) -> dict:
 
     return d
 
-"""
-1.5
-Returns the addition table given a integer
-"""
 def addition_table(n: int) -> list:
+    """
+    1.5
+    Returns the addition table given a integer
+    """
     rst = [[i for i in range(n)] for j in range(n)]
 
     for i in range(1, n + 1):
@@ -87,11 +87,11 @@ def addition_table(n: int) -> list:
 
     return rst
 
-"""
-1.7
-Switch keys and values of a dictionary given in argument
-"""
 def switch(d: dict) -> dict:
+    """
+    1.7
+    Switch keys and values of a dictionary given in argument
+    """
     rst = dict()
 
     for k, v in d.items():
@@ -99,28 +99,28 @@ def switch(d: dict) -> dict:
 
     return rst
 
-"""
-1.8
-Check if two lists have the same elements, regardless of the number
-of elements
-"""
 def same_elements(l1: list, l2: list) -> bool:
+    """
+    1.8
+    Check if two lists have the same elements, regardless of the number
+    of elements
+    """
     return is_anagram(uniq(l1), uniq(l2))
 
-"""
-1.8
-Check if two lists are anagrams: same elements but in order or in
-disorder
-"""
 def is_anagram(l1: list, l2: list) -> bool:
+    """
+    1.8
+    Check if two lists are anagrams: same elements but in order or in
+    disorder
+    """
     return (sorted(l1) == (sorted(l2)))
 
-"""
-2
-Game where the user must guess the number generated [0, 100] by the
-computer. The user can try n times, n given in argument
-"""
 def mystery_number(n: int):
+    """
+    2
+    Game where the user must guess the number generated [0, 100] by the
+    computer. The user can try n times, n given in argument
+    """
     if n <= 0: return
 
     number_to_guess = randint(0, 100)
@@ -140,16 +140,16 @@ def mystery_number(n: int):
 
         i += 1
 
-"""
-3
-Game where each player roll the dice
-Game stops when a player reached n points
-A player rolls a dice till he got 1
-An even number increases the player's score
-3, the score is multiplied by 2
-5, the player loses 2 points
-"""
 def dice_game(n: int):
+    """
+    3
+    Game where each player roll the dice
+    Game stops when a player reached n points
+    A player rolls a dice till he got 1
+    An even number increases the player's score
+    3, the score is multiplied by 2
+    5, the player loses 2 points
+    """
     if n <= 0: return
 
     player_points = [0, 0]

@@ -137,6 +137,45 @@ def mystery_number(n: int):
 
         i += 1
 
+def dice_game(n: int):
+    if n <= 0: return
+
+    player_points = [0, 0]
+    current = 0
+
+    while player_points[0] < 50 and player_points[1] < 50:
+        turn_end = False
+        print("Turn of Player %d (%d)" % (current, player_points[current]))
+
+        while not turn_end:
+            print("Press enter to roll the dice")
+            input()
+            print("Rolling the dice...")
+            dice = randint(1, 6)
+            print("> %d" % (dice))
+
+            if dice == 1:
+                print("End of turn")
+                turn_end = True
+            elif dice%2 == 0:
+                print("%d + %d" % (player_points[current], dice))
+                player_points[current] += dice
+            elif dice == 3:
+                print("%d * 2" % (player_points[current]))
+                player_points[current] *= 2
+            elif dice == 5:
+                print("%d - 2" % (player_points[current]))
+                player_points[current] -= 2
+
+            print("Total points at end of turn : %d" % (player_points[current]))
+            if player_points[current] > 50:
+                turn_end = True
+
+        current = (current + 1) % 2
+
+    print("Player %d won !" % (current))
+    print("Scores : " + str(player_points))
+
 
 def test_sort_uniq():
     l1 = [1, 2, 3, 3, 3, 4, 4, 6]
@@ -197,6 +236,9 @@ def test_is_anagram():
 def test_mystery_number():
     mystery_number(10)
 
+def test_dice_game():
+    dice_game(50)
+
 def main():
     test_sort_uniq()
     test_uniq()
@@ -207,7 +249,8 @@ def main():
     test_switch()
     test_same_elements()
     test_is_anagram()
-    test_mystery_number()
+    #test_mystery_number()
+    test_dice_game()
 
 
 main()

@@ -97,6 +97,20 @@ def switch(d: dict) -> dict:
 
     return rst
 
+"""
+Check if two lists have the same elements, regardless of the number
+of elements
+"""
+def same_elements(l1: list, l2: list) -> bool:
+    return is_anagram(distinct(l1), distinct(l2))
+
+"""
+Check if two lists are anagrams: same elements but in order or in
+disorder
+"""
+def is_anagram(l1: list, l2: list) -> bool:
+    return (sorted(l1) == (sorted(l2)))
+
 def test_sort_uniq():
     l1 = [1, 2, 3, 3, 3, 4, 4, 6]
     print(l1)
@@ -137,6 +151,21 @@ def test_switch():
     d2 = switch(d1)
     print(d2)
 
+def test_same_elements():
+    l1 = [1, 1, 2, 4, 5, 4, 3]
+    l2 = [5, 1, 2, 3, 4, 1, 1, 2]
+    print(same_elements(l1, l2))# True
+    l3 = [1, 1, 2, 4, 5, 4, 6]
+    l4 = [5, 1, 2, 3, 4, 1, 1, 2]
+    print(same_elements(l3, l4))# False
+
+def test_is_anagram():
+    l1 = "azerty"
+    l2 = "ytreza"
+    print(is_anagram(l1, l2))# True
+    l1 = "azerty"
+    l2 = "ytrezay"
+    print(is_anagram(l1, l2))# False
 
 def main():
     test_sort_uniq()
@@ -146,6 +175,8 @@ def main():
     test_occurrences()
     test_addition()
     test_switch()
+    test_same_elements()
+    test_is_anagram()
 
 
 main()

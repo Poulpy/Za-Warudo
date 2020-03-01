@@ -49,7 +49,8 @@ def flatten(l: list) -> list:
 def successive_ints(l: list) -> list:
     """
     1.3
-    Return a list containing the successive integers in the list given in argument
+    Return a list containing the successive integers in the list given in
+    argument
     """
     rst = []
 
@@ -66,7 +67,6 @@ def occurrences(l: list) -> dict:
     list given in argument
     """
     d = dict()
-    numbers = uniq(l)
 
     for el in l:
         d[el] = l.count(el)
@@ -82,8 +82,8 @@ def dice_combinations() -> dict:
     """
     combinations = {n:[] for n in range(2, 13)}
 
-    for i in range(1, 6 + 1):
-        for j in range(1, 6 + 1):
+    for i in range(1, 7):
+        for j in range(1, 7):
             combinations[i + j].append([i, j])
 
     return combinations
@@ -93,13 +93,17 @@ def erathostenes_sieve(n: int) -> dict:
     1.6
     Returns a dictionary containing prime numbers
     It is not recommended to use a list (1) because of reallocation
-    and (2) because of index handling (the primes starts at 2, the
-    list, 0)
+    and (2) because of index handling : the prime numbers start at 2 and the
+    list, 0; and because some numbers are removed, the index changes too
     """
+    if n <= 0: raise ValueError("Argument can't be <= 0")
+
     primes = {n:None for n in range(2, n + 1)}
 
+    # We must convert it as a list, because the size changes
     for prime in list(primes.keys()):
         for number in list(primes.keys()):
+            # It is a composit number if it is a multiple of the prime
             if prime != number and number%prime == 0:
                 del primes[number]
 

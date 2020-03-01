@@ -6,7 +6,7 @@ def mystery_number(n: int):
     Game where the user must guess the number generated [0, 100] by the
     computer. The user can try n times, n given in argument
     """
-    if n <= 0: return
+    if n <= 0: raise ValueError("The number of trials can't be <= 0")
 
     number_to_guess = randint(0, 100)
     i = 0
@@ -35,12 +35,12 @@ def dice_game(n: int):
     3, the score is multiplied by 2
     5, the player loses 2 points
     """
-    if n <= 0: return
+    if n <= 0: raise ValueError("The score can't be <= 0")
 
     player_points = [0, 0]
     current = 0
 
-    while player_points[0] < 50 and player_points[1] < 50:
+    while player_points[0] < n and player_points[1] < n:
         turn_end = False
         print("Turn of Player %d (%d)" % (current, player_points[current]))
 
@@ -65,7 +65,7 @@ def dice_game(n: int):
                 player_points[current] -= 2
 
             print("Total points at end of turn : %d" % (player_points[current]))
-            if player_points[current] > 50:
+            if player_points[current] > n:
                 turn_end = True
 
         current = (current + 1) % 2

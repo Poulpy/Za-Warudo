@@ -9,7 +9,6 @@ test:
 pages:
   stage: deploy
   script:
-  - apk add --update python3-pip
   - pip3 install pdoc3
   - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force

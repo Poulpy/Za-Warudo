@@ -9,7 +9,7 @@ test:
 pages:
   stage: deploy
   script:
-  - apt-get -y install pip3
+  - apk add install python3-pip
   - pip3 install pdoc3
   - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force

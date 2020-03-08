@@ -3,7 +3,7 @@ from math import sqrt
 def uniq(l: list) -> list:
     """
     1.1
-    Return a list removed form its duplicates
+    Return a list removed from its duplicates
     """
     result = []
     i = 0
@@ -18,8 +18,10 @@ def uniq(l: list) -> list:
 def sort_uniq(l: list) -> list:
     """
     1.1
-    Remove the duplicates in an sorted list
+    Remove the duplicates in a sorted list
     """
+    if len(l) == 0: return l
+
     i = 1
     rst = [l[0]]
 
@@ -49,8 +51,8 @@ def flatten(l: list) -> list:
 def successive_ints(l: list) -> list:
     """
     1.3
-    Return a list containing the successive integers in the list given in
-    argument
+    Return a list containing the successive integers in the
+    list given in argument
     """
     rst = []
 
@@ -63,8 +65,8 @@ def successive_ints(l: list) -> list:
 def occurrences(l: list) -> dict:
     """
     1.4
-    Return a dictionnary, containing the number of occurrences of an element
-    in a list given in argument
+    Return a dictionnary, containing the number of occurrences of
+    an element in a list given in argument
     """
     d = dict()
 
@@ -76,8 +78,8 @@ def occurrences(l: list) -> dict:
 def dice_combinations() -> dict:
     """
     1.5
-    Returns the combinations of 2 dices. The key is the result, and
-    the value is a 2D list of 2 lengthed list (2 dices)
+    Returns the combinations of 2 dices. The key is the result,
+    and the value is a 2D list of 2 lengthed list (2 dices)
     {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
     """
     combinations = {n:[] for n in range(2, 13)}
@@ -92,9 +94,10 @@ def erathostenes_sieve(n: int) -> dict:
     """
     1.6
     Returns a dictionary containing prime numbers
-    It is not recommended to use a list (1) because of reallocation
-    and (2) because of index handling : the prime numbers start at 2 and the
-    list, 0; and because some numbers are removed, the index changes too
+    It is not recommended to use a list (1) because of
+    reallocation and (2) because of index handling : the prime
+    numbers start at 2 and the list, 0; and because some numbers
+    are removed, the index changes too
     """
     if n <= 0: raise ValueError("Argument can't be <= 0")
 
@@ -118,23 +121,23 @@ def switch(d: dict) -> dict:
     rst = dict()
 
     for k, v in d.items():
-        rst[str(v)] = k
+        rst[v] = k
 
     return rst
 
 def same_elements(l1: list, l2: list) -> bool:
     """
     1.8
-    Check if two lists have the same elements, regardless of the number
-    of elements
+    Check if two lists have the same elements, regardless of the
+    number of elements
     """
     return is_anagram(uniq(l1), uniq(l2))
 
 def is_anagram(l1: list, l2: list) -> bool:
     """
     1.8
-    Check if two lists are anagrams: same elements but in order or in
-    disorder
+    Check if two lists are anagrams: same elements but in order or
+    in disorder
     """
     return (occurrences(l1) == (occurrences(l2)))
 

@@ -63,8 +63,8 @@ def successive_ints(l: list) -> list:
 def occurrences(l: list) -> dict:
     """
     1.4
-    Return a dictionnary, containing the number of occurrences of an int in the
-    list given in argument
+    Return a dictionnary, containing the number of occurrences of an element
+    in a list given in argument
     """
     d = dict()
 
@@ -136,5 +136,5 @@ def is_anagram(l1: list, l2: list) -> bool:
     Check if two lists are anagrams: same elements but in order or in
     disorder
     """
-    return (sorted(l1) == (sorted(l2)))
+    return (occurrences(l1) == (occurrences(l2)))
 

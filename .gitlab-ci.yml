@@ -10,7 +10,7 @@ pages:
   stage: deploy
   script:
   - apk add tk
-  - pip3 install setuptools
+  - python3 -m pip3 install git+https://github.com/RedFantom/ttkthemes
   - pip3 install ttkthemes
   - pip3 install pdoc3
   - export PYTHONPATH="src"

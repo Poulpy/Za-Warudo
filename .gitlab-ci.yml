@@ -14,9 +14,9 @@ pages:
   - export LIBRARY_PATH=/lib:/usr/lib
   - pip install --upgrade pip
   - pip install --upgrade pillow
+  - pip3 install ttkthemes
   - pip3 install pdoc3
-  - ls -R ~/.local/lib/
-  - export PYTHONPATH="src:~/.local/lib/python3.7/site-packages/ttkthemes"
+  - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force
   artifacts:
     paths:

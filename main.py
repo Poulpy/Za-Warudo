@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-from ttkthemes import ThemedTk
 from ttkthemes import ThemedStyle
 
 class App(Tk):
@@ -18,11 +17,12 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("arc")
         container.pack(side="top", fill="both", expand=True)
+        self.geometry("600x600")
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (StartPage, PageOne, PageTwo):
+        for F in (ConnectionPage, EventsPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -30,9 +30,9 @@ class App(Tk):
             # put all of the pages in the same location;
             # the one on the top of the stacking order
             # will be the one that is visible.
-            frame.grid(row=0, column=0, sticky="nsew")
+            frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
-        self.show_frame("StartPage")
+        self.show_frame("ConnectionPage")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -40,23 +40,32 @@ class App(Tk):
         frame.tkraise()
 
 
-class StartPage(ttk.Frame):
+class ConnectionPage(ttk.Frame):
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
-        label = ttk.Label(self, text="This is the start page")#, font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
 
-        button1 = ttk.Button(self, text="Go to Page One",
-                            command=lambda: controller.show_frame("PageOne"))
-        button2 = ttk.Button(self, text="Go to Page Two",
-                            command=lambda: controller.show_frame("PageTwo"))
-        button1.pack()
-        button2.pack()
+        connection_label = ttk.Label(self, text="Connection")
+        connection_label.grid(row=0, column=1, sticky=S)
 
 
-class PageOne(ttk.Frame):
+        self.login_entry = ttk.Entry(self)
+        self.login_entry.grid(row=1, column=1, padx=5, pady=5, sticky=NSEW)
+
+        self.password_entry = ttk.Entry(self)
+        self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
+
+        login_button = ttk.Button(self, text="Login", command=lambda: controller.show_frame("EventsPage"))
+        login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(4, weight=1)
+
+
+class EventsPage(ttk.Frame):
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
@@ -64,32 +73,17 @@ class PageOne(ttk.Frame):
         label = ttk.Label(self, text="This is page 1")#, font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
         button = ttk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
+                           command=lambda: controller.show_frame("ConnectionPage"))
         button.pack()
 
-
-class PageTwo(ttk.Frame):
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = ttk.Label(self, text="This is page 2")#, font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-        button = ttk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
 
 
 if __name__ == "__main__":
     app = App()
     app.mainloop()
-def hello():
-    print("Hello")
-
-def clickb(event):
-    print("there's a click!")
 
 
+"""
 class LoginPage(ttk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -121,7 +115,6 @@ class EventsPage(ttk.Frame):
         label.grid(row=1, column=1)
 
 
-"""
 window = ThemedTk(theme="arc")
 window.frames = {}
 window.geometry("500x500")

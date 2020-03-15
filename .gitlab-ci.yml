@@ -9,7 +9,6 @@ test:
 pages:
   stage: deploy
   script:
-  - apk add python-tk
   - apk add tk
   - pip3 install ttkthemes
   - pip3 install pdoc3

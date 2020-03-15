@@ -10,7 +10,8 @@ pages:
   stage: deploy
   script:
   - apk add tk
-  - apk add zlib-dev
+  - apk add jpeg-dev zlib-dev
+  - export LIBRARY_PATH=/lib:/usr/lib
   - pip install --upgrade pip
   - pip install --upgrade pillow
   - pip3 install pdoc3

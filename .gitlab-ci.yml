@@ -9,7 +9,8 @@ test:
 pages:
   stage: deploy
   script:
-  - apt-get install python-tk
+  - apk install python-tk
+  - apk install tk
   - pip3 install ttkthemes
   - pip3 install pdoc3
   - export PYTHONPATH="src"

@@ -10,6 +10,8 @@ pages:
   stage: deploy
   script:
   - apk add tk
+  - pip install --upgrade pip
+  - pip install --upgrade pillow
   - pip3 install pdoc3
   - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force

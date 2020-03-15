@@ -10,6 +10,7 @@ pages:
   stage: deploy
   script:
   - apk add tk
+  - pip3 install --upgrade Pillow
   - pip3 install ttkthemes
   - pip3 install pdoc3
   - export PYTHONPATH="src"

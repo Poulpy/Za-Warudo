@@ -1,19 +1,18 @@
+import csv
+from user import User
+from debate import Debate
+from projection_room import ProjectionRoom
+from debate import Debate
+from event import Event
+from team import Team
 from peewee import SqliteDatabase
-from models import User, ProjectionRoom, Team, Debate, Event
-"""
-from models.User import User
-from models.Event import Event
-from models.Team import Team
-from models.ProjectionRoom import ProjectionRoom
-from models.Debate import Debate
-"""
 
 db = SqliteDatabase("db/app.db")
 SEED_FILE = "db/seed.csv"
 
 with open(SEED_FILE) as csv_file:
     db.connect()
-    db.create_tables([User, ProjectionRoom, Team, Debate, Event])
+    db.create_tables([User, ProjectionRoom, Team, Debate, Event], safe = True)
     print("> Tables created")
 
     csv_reader = csv.reader(csv_file, delimiter=",")

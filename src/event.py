@@ -1,6 +1,5 @@
 # from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField
 from user import User
-from debate import Debate
 from projection_room import ProjectionRoom
 from debate import Debate
 from peewee import *

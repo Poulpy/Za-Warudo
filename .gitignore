@@ -1,5 +1,7 @@
 */__pycache__
 */*swp
+*/*/*swp
+src/*/.*swp
 *pyc
 */*pyc
 Session.vim

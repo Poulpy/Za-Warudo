@@ -1,3 +1,20 @@
+### Seed, drop or look into the database
+
+```
+python3.5 src/seed.py seed
+python3.5 src/seed.py drop
+python3.5 src/seed.py select
+```
+
+
+### Execute the app
+
+```
+export PYTHONPATH='src/'
+python3.5 src/main.py
+```
+
+
 ### Execute the tests
 
 ```
@@ -8,6 +25,12 @@ python3.5 tests/TestListMethods.py
 ### Requirements
 
 Python 3.5
+
+peewee
+
+tkinter
+
+ttkthemes
 
 ### Documentation
 

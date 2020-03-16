@@ -9,9 +9,9 @@ from team import Team
 from peewee import SqliteDatabase
 import logging as log
 
-# log = logging.getLogger()
 db = SqliteDatabase("db/app.db")
 SEED_FILE = "db/seed.csv"
+MODELS = (User, ProjectionRoom, Team, Debate, Event)
 
 def seed():
     with open(SEED_FILE) as csv_file:
@@ -37,6 +37,12 @@ def drop():
     log.info("Tables dropped")
     db.close()
 
+def select():
+    db.connect()
+    for table in MODELS:
+        for i in table.select():
+            print(i)
+    db.close()
 
 if __name__ == "__main__":
     log.basicConfig(filename="log.txt", level=log.INFO)
@@ -44,15 +50,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 0:
         if sys.argv[1] == "seed":
-            print("seed")
             seed()
         elif sys.argv[1] == "drop":
             drop()
-
-
-
-
-
-
+        elif sys.argv[1] == "select":
+            select()
 
 

@@ -9,6 +9,12 @@ test:
 pages:
   stage: deploy
   script:
+  - apk add tk
+  - apk add build-base python-dev py-pip jpeg-dev zlib-dev musl-dev
+  - export LIBRARY_PATH=/lib:/usr/lib
+  - pip install --upgrade pip
+  - pip install --upgrade pillow
+  - pip3 install ttkthemes
   - pip3 install pdoc3
   - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force

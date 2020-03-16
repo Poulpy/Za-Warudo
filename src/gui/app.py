@@ -20,6 +20,7 @@ class App(Tk):
         style.set_theme("arc")
         container.pack(side="top", fill="both", expand=True)
         self.geometry("600x600")
+        self.title("ZA WARUDO")
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 

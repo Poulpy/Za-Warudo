@@ -1,6 +1,6 @@
 import unittest
 from peewee import *
-from models.User import User
+from user import User
 
 db = SqliteDatabase("db/test.db")
 
@@ -9,12 +9,10 @@ class TestDataBase(unittest.TestCase):
     def test_connection(self):
         db.connect()
         db.create_tables([User])
-        # tmp = User.create(name="Test", login="changeme", password="changeme")
         print("Users count : " + str(User.select().count()))
         for user in User.select():
             print(user)
 
-        # tmp.delete_instance()
 
         db.close()
 
@@ -23,6 +21,14 @@ class TestDataBase(unittest.TestCase):
         db.create_tables([User])
         u = User.select().where(User.login=="jgaspar").first()
         self.assertEqual(u.password, "changeme")
+
+        db.close()
+
+    def test_none(self):
+        db.connect()
+        db.create_tables([User])
+        u = User.select().where(User.login=="zefioezhoeihaer").first()
+        self.assertEqual(u, None)
 
         db.close()
 

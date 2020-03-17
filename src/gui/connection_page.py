@@ -34,38 +34,14 @@ class ConnectionPage(ttk.Frame):
         up.grid_columnconfigure(4, weight=1)
 
         up.place(rely=.4, relx=.5, anchor=CENTER)
-        down.place(rely=.65, relx=.5, anchor=CENTER)
+        down.place(rely=.6, relx=.5, anchor=CENTER)
 
     def display_notification(self, message: str, color: str):
+        '''
+        Display something bellow the login button
+        the color argument is a string denoting a style, ie, Red.TLabel, TEntry
+        '''
         self.success_label_text.set(message)
         self.success_label.configure(style=color)
         log.info(message)
 
-"""
-
-    def check_credentials(self):
-        self.s = ttk.Style()
-        self.s.configure("Red.TLabel", foreground="red")
-        # self.s.configure("Green.TLabel", foreground="green")
-
-        db.connect()
-        login = self.login_entry.get()
-        password = self.password_entry.get()
-
-        u = User.select().where(User.login == login).first()
-
-        if u == None:
-            self.success_label_text.set("Authentification failed : no user found")
-            self.success_label.configure(style="Red.TLabel")
-            log.info("Authentification failed : no user found")
-        else:
-            if password == u.password:
-                log.info("Authentification successfull")
-                self.controller.show_frame("EventsPage")
-            else:
-                self.success_label_text.set("Authentification failed : password incorrect")
-                self.success_label.configure(style="Red.TLabel")
-                log.info("Authentification failed : password incorrect")
-
-        db.close()
-"""

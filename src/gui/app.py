@@ -10,6 +10,10 @@ import logging as log
 db = SqliteDatabase("db/app.db")
 
 class App(Tk):
+    '''
+    The controller of the application
+    Stores all events handler
+    '''
 
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
@@ -19,10 +23,12 @@ class App(Tk):
         container = ttk.Frame(self)
         style = ThemedStyle(self)
         style.set_theme("arc")
-        container.pack(side="top", fill="both", expand=True)
+
         self.geometry("600x600")
         self.minsize(300, 300)
         self.title("ZA WARUDO")
+
+        container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
@@ -31,6 +37,7 @@ class App(Tk):
         s.configure("Red.TLabel", foreground="red")
 
         self.frames = {}
+
         for P in (ConnectionPage, EventsPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
@@ -49,6 +56,10 @@ class App(Tk):
         frame.tkraise()
 
     def check_credentials(self):
+        '''
+        Event raised when the user click on the login button
+        on the connection page
+        '''
         db.connect()
 
         # We get the user input : login and password

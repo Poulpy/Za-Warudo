@@ -12,7 +12,7 @@ class ConnectionPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        up = ttk.Frame(self)
+        up = ttk.Frame(self, padding=(5, 5, 5, 5))
         down = ttk.Frame(self)
 
         connection_label = ttk.Label(up, text="Connection")
@@ -28,15 +28,17 @@ class ConnectionPage(ttk.Frame):
         login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
 
         self.success_label_text = StringVar()
-        self.success_label = ttk.Label(down, textvariable=self.success_label_text, wraplength=140, justify=CENTER)
+        self.success_label = ttk.Label(down, textvariable=self.success_label_text, justify=CENTER)
         self.success_label.grid(row=0, column=1, padx=5, pady=5, sticky=EW)
 
-        up.grid_rowconfigure(0, weight=1)
+        up.grid_rowconfigure(0, weight=1)#, minsize=100, weight=2)
         up.grid_rowconfigure(4, weight=1)
         up.grid_columnconfigure(0, weight=1)
         up.grid_columnconfigure(4, weight=1)
-        up.pack()
-        down.pack()
+        #up.pack(side=BOTTOM)
+        up.place(rely=.4, relx=.5, anchor=CENTER)
+        down.place(rely=.65, relx=.5, anchor=CENTER)
+        #down.pack()
 
     def check_credentials(self):
         self.s = ttk.Style()

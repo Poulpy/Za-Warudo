@@ -3,6 +3,7 @@ import sys
 import logging as log
 import os
 from peewee import SqliteDatabase
+from playhouse.reflection import print_table_sql
 from user import User
 from debate import Debate
 from projection_room import ProjectionRoom
@@ -80,10 +81,16 @@ def drop():
 
     db.close()
 
+def desc():
+    db.connect()
+    for table in MODELS:
+        print_table_sql(table)
+    db.close()
+
 def select():
     db.connect()
     for table in MODELS:
-        for i in table.select():
+        for i in table.select().dicts():
             print(i)
     db.close()
 
@@ -98,4 +105,6 @@ if __name__ == "__main__":
             drop()
         elif sys.argv[1] == "select":
             select()
+        elif sys.argv[1] == "desc":
+            desc()
 

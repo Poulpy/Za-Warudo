@@ -8,14 +8,60 @@ from event import Event
 from team import Team
 from peewee import SqliteDatabase
 import logging as log
+import os
 
 db = SqliteDatabase("db/app.db")
-SEED_FILE = "db/seed.csv"
+SEED_FILES_DIR = "db/seed_files/"
+USERS_SEED_FILE = "users.csv"
 MODELS = (User, ProjectionRoom, Team, Debate, Event)
 
+
+def get_class(kls):
+    parts = kls.split('.')
+    module = ".".join(parts[:-1])
+    m = __import__( module )
+    for comp in parts[1:]:
+        m = getattr(m, comp)
+    return m
+
 def seed():
+    '''
+    First row : name of the class
+    Second row : name of the fields to seed, in the right order
+    Other rows : datas
+    '''
+    db.connect()
+    tables = []
+    datas = []
+    seeds = []
+
+    for root, dirs, files in os.walk(SEED_FILES_DIR):
+        for seed_file in files:
+            seeds = []
+            with open(root + seed_file) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=",")
+                datas = list(csv_reader)
+                klass = (datas.pop(0))[0]
+                fields = datas.pop(0)
+
+                M = get_class(klass)
+                tables.append(M)
+
+                for data in datas:
+                    seeds.append({fields[i]:data[i] for i in range(len(data))})
+
+            log.info("Parsing done")
+            print(seeds)
+
+    log.info("Seeding done")
+    print(tables)
+
+    db.close()
+
+    '''
     with open(SEED_FILE) as csv_file:
         log.info("Seeding the database")
+
         db.connect()
 
         db.create_tables([User, ProjectionRoom, Team, Debate, Event], safe = True)
@@ -30,6 +76,7 @@ def seed():
             User.create(name=row[0], login=row[1], password=row[2])
 
         db.close()
+        '''
 
 def drop():
     db.connect()
@@ -45,7 +92,7 @@ def select():
     db.close()
 
 if __name__ == "__main__":
-    log.basicConfig(filename="log.txt", level=log.INFO)
+    log.basicConfig(filename="log/seed.txt", level=log.INFO)
     log.getLogger().addHandler(log.StreamHandler(sys.stdout))
 
     if len(sys.argv) > 0:

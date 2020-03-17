@@ -1,3 +1,5 @@
+user.User
+name,login,password
 Paul,prepain,changeme
 Joshua,jhauser,changeme
 Hugo,hhenrotte,changeme

@@ -12,25 +12,37 @@ class ConnectionPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        connection_label = ttk.Label(self, text="Connection")
+        up = ttk.Frame(self)
+        down = ttk.Frame(self)
+
+        connection_label = ttk.Label(up, text="Connection")
         connection_label.grid(row=0, column=1, sticky=S)
 
-
-        self.login_entry = ttk.Entry(self)
+        self.login_entry = ttk.Entry(up)
         self.login_entry.grid(row=1, column=1, padx=5, pady=5, sticky=NSEW)
 
-        self.password_entry = ttk.Entry(self)
+        self.password_entry = ttk.Entry(up)
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
 
-        login_button = ttk.Button(self, text="Login", command=self.check_credentials)
+        login_button = ttk.Button(up, text="Login", command=self.check_credentials)
         login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(3, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(4, weight=1)
+        self.success_label_text = StringVar()
+        self.success_label = ttk.Label(down, textvariable=self.success_label_text, wraplength=140, justify=CENTER)
+        self.success_label.grid(row=0, column=1, padx=5, pady=5, sticky=EW)
+
+        up.grid_rowconfigure(0, weight=1)
+        up.grid_rowconfigure(4, weight=1)
+        up.grid_columnconfigure(0, weight=1)
+        up.grid_columnconfigure(4, weight=1)
+        up.pack()
+        down.pack()
 
     def check_credentials(self):
+        self.s = ttk.Style()
+        self.s.configure("Red.TLabel", foreground="red")
+        # self.s.configure("Green.TLabel", foreground="green")
+
         db.connect()
         login = self.login_entry.get()
         password = self.password_entry.get()
@@ -38,12 +50,16 @@ class ConnectionPage(ttk.Frame):
         u = User.select().where(User.login == login).first()
 
         if u == None:
+            self.success_label_text.set("Authentification failed : no user found")
+            self.success_label.configure(style="Red.TLabel")
             log.info("Authentification failed : no user found")
         else:
             if password == u.password:
                 log.info("Authentification successfull")
                 self.controller.show_frame("EventsPage")
             else:
+                self.success_label_text.set("Authentification failed : password incorrect")
+                self.success_label.configure(style="Red.TLabel")
                 log.info("Authentification failed : password incorrect")
 
         db.close()

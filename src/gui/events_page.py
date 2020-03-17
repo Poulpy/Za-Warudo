@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
+from datetime import datetime
 
 class EventsPage(ttk.Frame):
 
@@ -17,15 +18,23 @@ class EventsPage(ttk.Frame):
         new_vacation_button = ttk.Button(self, text="New Vacation")
         timetable_button = ttk.Button(self, text="Timetable")
 
+        ttk.Button(self, text='Choose dateee', command=self.example3).grid(row=1, column=1)
+        ttk.Button(self, text='Choose date', command=self.example1).grid(row=1, column=0)
+        self.date_text = StringVar()
+        self.date_label = ttk.Label(self, textvariable=self.date_text)
+        self.date_text.set(datetime.now().strftime("%m-%d %H:00"))
+        print(datetime.now().strftime("%m-%d %H:00"))
+
         title.grid(row=0, column=0)
         timetable_button.grid(row=0, column=1)
         new_vacation_button.grid(row=0, column=2)
         new_event_button.grid(row=0, column=3)
         log_out_button.grid(row=0, column=4)
 
+        self.date_label.grid(row=1, column=3)
+
         self.grid_columnconfigure(0, weight=2)
-        ttk.Button(self, text='Calendar', command=self.example1).grid(row=1, column=0)
-        ttk.Button(self, text='DateEntry', command=self.example2).grid(row=1, column=1)
+        # ttk.Button(self, text='DateEntry', command=self.example2).grid(row=1, column=1)
 
     def example1(self):
         def print_sel():
@@ -34,8 +43,8 @@ class EventsPage(ttk.Frame):
         top = Toplevel(self)
 
         cal = Calendar(top,
-                       font="Arial 14", selectmode='day',
-                       cursor="hand1", year=2018, month=2, day=5)
+                        selectmode='day',
+                       cursor="hand1", year=2020, month=2, day=5)
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
 
@@ -47,3 +56,20 @@ class EventsPage(ttk.Frame):
         cal = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2)
         cal.pack(padx=10, pady=10)
+
+    def example3(self):
+
+        top = Toplevel(self)
+
+        cal = Calendar(top, selectmode='none')
+        date = cal.datetime.today() + cal.timedelta(days=2)
+        cal.calevent_create(date, 'Hello World', 'message')
+        cal.calevent_create(date, 'Reminder 2', 'reminder')
+        cal.calevent_create(date + cal.timedelta(days=-2), 'Reminder 1', 'reminder')
+        cal.calevent_create(date + cal.timedelta(days=3), 'Message', 'message')
+
+        cal.tag_config('reminder', background='red', foreground='yellow')
+
+        cal.pack(fill="both", expand=True)
+        ttk.Label(top, text="Hover over the events.").pack()
+

@@ -31,14 +31,19 @@ class ConnectionPage(ttk.Frame):
         self.success_label = ttk.Label(down, textvariable=self.success_label_text, justify=CENTER)
         self.success_label.grid(row=0, column=1, padx=5, pady=5, sticky=EW)
 
-        up.grid_rowconfigure(0, weight=1)#, minsize=100, weight=2)
+        up.grid_rowconfigure(0, weight=1)
         up.grid_rowconfigure(4, weight=1)
         up.grid_columnconfigure(0, weight=1)
         up.grid_columnconfigure(4, weight=1)
-        #up.pack(side=BOTTOM)
+
         up.place(rely=.4, relx=.5, anchor=CENTER)
         down.place(rely=.65, relx=.5, anchor=CENTER)
-        #down.pack()
+
+    def display_notification(self, message: str, color: str):
+        self.success_label_text.set(message)
+        self.success_label.configure(style=color)
+        log.info(message)
+
 
     def check_credentials(self):
         self.s = ttk.Style()

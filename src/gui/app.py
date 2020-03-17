@@ -25,6 +25,10 @@ class App(Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # Styles
+        s = ttk.Style()
+        s.configure("Red.TLabel", foreground="red")
+
         self.frames = {}
         for F in (ConnectionPage, EventsPage):
             page_name = F.__name__

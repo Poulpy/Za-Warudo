@@ -1,4 +1,6 @@
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField
+from category import Category
+from projection_room import ProjectionRoom
 
 db = SqliteDatabase("db/app.db")
 

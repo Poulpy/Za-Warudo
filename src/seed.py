@@ -1,28 +1,36 @@
 import csv
 import sys
+import logging as log
+import os
+from peewee import SqliteDatabase
 from user import User
 from debate import Debate
 from projection_room import ProjectionRoom
 from debate import Debate
 from event import Event
 from team import Team
-from peewee import SqliteDatabase
-import logging as log
-import os
+from category import Category
+from seats_category import SeatsCategory
+from vacation import Vacation
 
 db = SqliteDatabase("db/app.db")
 SEED_FILES_DIR = "db/seed_files/"
 USERS_SEED_FILE = "users.csv"
-MODELS = (User, ProjectionRoom, Team, Debate, Event)
+MODELS = (User, ProjectionRoom, Team, Debate, Event, Category,
+          SeatsCategory, Vacation)
 
 
 def get_class(kls):
+    module, klass = kls.split('.')
+    return getattr(__import__(module), klass)
+    '''
     parts = kls.split('.')
     module = ".".join(parts[:-1])
     m = __import__( module )
     for comp in parts[1:]:
         m = getattr(m, comp)
     return m
+    '''
 
 def seed():
     '''
@@ -31,57 +39,45 @@ def seed():
     Other rows : datas
     '''
     db.connect()
-    tables = []
     datas = []
-    seeds = []
+    klass = ""
+    log.info("Creating the tables...")
+    db.create_tables(list(MODELS))
+    log.info("Tables created")
+    log.info("Seeding...")
 
     for root, dirs, files in os.walk(SEED_FILES_DIR):
         for seed_file in files:
             seeds = []
+
             with open(root + seed_file) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=",")
                 datas = list(csv_reader)
+
                 klass = (datas.pop(0))[0]
                 fields = datas.pop(0)
-
-                M = get_class(klass)
-                tables.append(M)
 
                 for data in datas:
                     seeds.append({fields[i]:data[i] for i in range(len(data))})
 
-            log.info("Parsing done")
-            print(seeds)
+            log.info("Seeding %s..." % (klass))
+            Table = get_class(klass)
+            Table.insert_many(seeds).execute()
+
+            log.info("Parsing done for %s" % (klass))
 
     log.info("Seeding done")
-    print(tables)
-
     db.close()
-
-    '''
-    with open(SEED_FILE) as csv_file:
-        log.info("Seeding the database")
-
-        db.connect()
-
-        db.create_tables([User, ProjectionRoom, Team, Debate, Event], safe = True)
-        log.info("Tables created")
-
-        User.create(name="admin", login="admin", password="admin")
-        log.info("Administrator created")
-
-        csv_reader = csv.reader(csv_file, delimiter=",")
-
-        for row in csv_reader:
-            User.create(name=row[0], login=row[1], password=row[2])
-
-        db.close()
-        '''
 
 def drop():
     db.connect()
-    db.drop_tables([User, ProjectionRoom, Team, Debate, Event], safe = True)
+
+    tables = list(MODELS)
+
+    log.info("Dropping all tables")
+    db.drop_tables(tables, safe = True)
     log.info("Tables dropped")
+
     db.close()
 
 def select():
@@ -102,5 +98,4 @@ if __name__ == "__main__":
             drop()
         elif sys.argv[1] == "select":
             select()
-
 

@@ -34,6 +34,8 @@ peewee
 
 tkinter
 
+tkcalendar
+
 ttkthemes
 
 ### Documentation

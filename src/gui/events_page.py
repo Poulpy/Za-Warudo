@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkcalendar import Calendar, DateEntry
 
 class EventsPage(ttk.Frame):
 
@@ -23,3 +24,26 @@ class EventsPage(ttk.Frame):
         log_out_button.grid(row=0, column=4)
 
         self.grid_columnconfigure(0, weight=2)
+        ttk.Button(self, text='Calendar', command=self.example1).grid(row=1, column=0)
+        ttk.Button(self, text='DateEntry', command=self.example2).grid(row=1, column=1)
+
+    def example1(self):
+        def print_sel():
+            print(cal.selection_get())
+
+        top = Toplevel(self)
+
+        cal = Calendar(top,
+                       font="Arial 14", selectmode='day',
+                       cursor="hand1", year=2018, month=2, day=5)
+        cal.pack(fill="both", expand=True)
+        ttk.Button(top, text="ok", command=print_sel).pack()
+
+    def example2(self):
+        top = Toplevel(self)
+
+        ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
+
+        cal = DateEntry(top, width=12, background='darkblue',
+                        foreground='white', borderwidth=2)
+        cal.pack(padx=10, pady=10)

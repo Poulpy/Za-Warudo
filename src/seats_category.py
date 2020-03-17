@@ -1,4 +1,4 @@
-from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField
+from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, Check
 from category import Category
 from projection_room import ProjectionRoom
 
@@ -8,7 +8,7 @@ class SeatsCategory(Model):
 
     projection_room = ForeignKeyField(ProjectionRoom, backref="seats_categories")
     category = ForeignKeyField(Category)
-    seats = IntegerField(default = 0)
+    seats = IntegerField(default = 0, constraints=[Check('seats >= 0')])
 
     class Meta:
         database = db

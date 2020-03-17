@@ -1,16 +1,20 @@
-### Seed, drop or look into the database
+### Manipulate the database
 
 ```
+# Seed the database
 python3.5 src/seed.py seed
+# Droping the database ~ rm db/app.db
 python3.5 src/seed.py drop
+# All tuples in the database
 python3.5 src/seed.py select
+# Some info about the tables
+python3.5 src/seed.py desc
 ```
 
 
 ### Execute the app
 
 ```
-export PYTHONPATH='src/'
 python3.5 src/main.py
 ```
 

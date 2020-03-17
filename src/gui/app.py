@@ -3,6 +3,11 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle
 from gui.connection_page import ConnectionPage
 from gui.events_page import EventsPage
+from peewee import *
+from user import User
+import logging as log
+
+db = SqliteDatabase("db/app.db")
 
 class App(Tk):
 
@@ -11,10 +16,6 @@ class App(Tk):
 
         # self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
 
-        # the container is where we'll stack a bunch of frames
-        # on top of each other, then the one we want visible
-        # will be raised above the others
-        # container = ttk.Frame(self)
         container = ttk.Frame(self)
         style = ThemedStyle(self)
         style.set_theme("arc")
@@ -30,9 +31,9 @@ class App(Tk):
         s.configure("Red.TLabel", foreground="red")
 
         self.frames = {}
-        for F in (ConnectionPage, EventsPage):
-            page_name = F.__name__
-            frame = F(parent=container, controller=self)
+        for P in (ConnectionPage, EventsPage):
+            page_name = P.__name__
+            frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
 
             # put all of the pages in the same location;
@@ -46,4 +47,26 @@ class App(Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+
+    def check_credentials(self):
+        db.connect()
+
+        # We get the user input : login and password
+        login = self.frames["ConnectionPage"].login_entry.get()
+        password = self.frames["ConnectionPage"].password_entry.get()
+
+        # We search in the database the user with the corresponding login
+        u = User.select().where(User.login == login).first()
+
+        # We check if the login is right and then the password
+        if u == None:
+            self.frames["ConnectionPage"].display_notification("Authentification failed : no user found", "Red.TLabel")
+        else:
+            if password == u.password:
+                log.info("Authentification successfull")
+                self.show_frame("EventsPage")
+            else:
+                self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
+
+        db.close()
 

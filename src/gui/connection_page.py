@@ -1,10 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from peewee import *
 from user import User
 import logging as log
-
-db = SqliteDatabase("db/app.db")
 
 class ConnectionPage(ttk.Frame):
 
@@ -24,7 +21,7 @@ class ConnectionPage(ttk.Frame):
         self.password_entry = ttk.Entry(up, show="*")
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
 
-        login_button = ttk.Button(up, text="Login", command=self.check_credentials)
+        login_button = ttk.Button(up, text="Login", command=self.controller.check_credentials)
         login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
 
         self.success_label_text = StringVar()
@@ -44,6 +41,7 @@ class ConnectionPage(ttk.Frame):
         self.success_label.configure(style=color)
         log.info(message)
 
+"""
 
     def check_credentials(self):
         self.s = ttk.Style()
@@ -70,4 +68,4 @@ class ConnectionPage(ttk.Frame):
                 log.info("Authentification failed : password incorrect")
 
         db.close()
-
+"""

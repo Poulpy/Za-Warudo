@@ -74,6 +74,7 @@ class App(Tk):
             self.frames["ConnectionPage"].display_notification("Authentification failed : no user found", "Red.TLabel")
         else:
             if password == u.password:
+                self.frames["ConnectionPage"].display_notification("", "TLabel")
                 log.info("Authentification successfull")
                 self.show_frame("EventsPage")
             else:

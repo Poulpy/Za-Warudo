@@ -46,6 +46,7 @@ def seed():
     db.create_tables(list(MODELS))
     log.info("Tables created")
     log.info("Seeding...")
+    User.create(name="Admin", login="admin", password="admin", is_admin=True)
 
     for root, dirs, files in os.walk(SEED_FILES_DIR):
         for seed_file in files:

@@ -17,6 +17,7 @@ class ConnectionPage(ttk.Frame):
 
         self.login_entry = ttk.Entry(up)
         self.login_entry.grid(row=1, column=1, padx=5, pady=5, sticky=NSEW)
+        self.login_entry.focus()
 
         self.password_entry = ttk.Entry(up, show="*")
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)

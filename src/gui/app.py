@@ -63,6 +63,7 @@ class App(Tk):
             pmenu.add_command(label="Timetable")
             pmenu.add_command(label="New vacation")
             pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
+            pmenu.add_separator()
         pmenu.add_command(label="Exit", command=self.destroy)
 
         help_menu.add_command(label="About")

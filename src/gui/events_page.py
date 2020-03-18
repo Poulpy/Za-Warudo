@@ -19,30 +19,25 @@ class EventsPage(ttk.Frame):
                            command=lambda: controller.show_frame("ConnectionPage"))
 
         new_event_button = ttk.Button(header, text="New event")
-        new_vacation_button = ttk.Button(header, text="New Vacation")
-        timetable_button = ttk.Button(header, text="Timetable")
-
 
         title.grid(row=0, column=0, sticky=(W+N))
-        timetable_button.grid(row=0, column=1, sticky=E)
-        new_vacation_button.grid(row=0, column=2, sticky=E)
-        new_event_button.grid(row=0, column=3, sticky=E)
-        log_out_button.grid(row=0, column=4, sticky=E)
+        new_event_button.grid(row=0, column=2, sticky=E)
 
         date_button = ttk.Button(header, text='Choose date', command=self.choose_date)
         self.date_text = StringVar()
-        self.date_label = ttk.Label(header, textvariable=self.date_text, font=("TkDefaultFont", "15"))
+        self.date_label = ttk.Label(header, textvariable=self.date_text)
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
         events = self.controller.get_events(self.date_text.get())
 
 
         date_button.grid(row=1, column=0, sticky=W)
-        self.date_label.grid(row=1, column=4, sticky=W)
+        self.date_label.grid(row=1, column=2, sticky=W)
 
-        header.grid_rowconfigure(0, minsize=40)
-        header.grid_columnconfigure(0, weight=2)
+        header.grid_columnconfigure(1, weight=2)
 
-        header.pack(side=TOP)
+        header.pack(side=TOP, expand=True, fill='both')
+        # header.grid(row=0, column=0)
+
         frames = [None for i in range(events.count())]
         for i, event in enumerate(events.dicts()):
             frames[i] = ttk.Frame(body)
@@ -51,11 +46,13 @@ class EventsPage(ttk.Frame):
             ttk.Button(frames[i], text="Details").grid(row=1, column=2, sticky=E)
             ttk.Button(frames[i], text="Delete").grid(row=2, column=2, sticky=E)
             ttk.Button(frames[i], text="Ticketing").grid(row=3, column=2, sticky=E)
-            frames[i].grid_columnconfigure(0, weight=3)
-            # frames[i].pack()
-            frames[i].grid(row=0, columnspan=2)
+            frames[i].grid_columnconfigure(0, weight=2)
+            frames[i].grid_columnconfigure(1, weight=2)
+            frames[i].pack(side=LEFT)
+            #frames[i].grid(row=0, column=0)
 
-        body.pack(side=LEFT)
+        body.pack(side=TOP, expand=True, fill='both')
+        # body.grid(row=1, column=0)
 
 
     def choose_date(self):

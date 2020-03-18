@@ -26,7 +26,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("arc")
 
-        self.geometry("600x600")
+        self.geometry("400x600")
         self.minsize(300, 300)
         self.title("ZA WARUDO")
 
@@ -81,6 +81,7 @@ class App(Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+
         if page_name == "ConnectionPage":
             self.set_menu(False)
         else:

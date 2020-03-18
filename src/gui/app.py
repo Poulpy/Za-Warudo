@@ -59,10 +59,9 @@ class App(Tk):
         events = Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day))
-        log.info(events.count())
         db.close()
         for event in events.dicts():
-            print(event)
+            log.info(event)
         return events
 
     def show_frame(self, page_name):

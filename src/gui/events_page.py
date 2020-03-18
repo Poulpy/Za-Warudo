@@ -10,20 +10,18 @@ class EventsPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        title = ttk.Label(self, text="Events", font=("TkDefaultFont", "24"))#, font=controller.title_font)
+        header = ttk.Frame(self)
+        body = ttk.Frame(self)
+
+        title = ttk.Label(header, text="Events", font=("TkDefaultFont", "20"))#, font=controller.title_font)
         #label.pack(side="top", fill="x", pady=10)
-        log_out_button = ttk.Button(self, text="Log out",
+        log_out_button = ttk.Button(header, text="Log out",
                            command=lambda: controller.show_frame("ConnectionPage"))
 
-        new_event_button = ttk.Button(self, text="New event")
-        new_vacation_button = ttk.Button(self, text="New Vacation")
-        timetable_button = ttk.Button(self, text="Timetable")
+        new_event_button = ttk.Button(header, text="New event")
+        new_vacation_button = ttk.Button(header, text="New Vacation")
+        timetable_button = ttk.Button(header, text="Timetable")
 
-        date_button = ttk.Button(self, text='Choose date', command=self.choose_date)
-        self.date_text = StringVar()
-        self.date_label = ttk.Label(self, textvariable=self.date_text)
-        self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
-        self.controller.get_events(self.date_text.get())
 
         title.grid(row=0, column=0, sticky=(W+N))
         timetable_button.grid(row=0, column=1, sticky=E)
@@ -31,12 +29,33 @@ class EventsPage(ttk.Frame):
         new_event_button.grid(row=0, column=3, sticky=E)
         log_out_button.grid(row=0, column=4, sticky=E)
 
-        date_button.grid(row=1, column=0)
-        self.date_label.grid(row=1, column=1)
+        date_button = ttk.Button(header, text='Choose date', command=self.choose_date)
+        self.date_text = StringVar()
+        self.date_label = ttk.Label(header, textvariable=self.date_text, font=("TkDefaultFont", "15"))
+        self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
+        events = self.controller.get_events(self.date_text.get())
 
-        self.grid_rowconfigure(0, minsize=40)
-        self.grid_columnconfigure(0, weight=2)
 
+        date_button.grid(row=1, column=0, sticky=W)
+        self.date_label.grid(row=1, column=4, sticky=W)
+
+        header.grid_rowconfigure(0, minsize=40)
+        header.grid_columnconfigure(0, weight=2)
+
+        header.pack(side=TOP)
+        frames = [None for i in range(events.count())]
+        for i, event in enumerate(events.dicts()):
+            frames[i] = ttk.Frame(body)
+            ttk.Label(frames[i], text=event['name']).grid(row=0, column=0, sticky=W)
+            ttk.Button(frames[i], text="Edit").grid(row=0, column=2, sticky=E)
+            ttk.Button(frames[i], text="Details").grid(row=1, column=2, sticky=E)
+            ttk.Button(frames[i], text="Delete").grid(row=2, column=2, sticky=E)
+            ttk.Button(frames[i], text="Ticketing").grid(row=3, column=2, sticky=E)
+            frames[i].grid_columnconfigure(0, weight=3)
+            # frames[i].pack()
+            frames[i].grid(row=0, columnspan=2)
+
+        body.pack(side=LEFT)
 
 
     def choose_date(self):

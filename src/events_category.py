@@ -1,17 +1,17 @@
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, Check
 from category import Category
+from event import Event
 from projection_room import ProjectionRoom
 
 db = SqliteDatabase("db/app.db")
 
-class SeatsCategory(Model):
+class EventsCategory(Model):
 
-    projection_room = ForeignKeyField(ProjectionRoom, backref="seats_categories")
+    event = ForeignKeyField(Event)
     category = ForeignKeyField(Category)
-    seats = IntegerField(default = 0, constraints=[Check('seats >= 0')])
 
     class Meta:
         database = db
-        table_name = "seats_categories"
+        table_name = "events_categories"
 
 

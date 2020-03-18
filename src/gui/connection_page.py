@@ -21,6 +21,7 @@ class ConnectionPage(ttk.Frame):
 
         self.password_entry = ttk.Entry(up, show="*")
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
+        self.password_entry.bind("<Return>", self.controller.check_credentials)
 
         login_button = ttk.Button(up, text="Login", command=self.controller.check_credentials)
         login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)

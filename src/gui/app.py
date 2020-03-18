@@ -55,7 +55,7 @@ class App(Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def check_credentials(self):
+    def check_credentials(self, event=None):
         '''
         Event raised when the user click on the login button
         on the connection page

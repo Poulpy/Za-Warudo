@@ -18,12 +18,10 @@ class EventsPage(ttk.Frame):
         new_vacation_button = ttk.Button(self, text="New Vacation")
         timetable_button = ttk.Button(self, text="Timetable")
 
-        ttk.Button(self, text='Choose dateee', command=self.example3).grid(row=1, column=1)
-        ttk.Button(self, text='Choose date', command=self.example1).grid(row=1, column=0)
+        ttk.Button(self, text='Choose date', command=self.choose_date).grid(row=1, column=0)
         self.date_text = StringVar()
         self.date_label = ttk.Label(self, textvariable=self.date_text)
-        self.date_text.set(datetime.now().strftime("%m-%d %H:00"))
-        print(datetime.now().strftime("%m-%d %H:00"))
+        self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
 
         title.grid(row=0, column=0)
         timetable_button.grid(row=0, column=1)
@@ -34,19 +32,24 @@ class EventsPage(ttk.Frame):
         self.date_label.grid(row=1, column=3)
 
         self.grid_columnconfigure(0, weight=2)
-        # ttk.Button(self, text='DateEntry', command=self.example2).grid(row=1, column=1)
 
-    def example1(self):
+    def choose_date(self):
         def print_sel():
             print(cal.selection_get())
 
         top = Toplevel(self)
 
         cal = Calendar(top,
-                        selectmode='day',
-                       cursor="hand1", year=2020, month=2, day=5)
+                       selectmode='day',
+                       cursor="hand1",
+                       locale="fr_FR",
+                       date_pattern="y-mm-dd")
         cal.pack(fill="both", expand=True)
-        ttk.Button(top, text="ok", command=print_sel).pack()
+        ttk.Button(top, text="OK", command=lambda: self.display_events(top, cal)).pack()
+
+    def display_events(self, top, cal):
+        top.destroy()
+        self.date_text.set(cal.selection_get())
 
     def example2(self):
         top = Toplevel(self)

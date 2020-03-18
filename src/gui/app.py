@@ -51,6 +51,19 @@ class App(Tk):
             frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
         self.show_frame("ConnectionPage")
+        self.set_menu(False)
+
+
+    def set_menu(self, is_connected: bool):
+        menubar = Menu(self)
+        pmenu = Menu(menubar, tearoff=0)
+        if is_connected:
+            pmenu.add_command(label="Timetable")
+            pmenu.add_command(label="New vacation")
+            pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
+        pmenu.add_command(label="Exit", command=self.destroy)
+        menubar.add_cascade(label="Fichier", menu=pmenu)
+        self.config(menu=menubar)
 
     def get_events(self, date_str: str):
         db.connect()
@@ -68,6 +81,10 @@ class App(Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+        if page_name == "ConnectionPage":
+            self.set_menu(False)
+        else:
+            self.set_menu(True)
 
     def check_credentials(self, event=None):
         '''

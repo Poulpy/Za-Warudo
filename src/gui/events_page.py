@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
+import logging as log
 
 class EventsPage(ttk.Frame):
 
@@ -9,7 +10,7 @@ class EventsPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        title = ttk.Label(self, text="Events")#, font=controller.title_font)
+        title = ttk.Label(self, text="Events", font=("TkDefaultFont", "24"))#, font=controller.title_font)
         #label.pack(side="top", fill="x", pady=10)
         log_out_button = ttk.Button(self, text="Log out",
                            command=lambda: controller.show_frame("ConnectionPage"))
@@ -22,23 +23,23 @@ class EventsPage(ttk.Frame):
         self.date_text = StringVar()
         self.date_label = ttk.Label(self, textvariable=self.date_text)
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
+        self.controller.get_events(self.date_text.get())
 
-        title.grid(row=0, column=0)
-        timetable_button.grid(row=0, column=1)
-        new_vacation_button.grid(row=0, column=2)
-        new_event_button.grid(row=0, column=3)
-        log_out_button.grid(row=0, column=4)
+        title.grid(row=0, column=0, sticky=(W+N))
+        timetable_button.grid(row=0, column=1, sticky=E)
+        new_vacation_button.grid(row=0, column=2, sticky=E)
+        new_event_button.grid(row=0, column=3, sticky=E)
+        log_out_button.grid(row=0, column=4, sticky=E)
 
         date_button.grid(row=1, column=0)
         self.date_label.grid(row=1, column=1)
 
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(0, minsize=40)
         self.grid_columnconfigure(0, weight=2)
 
-    def choose_date(self):
-        def print_sel():
-            print(cal.selection_get())
 
+
+    def choose_date(self):
         top = Toplevel(self)
 
         cal = Calendar(top,
@@ -52,6 +53,7 @@ class EventsPage(ttk.Frame):
     def display_events(self, top, cal):
         top.destroy()
         self.date_text.set(cal.selection_get())
+        log.info(self.controller.get_events(self.date_text.get()))
 
     def example2(self):
         top = Toplevel(self)

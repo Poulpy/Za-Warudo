@@ -5,7 +5,9 @@ from gui.connection_page import ConnectionPage
 from gui.events_page import EventsPage
 from peewee import *
 from user import User
+from event import Event
 import logging as log
+from datetime import datetime
 
 db = SqliteDatabase("db/app.db")
 
@@ -49,6 +51,19 @@ class App(Tk):
             frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
         self.show_frame("ConnectionPage")
+
+    def get_events(self, date_str: str):
+        db.connect()
+        log.info(date_str)
+        date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        events = Event.select().where((Event.begin.year == date.year)
+                                    & (Event.begin.month == date.month)
+                                    & (Event.begin.day == date.day))
+        log.info(events.count())
+        db.close()
+        for event in events.dicts():
+            print(event)
+        return events
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''

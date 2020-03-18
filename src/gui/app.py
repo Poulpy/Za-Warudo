@@ -3,6 +3,7 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle
 from gui.connection_page import ConnectionPage
 from gui.events_page import EventsPage
+from gui.edit_event_page import EditEventPage
 from peewee import *
 from user import User
 from event import Event
@@ -24,9 +25,9 @@ class App(Tk):
 
         container = ttk.Frame(self)
         style = ThemedStyle(self)
-        style.set_theme("arc")
+        style.set_theme("breeze")
 
-        self.geometry("400x600")
+        self.geometry("600x600")
         self.minsize(300, 300)
         self.title("ZA WARUDO")
 
@@ -40,7 +41,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -57,12 +58,16 @@ class App(Tk):
     def set_menu(self, is_connected: bool):
         menubar = Menu(self)
         pmenu = Menu(menubar, tearoff=0)
+        help_menu = Menu(menubar, tearoff=0)
         if is_connected:
             pmenu.add_command(label="Timetable")
             pmenu.add_command(label="New vacation")
             pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
         pmenu.add_command(label="Exit", command=self.destroy)
+
+        help_menu.add_command(label="About")
         menubar.add_cascade(label="Fichier", menu=pmenu)
+        menubar.add_cascade(label="Help", menu=help_menu)
         self.config(menu=menubar)
 
     def get_events(self, date_str: str):

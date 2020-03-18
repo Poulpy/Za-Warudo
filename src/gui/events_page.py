@@ -13,12 +13,9 @@ class EventsPage(ttk.Frame):
         header = ttk.Frame(self)
         body = ttk.Frame(self)
 
-        title = ttk.Label(header, text="Events", font=("TkDefaultFont", "20"))#, font=controller.title_font)
-        #label.pack(side="top", fill="x", pady=10)
-        log_out_button = ttk.Button(header, text="Log out",
-                           command=lambda: controller.show_frame("ConnectionPage"))
+        title = ttk.Label(header, text="Events", font=("TkDefaultFont", "15"))
 
-        new_event_button = ttk.Button(header, text="New event")
+        new_event_button = ttk.Button(header, text="New event", command=lambda: controller.show_frame("EditEventPage"))
 
         title.grid(row=0, column=0, sticky=(W+N))
         new_event_button.grid(row=0, column=2, sticky=E)
@@ -42,6 +39,8 @@ class EventsPage(ttk.Frame):
         for i, event in enumerate(events.dicts()):
             frames[i] = ttk.Frame(body)
             ttk.Label(frames[i], text=event['name']).grid(row=0, column=0, sticky=W)
+            date = event['begin'].strftime("%H:%M") + '-' + event['end'].strftime("%H:%M")
+            ttk.Label(frames[i], text=date).grid(row=1, column=0)
             ttk.Button(frames[i], text="Edit").grid(row=0, column=2, sticky=E)
             ttk.Button(frames[i], text="Details").grid(row=1, column=2, sticky=E)
             ttk.Button(frames[i], text="Delete").grid(row=2, column=2, sticky=E)

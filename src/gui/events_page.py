@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
 import logging as log
+from gui.entry_date import EntryDate
 
 class EventsPage(ttk.Frame):
 
@@ -20,14 +21,16 @@ class EventsPage(ttk.Frame):
         title.grid(row=0, column=0, sticky=(W+N))
         new_event_button.grid(row=0, column=2, sticky=E)
 
-        date_button = ttk.Button(header, text='Choose date', command=self.choose_date)
+        # date_button = ttk.Button(header, text='Choose date', command=self.choose_date)
         self.date_text = StringVar()
+        self.date_entry = EntryDate(header, textvariable=self.date_text)
         self.date_label = ttk.Label(header, textvariable=self.date_text)
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
         events = self.controller.get_events(self.date_text.get())
 
 
-        date_button.grid(row=1, column=0, sticky=W)
+        #date_button.grid(row=1, column=0, sticky=W)
+        self.date_entry.grid(row=1, column=0, sticky=W)
         self.date_label.grid(row=1, column=2, sticky=W)
 
         header.grid_columnconfigure(1, weight=2)

@@ -45,18 +45,28 @@ class EditEventPage(ttk.Frame):
         management_chbutton = ttk.Checkbutton(self, text="Management reserved")
         guest_attendance_chbutton = ttk.Checkbutton(self, text="Guest attendance confirmed")
 
+        members_label = ttk.Label(self, text="Choose members")
+        user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
+        members_frame = ttk.Frame(self)
+        users_chbuttons = [None for i in range(len(user_names))]
+
+        for i, user in enumerate(user_names):
+            users_chbuttons[i] = ttk.Checkbutton(members_frame, text=user)
+            users_chbuttons[i].grid(row=i, column=0, sticky=W)
+
+
 
         title.grid(row=0, column=0, sticky=(W+N))
         back_button.grid(row=0, column=3, sticky=E)
 
-        name_label.grid(row=1, column=0)
+        name_label.grid(row=1, column=0, sticky=W)
         self.name_entry.grid(row=1, column=1)
 
-        begin.grid(row=2, column=0)
+        begin.grid(row=2, column=0, sticky=W)
         self.begin_entry.grid(row=2, column=1)
-        end.grid(row=3, column=0)
+        end.grid(row=3, column=0, sticky=W)
         self.end_entry.grid(row=3, column=1)
-        pj_label.grid(row=4, column=0)
+        pj_label.grid(row=4, column=0, sticky=W)
         projection_types.grid(row=4, column=1)
         pr_label.grid(row=4, column=2)
         projection_rooms.grid(row=4, column=3)
@@ -65,4 +75,6 @@ class EditEventPage(ttk.Frame):
         equipment_chbutton.grid(row=5, column=1)
         management_chbutton.grid(row=5, column=2)
         guest_attendance_chbutton.grid(row=5, column=3)
+        members_label.grid(row=6, column=0)
+        members_frame.grid(row=7, column=0)
 

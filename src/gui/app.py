@@ -28,7 +28,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("600x600")
+        self.geometry("700x600")
         self.minsize(300, 300)
         self.title("ZA WARUDO")
 
@@ -87,6 +87,12 @@ class App(Tk):
         proj_rooms = ProjectionRoom.select()
         db.close()
         return proj_rooms
+
+    def get_users(self):
+        db.connect()
+        users = User.select()
+        db.close()
+        return users
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''

@@ -7,6 +7,7 @@ from gui.edit_event_page import EditEventPage
 from peewee import *
 from user import User
 from event import Event
+from projection_room import ProjectionRoom
 import logging as log
 from datetime import datetime
 
@@ -79,9 +80,13 @@ class App(Tk):
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day))
         db.close()
-        for event in events.dicts():
-            log.info(event)
         return events
+
+    def get_projection_rooms(self):
+        db.connect()
+        proj_rooms = ProjectionRoom.select()
+        db.close()
+        return proj_rooms
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''

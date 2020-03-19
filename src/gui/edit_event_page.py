@@ -25,6 +25,21 @@ class EditEventPage(ttk.Frame):
         end = ttk.Label(self, text="End date")
         self.end_entry = EntryDate(self, textvariable=self.end_text)
 
+        pj_label = ttk.Label(self, text="Projection type")
+        self.projection_type_choosen = StringVar()
+        projection_types = ttk.Combobox(self, textvariable=self.projection_type_choosen)
+        projection_types['values'] = ["Film",
+                                      "Documentary"]
+        projection_types.current(0)
+
+        pjs = [pj['location'] for pj in controller.get_projection_rooms().dicts()]
+
+        pr_label = ttk.Label(self, text="Projection room")
+        self.projection_room_choosen = StringVar()
+        projection_rooms = ttk.Combobox(self, textvariable=self.projection_room_choosen)
+        projection_rooms['values'] = pjs
+        projection_rooms.current(0)
+
 
         title.grid(row=0, column=0, sticky=(W+N))
         back_button.grid(row=0, column=2, sticky=E)
@@ -36,4 +51,8 @@ class EditEventPage(ttk.Frame):
         self.begin_entry.grid(row=2, column=1)
         end.grid(row=3, column=0)
         self.end_entry.grid(row=3, column=1)
+        pj_label.grid(row=4, column=0)
+        projection_types.grid(row=4, column=1)
+        pr_label.grid(row=4, column=2)
+        projection_rooms.grid(row=4, column=3)
 

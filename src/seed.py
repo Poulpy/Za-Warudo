@@ -11,14 +11,14 @@ from debate import Debate
 from event import Event
 from team import Team
 from category import Category
-from seats_category import SeatsCategory
+from events_category import EventsCategory
 from vacation import Vacation
 
 db = SqliteDatabase("db/app.db")
 SEED_FILES_DIR = "db/seed_files/"
 USERS_SEED_FILE = "users.csv"
 MODELS = (User, ProjectionRoom, Team, Debate, Event, Category,
-          SeatsCategory, Vacation)
+          EventsCategory, Vacation)
 
 
 def get_class(kls):

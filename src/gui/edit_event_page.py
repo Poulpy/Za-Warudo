@@ -39,11 +39,11 @@ class EditEventPage(ttk.Frame):
         self.end_entry.grid(row=3, column=1)
 
 
-    def set_begin_label(self, txt, event=None):
+    def set_begin_label(self, txt):
         print("begin " + txt.strftime("%Y-%m-%d %H:%M"))
         self.begin_text.set(txt)
 
-    def set_end_label(self, txt, event=None):
+    def set_end_label(self, txt):
         print("end " + txt.strftime("%Y-%m-%d %H:%M"))
         self.end_text.set(txt)
 

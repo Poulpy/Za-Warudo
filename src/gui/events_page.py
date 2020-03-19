@@ -21,7 +21,6 @@ class EventsPage(ttk.Frame):
         title.grid(row=0, column=0, sticky=(W+N))
         new_event_button.grid(row=0, column=2, sticky=E)
 
-        # date_button = ttk.Button(header, text='Choose date', command=self.choose_date)
         self.date_text = StringVar()
         self.date_entry = EntryDate(header, textvariable=self.date_text)
         self.date_label = ttk.Label(header, textvariable=self.date_text)
@@ -29,7 +28,6 @@ class EventsPage(ttk.Frame):
         events = self.controller.get_events(self.date_text.get())
 
 
-        #date_button.grid(row=1, column=0, sticky=W)
         self.date_entry.grid(row=1, column=0, sticky=W)
         self.date_label.grid(row=1, column=2, sticky=W)
 
@@ -57,44 +55,8 @@ class EventsPage(ttk.Frame):
         # body.grid(row=1, column=0)
 
 
-    def choose_date(self):
-        top = Toplevel(self)
-
-        cal = Calendar(top,
-                       selectmode='day',
-                       cursor="hand1",
-                       locale="fr_FR",
-                       date_pattern="y-mm-dd")
-        cal.pack(fill="both", expand=True)
-        ttk.Button(top, text="OK", command=lambda: self.display_events(top, cal)).pack()
-
     def display_events(self, top, cal):
-        top.destroy()
-        self.date_text.set(cal.selection_get())
+        #top.destroy()
+        #self.date_text.set(cal.selection_get())
         log.info(self.controller.get_events(self.date_text.get()))
-
-    def example2(self):
-        top = Toplevel(self)
-
-        ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
-
-        cal = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2)
-        cal.pack(padx=10, pady=10)
-
-    def example3(self):
-
-        top = Toplevel(self)
-
-        cal = Calendar(top, selectmode='none')
-        date = cal.datetime.today() + cal.timedelta(days=2)
-        cal.calevent_create(date, 'Hello World', 'message')
-        cal.calevent_create(date, 'Reminder 2', 'reminder')
-        cal.calevent_create(date + cal.timedelta(days=-2), 'Reminder 1', 'reminder')
-        cal.calevent_create(date + cal.timedelta(days=3), 'Message', 'message')
-
-        cal.tag_config('reminder', background='red', foreground='yellow')
-
-        cal.pack(fill="both", expand=True)
-        ttk.Label(top, text="Hover over the events.").pack()
 

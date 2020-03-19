@@ -54,6 +54,7 @@ class EditEventPage(ttk.Frame):
             users_chbuttons[i] = ttk.Checkbutton(members_frame, text=user)
             users_chbuttons[i].grid(row=i, column=0, sticky=W)
 
+        save_button = ttk.Button(self, text="Save", command=self.save)
 
 
         title.grid(row=0, column=0, sticky=(W+N))
@@ -77,4 +78,14 @@ class EditEventPage(ttk.Frame):
         guest_attendance_chbutton.grid(row=5, column=3)
         members_label.grid(row=6, column=0)
         members_frame.grid(row=7, column=0)
+        save_button.grid(row=8, column=0)
+
+    def save(self, event=None):
+        log.info("Name " + name_entry.get())
+        log.info("Begin " + begin_text.get())
+        log.info("End " + end_text.get())
+        log.info("Projection type " + projection_type_choosen.get())
+        log.info("Projection room " + projection_room_choosen.get())
+
+
 

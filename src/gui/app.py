@@ -30,7 +30,7 @@ class App(Tk):
 
         self.geometry("700x600")
         self.minsize(300, 300)
-        self.title("ZA WARUDO")
+        self.title("Za Warudo")
 
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)

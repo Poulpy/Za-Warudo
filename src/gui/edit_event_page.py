@@ -40,9 +40,14 @@ class EditEventPage(ttk.Frame):
         projection_rooms['values'] = pjs
         projection_rooms.current(0)
 
+        room_chbutton = ttk.Checkbutton(self, text="Room reserved")
+        equipment_chbutton = ttk.Checkbutton(self, text="Equipment reserved")
+        management_chbutton = ttk.Checkbutton(self, text="Management reserved")
+        guest_attendance_chbutton = ttk.Checkbutton(self, text="Guest attendance confirmed")
+
 
         title.grid(row=0, column=0, sticky=(W+N))
-        back_button.grid(row=0, column=2, sticky=E)
+        back_button.grid(row=0, column=3, sticky=E)
 
         name_label.grid(row=1, column=0)
         self.name_entry.grid(row=1, column=1)
@@ -55,4 +60,9 @@ class EditEventPage(ttk.Frame):
         projection_types.grid(row=4, column=1)
         pr_label.grid(row=4, column=2)
         projection_rooms.grid(row=4, column=3)
+
+        room_chbutton.grid(row=5, column=0)
+        equipment_chbutton.grid(row=5, column=1)
+        management_chbutton.grid(row=5, column=2)
+        guest_attendance_chbutton.grid(row=5, column=3)
 

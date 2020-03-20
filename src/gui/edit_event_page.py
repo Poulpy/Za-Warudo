@@ -27,7 +27,7 @@ class EditEventPage(ttk.Frame):
 
         pj_label = ttk.Label(self, text="Projection type")
         self.projection_type_choosen = StringVar()
-        projection_types = ttk.Combobox(self, textvariable=self.projection_type_choosen)
+        projection_types = ttk.Combobox(self, textvariable=self.projection_type_choosen, state='readonly')
         projection_types['values'] = ["Film",
                                       "Documentary"]
         projection_types.current(0)
@@ -36,7 +36,7 @@ class EditEventPage(ttk.Frame):
 
         pr_label = ttk.Label(self, text="Projection room")
         self.projection_room_choosen = StringVar()
-        projection_rooms = ttk.Combobox(self, textvariable=self.projection_room_choosen)
+        projection_rooms = ttk.Combobox(self, textvariable=self.projection_room_choosen, state='readonly')
         projection_rooms['values'] = pjs
         projection_rooms.current(0)
 

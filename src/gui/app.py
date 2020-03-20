@@ -31,6 +31,7 @@ class App(Tk):
         self.geometry("700x600")
         self.minsize(300, 300)
         self.title("Za Warudo")
+        self.user = None
 
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -124,10 +125,20 @@ class App(Tk):
         else:
             if password == u.password:
                 self.frames["ConnectionPage"].display_notification("", "TLabel")
+                self.current_user = u
                 log.info("Authentification successfull")
                 self.show_frame("EventsPage")
             else:
                 self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
 
         db.close()
+
+    def create_event(self, event):
+        event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
+        event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
+        event['responsible'] = self.current_user.id
+        print(event['projection_room'])
+        Event.create(**event)
+
+
 

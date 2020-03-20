@@ -19,18 +19,25 @@ class EditEventPage(ttk.Frame):
         name_label = ttk.Label(self, text="Name")
         self.name_entry = ttk.Entry(self)
 
+        # Variables to get the values after input
         self.begin_text = StringVar()
         self.hour_text = StringVar()
+        self.running_time_text = StringVar()
+
+        self.hour_text.set('12')
+        self.running_time_text.set('60')
+
         begin = ttk.Label(self, text="Day")
-        self.begin_entry = EntryDate(self, textvariable=self.begin_text)
+        begin_entry = EntryDate(self, textvariable=self.begin_text)
         hour = ttk.Label(self, text="Hour")
-        self.end_entry = ttk.Entry(self, textvariable=self.hour_text)
+        hour_entry = Spinbox(self, from_=0, to=24, textvariable=self.hour_text)
+        running_time = ttk.Label(self, text="Running time (minutes)")
+        running_time_entry = Spinbox(self, from_=0, to=500, textvariable=self.running_time_text)
 
         pj_label = ttk.Label(self, text="Projection type")
         self.projection_type_choosen = StringVar()
         projection_types = ttk.Combobox(self, textvariable=self.projection_type_choosen, state='readonly')
-        projection_types['values'] = ["Film",
-                                      "Documentary"]
+        projection_types['values'] = ["Film", "Documentary"]
         projection_types.current(0)
 
         pjs = [pj['location'] for pj in controller.get_projection_rooms().dicts()]
@@ -65,9 +72,11 @@ class EditEventPage(ttk.Frame):
         self.name_entry.grid(row=1, column=1)
 
         begin.grid(row=2, column=0, sticky=W)
-        self.begin_entry.grid(row=2, column=1)
+        begin_entry.grid(row=2, column=1)
         hour.grid(row=3, column=0, sticky=W)
-        self.end_entry.grid(row=3, column=1)
+        hour_entry.grid(row=3, column=1, sticky=W)
+        running_time.grid(row=3, column=2)
+        running_time_entry.grid(row=3, column=3)
         pj_label.grid(row=4, column=0, sticky=W)
         projection_types.grid(row=4, column=1)
         pr_label.grid(row=4, column=2)
@@ -82,14 +91,33 @@ class EditEventPage(ttk.Frame):
         save_button.grid(row=8, column=0)
 
     def save(self, event=None):
+        new_event = dict()
+
         log.info("Name " + self.name_entry.get())
         log.info("Day " + self.begin_text.get())
         log.info("Hour " + self.hour_text.get())
+        log.info("Running time " + self.running_time_text.get())
+        '''
         p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
         if p.match(self.hour_text.get()) == None:
             print("Wrong hour format")
+        '''
 
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
 
+        new_event['name'] = self.name_entry.get()
+        new_event['begin'] = self.begin_text.get() + ' ' + self.hour_text.get() + ':00'
+        new_event['running_time'] = self.running_time_text.get()
+        new_event['projection_type'] = self.projection_type_choosen.get()
+        new_event['projection_room'] = self.projection_room_choosen.get()
+        self.controller.create_event(new_event)
+
         # ^(2[0-4]|1[0-9]|[1-9])$
+
+class Spinbox(ttk.Entry):
+
+    def __init__(self, master=None, **kw):
+
+        ttk.Entry.__init__(self, master, 'ttk::spinbox', **kw)
+

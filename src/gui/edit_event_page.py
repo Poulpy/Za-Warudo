@@ -87,5 +87,3 @@ class EditEventPage(ttk.Frame):
         log.info("Projection type " + projection_type_choosen.get())
         log.info("Projection room " + projection_room_choosen.get())
 
-
-

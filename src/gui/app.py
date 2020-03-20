@@ -68,7 +68,7 @@ class App(Tk):
         pmenu.add_command(label="Exit", command=self.destroy)
 
         help_menu.add_command(label="About")
-        menubar.add_cascade(label="Fichier", menu=pmenu)
+        menubar.add_cascade(label="Za Warudo", menu=pmenu)
         menubar.add_cascade(label="Help", menu=help_menu)
         self.config(menu=menubar)
 

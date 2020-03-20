@@ -1,3 +1,4 @@
 event.Event
 status,name,responsible,projection_room,projection_type
 created,Les sept samourais,1,1,Film
+finished,Yojinbo,1,2,Film

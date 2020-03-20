@@ -81,9 +81,9 @@ class EditEventPage(ttk.Frame):
         save_button.grid(row=8, column=0)
 
     def save(self, event=None):
-        log.info("Name " + name_entry.get())
-        log.info("Begin " + begin_text.get())
-        log.info("End " + end_text.get())
-        log.info("Projection type " + projection_type_choosen.get())
-        log.info("Projection room " + projection_room_choosen.get())
+        log.info("Name " + self.name_entry.get())
+        log.info("Begin " + self.begin_text.get())
+        log.info("End " + self.end_text.get())
+        log.info("Projection type " + self.projection_type_choosen.get())
+        log.info("Projection room " + self.projection_room_choosen.get())
 

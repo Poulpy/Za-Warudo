@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
+from datetime import timedelta
 from datetime import datetime
 import logging as log
 from gui.entry_date import EntryDate
@@ -37,7 +38,6 @@ class EventsPage(ttk.Frame):
 
 
 
-        events = self.controller.get_events(self.date_text.get())
 
         self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
         self.events_tree.column("Begin", width=50)
@@ -47,14 +47,7 @@ class EventsPage(ttk.Frame):
         self.events_tree.heading("Begin", text="Begin")
         self.events_tree.heading("End", text="End")
         self.events_tree.heading("Type", text="Type")
-        for i, event in enumerate(events.dicts()):
-            if i % 2 == 0:
-                tag = 'odd'
-            else:
-                tag = 'even'
-            tid = self.events_tree.insert("", 'end', text=event['name'],
-                                          values=(event['begin'].strftime("%H:%M"), event['end'].strftime("%H:%M"),
-                                          event['projection_type']), tags=(tag, 'select'))
+        self.set_displayed_events()
 
         self.events_tree.tag_configure('odd', background="#F0F0F0")
         self.events_tree.tag_configure('even', background="#FAFAFA")
@@ -101,6 +94,7 @@ class EventsPage(ttk.Frame):
             else:
                 tag = 'even'
             tid = self.events_tree.insert("", 'end', text=event['name'],
-                                          values=(event['begin'].strftime("%H:%M"), event['end'].strftime("%H:%M"),
-                                          event['projection_type']), tags=(tag, 'select'))
+                                          values=(event['begin'].strftime("%H:%M"),
+                                                  (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
+                                                  event['projection_type']), tags=(tag, 'select'))
 

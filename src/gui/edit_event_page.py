@@ -83,7 +83,6 @@ class EditEventPage(ttk.Frame):
     def save(self, event=None):
         log.info("Name " + self.name_entry.get())
         log.info("Begin " + self.begin_text.get())
-        log.info("End " + self.end_text.get())
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
 

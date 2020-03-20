@@ -12,7 +12,7 @@ class Event(Model):
 
     name = CharField()
     begin = DateTimeField(default=datetime.datetime.now())
-    end = DateTimeField(default=datetime.datetime.now() + datetime.timedelta(hours=2))
+    running_time = IntegerField(default=120, constraints=[Check('running_time >= 0')])
     projection_type = CharField()
 
     sold_seats = IntegerField(default=0, constraints=[Check('sold_seats >= 0')])

@@ -1,3 +1,4 @@
+import re
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
@@ -19,11 +20,11 @@ class EditEventPage(ttk.Frame):
         self.name_entry = ttk.Entry(self)
 
         self.begin_text = StringVar()
-        self.end_text = StringVar()
-        begin = ttk.Label(self, text="Begin date")
+        self.hour_text = StringVar()
+        begin = ttk.Label(self, text="Day")
         self.begin_entry = EntryDate(self, textvariable=self.begin_text)
-        end = ttk.Label(self, text="End date")
-        self.end_entry = EntryDate(self, textvariable=self.end_text)
+        hour = ttk.Label(self, text="Hour")
+        self.end_entry = ttk.Entry(self, textvariable=self.hour_text)
 
         pj_label = ttk.Label(self, text="Projection type")
         self.projection_type_choosen = StringVar()
@@ -65,7 +66,7 @@ class EditEventPage(ttk.Frame):
 
         begin.grid(row=2, column=0, sticky=W)
         self.begin_entry.grid(row=2, column=1)
-        end.grid(row=3, column=0, sticky=W)
+        hour.grid(row=3, column=0, sticky=W)
         self.end_entry.grid(row=3, column=1)
         pj_label.grid(row=4, column=0, sticky=W)
         projection_types.grid(row=4, column=1)
@@ -82,7 +83,13 @@ class EditEventPage(ttk.Frame):
 
     def save(self, event=None):
         log.info("Name " + self.name_entry.get())
-        log.info("Begin " + self.begin_text.get())
+        log.info("Day " + self.begin_text.get())
+        log.info("Hour " + self.hour_text.get())
+        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
+        if p.match(self.hour_text.get()) == None:
+            print("Wrong hour format")
+
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
 
+        # ^(2[0-4]|1[0-9]|[1-9])$

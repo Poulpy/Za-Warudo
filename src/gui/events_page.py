@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 from datetime import timedelta
@@ -28,7 +29,7 @@ class EventsPage(ttk.Frame):
         self.date_entry.grid(row=1, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Edit").grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
-        ttk.Button(self, text="Delete").grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
+        ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Ticketing").grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
 
@@ -97,4 +98,8 @@ class EventsPage(ttk.Frame):
                                           values=(event['begin'].strftime("%H:%M"),
                                                   (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
                                                   event['projection_type']), tags=(tag, 'select'))
+
+    def confirm_delete(self):
+        messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
+
 

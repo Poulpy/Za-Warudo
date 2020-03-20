@@ -45,7 +45,7 @@ class EventsPage(ttk.Frame):
         events_box.grid(column=0, row=1, rowspan=5, sticky=NSEW)
         '''
 
-        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')#, selectmode="extended")
+        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
         #self.events_tree['columns'] = ('Begin', 'End', 'Type')
         self.events_tree.column("Begin", width=50)
         self.events_tree.column("End", width=50)
@@ -61,18 +61,14 @@ class EventsPage(ttk.Frame):
                 tag = 'even'
             tid = self.events_tree.insert("", 'end', text=event['name'],
                                           values=(event['begin'].strftime("%H:%M"), event['end'].strftime("%H:%M"),
-                                          event['projection_type']), tags=(tag))
-            #self.events_tree.insert(tid, 'end', text=event['name'], values=(event['begin'].strftime("%H:%M"), event['end'].strftime("%H:%M"),
-                                                                             #event['projection_type']), tags=(tag))
-        #self.events_tree.tag_configure('odd', background="#E8E8E8")
-        #self.events_tree.tag_configure('even', background="#DFDFDF")
-        self.events_tree.tag_configure('select', background="yellow")
-        self.events_tree.tag_configure("Treeview", background="blue")
-        self.events_tree.tag_bind('odd', '<Button-1>', self.item_clicked)
-        self.events_tree.tag_bind('even', '<Button-1>', self.item_clicked)
+                                          event['projection_type']), tags=(tag, 'select'))
+
+        self.events_tree.tag_configure('odd', background="#F0F0F0")
+        self.events_tree.tag_configure('even', background="#FAFAFA")
+        self.events_tree.tag_configure('select')
+
+        self.events_tree.tag_bind('select', '<Button-1>', self.item_clicked)
         self.events_tree.grid(row=1, column=0, rowspan=5, sticky=NSEW)
-        #self.events_tree.bind('<1>', self.tree_select)
-        #self.events_tree.bind('<TreeviewSelect>', self.item_clicked)
 
         style = ttk.Style()
 
@@ -82,7 +78,6 @@ class EventsPage(ttk.Frame):
             ('Treeitem.image', {'side': 'left', 'sticky': ''}),
             ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [
                  ('Treeitem.text', {'side': 'left', 'sticky': ''}),
-                 #('Treeitem.background', {'active_color': 'blue'}),
             ]})
             ],
         })]
@@ -101,23 +96,6 @@ class EventsPage(ttk.Frame):
         #self.events_tree.item(item, tags='blue')
 
     def display_events(self, top, cal):
-        #top.destroy()
-        #self.date_text.set(cal.selection_get())
         log.info(self.controller.get_events(self.date_text.get()))
 
-    def set_displayed_events(self):
-        self.frames = [None for i in range(events.count())]
-        for i, event in enumerate(events.dicts()):
-            self.frames[i] = ttk.Frame(self)
-            ttk.Label(self.frames[i], text=event['name']).grid(row=0, column=0, sticky=W)
-            date = event['begin'].strftime("%H:%M") + '-' + event['end'].strftime("%H:%M")
-            ttk.Label(self.frames[i], text=date).grid(row=1, column=0)
-            ttk.Button(self.frames[i], text="Edit").grid(row=0, column=2, sticky=E)
-            ttk.Button(self.frames[i], text="Details").grid(row=1, column=2, sticky=E)
-            ttk.Button(self.frames[i], text="Delete").grid(row=2, column=2, sticky=E)
-            ttk.Button(self.frames[i], text="Ticketing").grid(row=3, column=2, sticky=E)
-            self.frames[i].grid_columnconfigure(0, weight=2)
-            self.frames[i].grid_columnconfigure(1, weight=2)
-            self.frames[i].pack(side=LEFT)
-            #self.frames[i].grid(row=0, column=0)
 

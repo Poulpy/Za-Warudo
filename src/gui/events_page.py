@@ -22,6 +22,7 @@ class EventsPage(ttk.Frame):
         self.date_entry = EntryDate(self, textvariable=self.date_text)
         self.date_label = ttk.Label(self, textvariable=self.date_text)
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
+        self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.set_displayed_events())
 
         self.date_entry.grid(row=1, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Edit").grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
@@ -37,16 +38,8 @@ class EventsPage(ttk.Frame):
 
 
         events = self.controller.get_events(self.date_text.get())
-        '''
-        events_box = Listbox(self, bg="#eaeaea", bd=0, selectbackground="#17b7ea")
-        for i, event in enumerate(events.dicts()):
-            events_box.insert(END, event['name'] + " " + event['begin'].strftime("%H:%M") + '-' + event['end'].strftime("%H:%M"))
-
-        events_box.grid(column=0, row=1, rowspan=5, sticky=NSEW)
-        '''
 
         self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
-        #self.events_tree['columns'] = ('Begin', 'End', 'Type')
         self.events_tree.column("Begin", width=50)
         self.events_tree.column("End", width=50)
         self.events_tree.column("Type", width=50)
@@ -98,4 +91,16 @@ class EventsPage(ttk.Frame):
     def display_events(self, top, cal):
         log.info(self.controller.get_events(self.date_text.get()))
 
+    def set_displayed_events(self):
+        events = self.controller.get_events(self.date_text.get())
+
+        self.events_tree.delete(*self.events_tree.get_children())
+        for i, event in enumerate(events.dicts()):
+            if i % 2 == 0:
+                tag = 'odd'
+            else:
+                tag = 'even'
+            tid = self.events_tree.insert("", 'end', text=event['name'],
+                                          values=(event['begin'].strftime("%H:%M"), event['end'].strftime("%H:%M"),
+                                          event['projection_type']), tags=(tag, 'select'))
 

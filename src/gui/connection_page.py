@@ -1,9 +1,13 @@
+import logging as log
 from tkinter import *
 from tkinter import ttk
+
 from user import User
-import logging as log
 
 class ConnectionPage(ttk.Frame):
+    '''
+    Frame for the user to log in
+    '''
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
@@ -15,10 +19,13 @@ class ConnectionPage(ttk.Frame):
         connection_label = ttk.Label(up, text="Connection")
         connection_label.grid(row=0, column=1, sticky=S)
 
+        # It's the input for the user's login
         self.login_entry = ttk.Entry(up)
         self.login_entry.grid(row=1, column=1, padx=5, pady=5, sticky=NSEW)
         self.login_entry.focus()
 
+        # It's the input for the user's password
+        # The password is hidden with *
         self.password_entry = ttk.Entry(up, show="*")
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
         self.password_entry.bind("<Return>", self.controller.check_credentials)
@@ -26,10 +33,13 @@ class ConnectionPage(ttk.Frame):
         login_button = ttk.Button(up, text="Login", command=self.controller.check_credentials)
         login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
 
+        # Label that shows if the authentification has failed
+        # TODO rename that var to fail_auth_label
         self.success_label_text = StringVar()
         self.success_label = ttk.Label(down, textvariable=self.success_label_text, justify=CENTER)
         self.success_label.grid(row=0, column=1, padx=5, pady=5, sticky=EW)
 
+        # We place the components in the grid
         up.grid_rowconfigure(0, weight=1)
         up.grid_rowconfigure(4, weight=1)
         up.grid_columnconfigure(0, weight=1)

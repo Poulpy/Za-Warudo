@@ -112,6 +112,8 @@ class EditEventPage(ttk.Frame):
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
         self.controller.create_event(new_event)
+        self.controller.update_events_page()
+        self.controller.show_frame("EventsPage")
 
         # ^(2[0-4]|1[0-9]|[1-9])$
 

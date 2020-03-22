@@ -95,6 +95,9 @@ class App(Tk):
         db.close()
         return users
 
+    def update_events_page(self):
+        self.frames["EventsPage"].set_displayed_events()
+
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]

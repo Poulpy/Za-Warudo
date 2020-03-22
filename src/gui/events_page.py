@@ -76,15 +76,6 @@ class EventsPage(ttk.Frame):
         self.events_tree.focus(it)
         self.events_tree.selection_set(it)
 
-    def tree_select(self, event=None):
-        item = self.events_tree.selection()[0]
-        print(item)
-        self.events_tree.focus(item)
-        #self.events_tree.item(item, tags='blue')
-
-    def display_events(self, top, cal):
-        log.info(self.controller.get_events(self.date_text.get()))
-
     def set_displayed_events(self):
         events = self.controller.get_events(self.date_text.get())
 

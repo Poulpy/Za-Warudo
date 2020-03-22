@@ -2,8 +2,6 @@ import logging as log
 from tkinter import *
 from tkinter import ttk
 
-from user import User
-
 class ConnectionPage(ttk.Frame):
     '''
     Frame for the user to log in

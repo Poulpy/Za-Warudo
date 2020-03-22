@@ -2,9 +2,9 @@ import datetime
 
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, BooleanField, Check
 
-from debate import Debate
-from projection_room import ProjectionRoom
-from user import User
+from models.debate import Debate
+from models.projection_room import ProjectionRoom
+from models.user import User
 
 db = SqliteDatabase("db/app.db")
 

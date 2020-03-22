@@ -1,6 +1,7 @@
 import re
 from tkinter import *
 from tkinter import ttk
+import ttkwidgets as tkw
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
 import logging as log
@@ -55,12 +56,20 @@ class EditEventPage(ttk.Frame):
 
         members_label = ttk.Label(self, text="Choose members")
         user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
-        members_frame = ttk.Frame(self)
-        users_chbuttons = [None for i in range(len(user_names))]
 
+        # List of users; the responsible has to choose among them
+        # members that'll participate in the event's organisation
+        self.members_tree = tkw.CheckboxTreeview(self, columns=('Events'), selectmode='browse')
+        self.members_tree.column("Events", width=50)
+        self.members_tree.heading("#0", text="Name")
+        self.members_tree.heading("Events", text="Events")
+
+        self.members_tree.tag_configure('odd', background="#F0F0F0")
+        self.members_tree.tag_configure('even', background="#FAFAFA")
         for i, user in enumerate(user_names):
-            users_chbuttons[i] = ttk.Checkbutton(members_frame, text=user)
-            users_chbuttons[i].grid(row=i, column=0, sticky=W)
+            self.members_tree.insert('', 'end', text=user, tags=('even' if i % 2 else 'odd',))
+
+
 
         save_button = ttk.Button(self, text="Save", command=self.save)
 
@@ -87,7 +96,8 @@ class EditEventPage(ttk.Frame):
         management_chbutton.grid(row=5, column=2)
         guest_attendance_chbutton.grid(row=5, column=3)
         members_label.grid(row=6, column=0)
-        members_frame.grid(row=7, column=0)
+        #members_frame.grid(row=7, column=0)
+        self.members_tree.grid(row=7, column=0, columnspan=2)
         save_button.grid(row=8, column=0)
 
     def save(self, event=None):

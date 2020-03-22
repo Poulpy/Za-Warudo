@@ -1,8 +1,7 @@
-# from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField
+from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, BooleanField, Check
 from user import User
 from projection_room import ProjectionRoom
 from debate import Debate
-from peewee import *
 import datetime
 
 db = SqliteDatabase("db/app.db")

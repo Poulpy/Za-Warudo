@@ -1,12 +1,15 @@
-# from peewee import SqliteDatabase, Model, ForeignKeyField
-# from . import User, Event
+from peewee import SqliteDatabase, Model, ForeignKeyField
 from user import User
 from event import Event
-from peewee import *
 
 db = SqliteDatabase("db/app.db")
 
 class Team(Model):
+    '''
+    A user can participate in the organisation of an
+    event : that's a member of a team
+    '''
+
     member = ForeignKeyField(User)
     event = ForeignKeyField(Event)
 

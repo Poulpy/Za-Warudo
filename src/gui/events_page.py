@@ -26,31 +26,27 @@ class EventsPage(ttk.Frame):
 
         title = ttk.Label(self, text="Events", font=("TkDefaultFont", "15"))
 
+        # Creation of of an event : clicking on that button
+        # will redirect the user on the edit event frame
         new_event_button = ttk.Button(self, text="New event", command=lambda: controller.show_frame("EditEventPage"))
-
-        title.grid(row=0, column=0, sticky=(W+N))
-        new_event_button.grid(row=0, column=1, sticky=(W+E), pady=5, padx=5)
 
         self.date_text = StringVar()
         self.date_entry = EntryDate(self, textvariable=self.date_text)
         self.date_label = ttk.Label(self, textvariable=self.date_text)
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
+        # Each time the date changes, the events of the
+        # date in the input are shown
         self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.set_displayed_events())
 
-        self.date_entry.grid(row=1, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Edit").grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Ticketing").grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
 
-        # self.date_label.grid(row=1, column=2, sticky=W)
-
-        self.grid_columnconfigure(0, weight=2)
-
-
-
-
+        # The events are shown in a table. The columns shows:
+        # the name, the date the event starts, the date the event
+        # ends, and the type of the projection
         self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
         self.events_tree.column("Begin", width=50)
         self.events_tree.column("End", width=50)
@@ -66,10 +62,14 @@ class EventsPage(ttk.Frame):
         self.events_tree.tag_configure('select')
 
         self.events_tree.tag_bind('select', '<Button-1>', self.item_clicked)
-        self.events_tree.grid(row=1, column=0, rowspan=5, sticky=NSEW)
 
         style = ttk.Style()
 
+        # The breeze theme is missing something: there is
+        # no highlight chen the user clicks on an item
+        # of the Treeview. These lines add little dots
+        # around the item to prevent that
+        # TODO see README
         style.layout("Treeview.Item",
         [('Treeitem.padding', {'sticky': 'nswe', 'children':
             [('Treeitem.indicator', {'side': 'left', 'sticky': ''}),
@@ -81,6 +81,13 @@ class EventsPage(ttk.Frame):
         })]
         )
 
+        title.grid(row=0, column=0, sticky=(W+N))
+        new_event_button.grid(row=0, column=1, sticky=(W+E), pady=5, padx=5)
+        self.date_entry.grid(row=1, column=1, sticky=(W+E), pady=5, padx=5)
+        self.events_tree.grid(row=1, column=0, rowspan=5, sticky=NSEW)
+        self.grid_columnconfigure(0, weight=2)
+
+
     def item_clicked(self, event=None):
         print('item clicked')
         it = self.events_tree.focus()
@@ -88,6 +95,10 @@ class EventsPage(ttk.Frame):
         self.events_tree.selection_set(it)
 
     def set_displayed_events(self):
+        '''
+        Show the events according to the date of the input
+        '''
+
         events = self.controller.get_events(self.date_text.get())
 
         self.events_tree.delete(*self.events_tree.get_children())

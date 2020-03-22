@@ -1,8 +1,8 @@
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, Check
 
-from category import Category
-from event import Event
-from projection_room import ProjectionRoom
+from models.category import Category
+from models.event import Event
+from models.projection_room import ProjectionRoom
 
 db = SqliteDatabase("db/app.db")
 

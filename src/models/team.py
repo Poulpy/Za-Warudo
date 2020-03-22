@@ -1,7 +1,7 @@
 from peewee import SqliteDatabase, Model, ForeignKeyField
 
-from user import User
-from event import Event
+from models.user import User
+from models.event import Event
 
 db = SqliteDatabase("db/app.db")
 

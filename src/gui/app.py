@@ -6,12 +6,12 @@ import logging as log
 from peewee import *
 from ttkthemes import ThemedStyle
 
-from event import Event
+from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
-from projection_room import ProjectionRoom
-from user import User
+from models.projection_room import ProjectionRoom
+from models.user import User
 
 db = SqliteDatabase("db/app.db")
 

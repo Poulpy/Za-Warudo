@@ -1,13 +1,24 @@
+from datetime import datetime
+from datetime import timedelta
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from tkcalendar import Calendar, DateEntry
-from datetime import timedelta
-from datetime import datetime
 import logging as log
+
+from tkcalendar import Calendar, DateEntry
+
 from gui.entry_date import EntryDate
 
 class EventsPage(ttk.Frame):
+    '''
+    Frame showing all events of a day. With the
+    right permissions, the user can :
+    - delete an event
+    - show some details
+    - modify
+    - see the ticketing page
+    - create an event
+    '''
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)

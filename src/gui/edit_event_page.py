@@ -1,22 +1,29 @@
-import re
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
+import logging as log
+import re
+
 import ttkwidgets as tkw
 from tkcalendar import Calendar, DateEntry
-from datetime import datetime
-import logging as log
+
 from gui.entry_date import EntryDate
 
 class EditEventPage(ttk.Frame):
+    '''
+    Frame to create a new event
+    Upon creation the user is redirected to the events page
+    TODO frame to create AND edit an event
+    '''
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
         back_button = ttk.Button(self, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
 
+        # Event form
         name_label = ttk.Label(self, text="Name")
         self.name_entry = ttk.Entry(self)
 
@@ -28,13 +35,21 @@ class EditEventPage(ttk.Frame):
         self.hour_text.set('12')
         self.running_time_text.set('60')
 
+        # Input for the date of the event
         begin = ttk.Label(self, text="Day")
         begin_entry = EntryDate(self, textvariable=self.begin_text)
+        # Input for the hour of the event
         hour = ttk.Label(self, text="Hour")
         hour_entry = Spinbox(self, from_=0, to=24, textvariable=self.hour_text)
+        # Input for the running time, in minutes
+        # TODO actually we can type anything in this s* widget
+        # do something to prevent that by using regex
+        # When clicking on the save button, there may be a label
+        # if the input is wrong
         running_time = ttk.Label(self, text="Running time (minutes)")
         running_time_entry = Spinbox(self, from_=0, to=500, textvariable=self.running_time_text)
 
+        # Dropdown list for the type of the projection (film, docu)
         pj_label = ttk.Label(self, text="Projection type")
         self.projection_type_choosen = StringVar()
         projection_types = ttk.Combobox(self, textvariable=self.projection_type_choosen, state='readonly')
@@ -43,17 +58,20 @@ class EditEventPage(ttk.Frame):
 
         pjs = [pj['location'] for pj in controller.get_projection_rooms().dicts()]
 
+        # Dropdown list for the location of the event
         pr_label = ttk.Label(self, text="Projection room")
         self.projection_room_choosen = StringVar()
         projection_rooms = ttk.Combobox(self, textvariable=self.projection_room_choosen, state='readonly')
         projection_rooms['values'] = pjs
         projection_rooms.current(0)
 
+        # Inputs for the event's status to go 'finished'
         room_chbutton = ttk.Checkbutton(self, text="Room reserved")
         equipment_chbutton = ttk.Checkbutton(self, text="Equipment reserved")
         management_chbutton = ttk.Checkbutton(self, text="Management reserved")
         guest_attendance_chbutton = ttk.Checkbutton(self, text="Guest attendance confirmed")
 
+        # TODO the user can assign users to this event
         members_label = ttk.Label(self, text="Choose members")
         user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
 
@@ -69,38 +87,51 @@ class EditEventPage(ttk.Frame):
         for i, user in enumerate(user_names):
             self.members_tree.insert('', 'end', text=user, tags=('even' if i % 2 else 'odd',))
 
-
-
+        # And of course, the button to save it all
         save_button = ttk.Button(self, text="Save", command=self.save)
 
 
+        # Placing the components
+        # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
         back_button.grid(row=0, column=3, sticky=E)
 
+        # ROW 1
         name_label.grid(row=1, column=0, sticky=W)
         self.name_entry.grid(row=1, column=1)
 
+        # ROW 2
         begin.grid(row=2, column=0, sticky=W)
         begin_entry.grid(row=2, column=1)
+
+        # ROW 3
         hour.grid(row=3, column=0, sticky=W)
         hour_entry.grid(row=3, column=1, sticky=W)
         running_time.grid(row=3, column=2)
         running_time_entry.grid(row=3, column=3)
+
+        # ROW 4
         pj_label.grid(row=4, column=0, sticky=W)
         projection_types.grid(row=4, column=1)
         pr_label.grid(row=4, column=2)
         projection_rooms.grid(row=4, column=3)
 
+        # ROW 5
         room_chbutton.grid(row=5, column=0)
         equipment_chbutton.grid(row=5, column=1)
         management_chbutton.grid(row=5, column=2)
         guest_attendance_chbutton.grid(row=5, column=3)
+
+        # ROW 6
         members_label.grid(row=6, column=0)
-        #members_frame.grid(row=7, column=0)
         self.members_tree.grid(row=7, column=0, columnspan=2)
         save_button.grid(row=8, column=0)
 
     def save(self, event=None):
+        '''
+        Get all the datas from the form to create an
+        event. Redirects to the events page
+        '''
         new_event = dict()
 
         log.info("Name " + self.name_entry.get())

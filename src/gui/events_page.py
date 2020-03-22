@@ -113,6 +113,9 @@ class EventsPage(ttk.Frame):
                                                   event['projection_type']), tags=(tag, 'select'))
 
     def confirm_delete(self):
+        '''
+        Pop up window to confirm an event deletion
+        '''
         messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
 
 

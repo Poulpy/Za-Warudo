@@ -6,15 +6,14 @@ import sys
 from peewee import SqliteDatabase
 from playhouse.reflection import print_table_sql
 
-from category import Category
-from debate import Debate
-from debate import Debate
-from event import Event
-from events_category import EventsCategory
-from projection_room import ProjectionRoom
-from team import Team
-from user import User
-from vacation import Vacation
+from models.user import User
+from models.category import Category
+from models.debate import Debate
+from models.event import Event
+from models.events_category import EventsCategory
+from models.projection_room import ProjectionRoom
+from models.team import Team
+from models.vacation import Vacation
 
 db = SqliteDatabase("db/app.db")
 

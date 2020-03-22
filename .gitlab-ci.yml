@@ -17,6 +17,7 @@ pages:
   - pip3 install peewee
   - pip3 install tkcalendar
   - pip3 install ttkthemes
+  - pip3 install ttkwidgets
   - pip3 install pdoc3
   - export PYTHONPATH="src"
   - pdoc3 --html -o public src --force

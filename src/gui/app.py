@@ -1,14 +1,17 @@
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
-from ttkthemes import ThemedStyle
-from gui.connection_page import ConnectionPage
-from gui.events_page import EventsPage
-from gui.edit_event_page import EditEventPage
-from peewee import *
-from user import User
-from event import Event
 import logging as log
-from datetime import datetime
+
+from peewee import *
+from ttkthemes import ThemedStyle
+
+from event import Event
+from gui.connection_page import ConnectionPage
+from gui.edit_event_page import EditEventPage
+from gui.events_page import EventsPage
+from projection_room import ProjectionRoom
+from user import User
 
 db = SqliteDatabase("db/app.db")
 
@@ -21,15 +24,19 @@ class App(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
 
-        # self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
-
         container = ttk.Frame(self)
+        # We use the 'breeze' theme because it's the most beautiful
+        # theme along with 'arc'
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("600x600")
+        self.geometry("700x600")
         self.minsize(300, 300)
-        self.title("ZA WARUDO")
+        self.title("Za Warudo")
+
+        # We want the current user logged in to be available from
+        # everywhere, like in rails
+        self.user = None
 
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -39,6 +46,8 @@ class App(Tk):
         s = ttk.Style()
         s.configure("Red.TLabel", foreground="red")
 
+        # All frames of the application
+        # TODO make it dynamic
         self.frames = {}
 
         for P in (ConnectionPage, EventsPage, EditEventPage):
@@ -52,42 +61,92 @@ class App(Tk):
             frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
         self.show_frame("ConnectionPage")
-        self.set_menu(False)
+        self.set_menu(is_connected=False)
 
 
     def set_menu(self, is_connected: bool):
+        '''
+        Show a menu on top of the window
+        '''
+
         menubar = Menu(self)
+
+        # 2 menus
         pmenu = Menu(menubar, tearoff=0)
         help_menu = Menu(menubar, tearoff=0)
+
         if is_connected:
             pmenu.add_command(label="Timetable")
             pmenu.add_command(label="New vacation")
             pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
             pmenu.add_separator()
-        pmenu.add_command(label="Exit", command=self.destroy)
 
+        pmenu.add_command(label="Exit", command=self.destroy)
         help_menu.add_command(label="About")
-        menubar.add_cascade(label="Fichier", menu=pmenu)
+
+        # We add all the menus
+        menubar.add_cascade(label="Za Warudo", menu=pmenu)
         menubar.add_cascade(label="Help", menu=help_menu)
+
         self.config(menu=menubar)
 
     def get_events(self, date_str: str):
+        '''
+        Return all events from the database, according to the date
+        given in argument (format : "%Y-%m-%d")
+        TODO pass the format in argument for flexibility
+        '''
+
         db.connect()
+
         log.info(date_str)
+
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
         events = Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day))
+
         db.close()
-        for event in events.dicts():
-            log.info(event)
+
         return events
+
+    def get_projection_rooms(self):
+        '''
+        Return all projection rooms
+        '''
+
+        db.connect()
+        proj_rooms = ProjectionRoom.select()
+        db.close()
+
+        return proj_rooms
+
+    def get_users(self):
+        '''
+        Return all users
+        '''
+
+        db.connect()
+        users = User.select()
+        db.close()
+
+        return users
+
+    def update_events_page(self):
+        '''
+        Update the events displayed in the events page
+        '''
+
+        self.frames["EventsPage"].set_displayed_events()
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
+
         frame = self.frames[page_name]
         frame.tkraise()
 
+        # There are some menu items/options that are only visible
+        # to logged in users
         if page_name == "ConnectionPage":
             self.set_menu(False)
         else:
@@ -113,10 +172,22 @@ class App(Tk):
         else:
             if password == u.password:
                 self.frames["ConnectionPage"].display_notification("", "TLabel")
+                self.current_user = u
                 log.info("Authentification successfull")
                 self.show_frame("EventsPage")
             else:
                 self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
 
         db.close()
+
+    def create_event(self, event):
+        '''
+        Create a event with a dict given in argument
+        '''
+        event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
+        event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
+        event['responsible'] = self.current_user.id
+        Event.create(**event)
+
+
 

@@ -1,9 +1,10 @@
-# from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField
-from user import User
-from projection_room import ProjectionRoom
-from debate import Debate
-from peewee import *
 import datetime
+
+from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, BooleanField, Check
+
+from debate import Debate
+from projection_room import ProjectionRoom
+from user import User
 
 db = SqliteDatabase("db/app.db")
 
@@ -12,7 +13,8 @@ class Event(Model):
 
     name = CharField()
     begin = DateTimeField(default=datetime.datetime.now())
-    end = DateTimeField(default=datetime.datetime.now() + datetime.timedelta(hours=2))
+    running_time = IntegerField(default=120, constraints=[Check('running_time >= 0')])
+    projection_type = CharField()
 
     sold_seats = IntegerField(default=0, constraints=[Check('sold_seats >= 0')])
     booked_seats = IntegerField(default=0, constraints=[Check('booked_seats >= 0')])

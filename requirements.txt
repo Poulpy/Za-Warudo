@@ -1,5 +1,5 @@
-pip install peewee
-pip install tkcalendar
-pip install ttkthemes
-pip install ttkwidgets
-pip install pdoc3
+peewee
+tkcalendar
+ttkthemes
+ttkwidgets
+pdoc3

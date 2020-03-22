@@ -1,5 +1,6 @@
 import sys
 import logging as log
+
 from gui.app import App
 
 if __name__ == "__main__":

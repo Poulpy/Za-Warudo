@@ -1,4 +1,5 @@
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, Check
+
 from category import Category
 from event import Event
 from projection_room import ProjectionRoom

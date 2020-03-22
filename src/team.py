@@ -1,4 +1,5 @@
 from peewee import SqliteDatabase, Model, ForeignKeyField
+
 from user import User
 from event import Event
 

@@ -27,6 +27,9 @@ python3.5 tests/TestListMethods.py
 ```
 
 ### Requirements
+```bash
+pip install -r requirements.txt
+```
 
 Python 3.5
 

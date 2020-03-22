@@ -1,15 +1,17 @@
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
-from ttkthemes import ThemedStyle
-from gui.connection_page import ConnectionPage
-from gui.events_page import EventsPage
-from gui.edit_event_page import EditEventPage
-from peewee import *
-from user import User
-from event import Event
-from projection_room import ProjectionRoom
 import logging as log
-from datetime import datetime
+
+from peewee import *
+from ttkthemes import ThemedStyle
+
+from event import Event
+from gui.connection_page import ConnectionPage
+from gui.edit_event_page import EditEventPage
+from gui.events_page import EventsPage
+from projection_room import ProjectionRoom
+from user import User
 
 db = SqliteDatabase("db/app.db")
 

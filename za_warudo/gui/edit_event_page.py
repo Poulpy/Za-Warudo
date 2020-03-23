@@ -114,11 +114,8 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.tag_configure('even', background="#FAFAFA")
 
         for i, category in enumerate(categories):
-            s = (str(category['price']) + " E").encode('utf-8')
-            print(s)
-            s = '%d%s' % (category['price'], '€')
-            print(s)
-            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s))
+            s = '%d%s' % (category['price'], ' €')
+            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
 
 
         # Placing the components

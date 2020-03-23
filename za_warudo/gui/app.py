@@ -13,6 +13,7 @@ from gui.events_page import EventsPage
 from models.projection_room import ProjectionRoom
 from models.user import User
 from models.team import Team
+from models.category import Category
 
 db = SqliteDatabase("db/app.db")
 
@@ -46,6 +47,7 @@ class App(Tk):
         # Styles
         s = ttk.Style()
         s.configure("Red.TLabel", foreground="red")
+        s.configure("Treeview", rowheight=30)
 
         # All frames of the application
         # TODO make it dynamic
@@ -110,6 +112,17 @@ class App(Tk):
         db.close()
 
         return events
+
+    def get_categories(self):
+        '''
+        Return all categories
+        '''
+        db.connect()
+        categories = Category.select()
+        db.close()
+
+        return categories
+
 
     def get_projection_rooms(self):
         '''

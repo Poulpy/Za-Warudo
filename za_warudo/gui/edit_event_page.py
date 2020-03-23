@@ -74,7 +74,7 @@ class EditEventPage(ttk.Frame):
 
 
         # TODO the user can assign users to this event
-        members_label = ttk.Label(self, text="Choose members")
+        members_label = ttk.Label(self, text="Add members")
         user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
 
         # List of users; the responsible has to choose among them
@@ -88,6 +88,22 @@ class EditEventPage(ttk.Frame):
         self.members_tree.tag_configure('even', background="#FAFAFA")
         for i, user in enumerate(user_names):
             self.members_tree.insert('', 'end', text=user, tags=('even' if i % 2 else 'odd',))
+
+        # CATEGORIES
+        categories_label = ttk.Label(self, text="Add categories")
+        categories = controller.get_categories().dicts()
+
+        self.cats_tree = tkw.CheckboxTreeview(self, columns=('Price'), selectmode='none')
+        self.cats_tree.column("#0", width=100)
+        self.cats_tree.column("Price", width=50)
+        self.cats_tree.heading("#0", text="Title")
+        self.cats_tree.heading("Price", text="Price")
+
+        self.cats_tree.tag_configure('odd', background="#F0F0F0")
+        self.cats_tree.tag_configure('even', background="#FAFAFA")
+
+        for i, category in enumerate(categories):
+            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(str(category['price']) + " €"))
 
         # And of course, the button to save it all
         save_button = ttk.Button(self, text="Save", command=self.save)
@@ -119,7 +135,7 @@ class EditEventPage(ttk.Frame):
         projection_rooms.grid(row=4, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 5
-        check_frame.grid(row=5, column=2, rowspan=2, columnspan=2, sticky=N+W)
+        check_frame.grid(row=7, column=2, rowspan=2, columnspan=2, sticky=N+W)
         room_chbutton.grid(row=5, column=2, sticky=W)
         equipment_chbutton.grid(row=6, column=2, sticky=W)
         management_chbutton.grid(row=7, column=2, sticky=W)
@@ -128,6 +144,9 @@ class EditEventPage(ttk.Frame):
         # ROW 6
         members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
         self.members_tree.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=W)
+        categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
+        self.cats_tree.grid(row=6, column=2, columnspan=2, pady=5, padx=5, sticky=W)
+
         save_button.grid(row=8, column=0, pady=5, padx=5, sticky=W)
 
     def save(self, event=None):

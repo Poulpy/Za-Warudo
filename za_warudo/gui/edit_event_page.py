@@ -117,11 +117,31 @@ class EditEventPage(ttk.Frame):
             s = '%d%s' % (category['price'], ' €')
             self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
 
+        self.author = StringVar()
+        self.context = StringVar()
+
+        presentation_frame = ttk.Frame(self)
+        presentation_check = ttk.Checkbutton(presentation_frame, text="Author presentation")
+        author_label = ttk.Label(presentation_frame, text="Author")
+        author_entry = ttk.Entry(presentation_frame, textvariable=self.author)
+        context_label = ttk.Label(presentation_frame, text="Context")
+        context_entry = ttk.Entry(presentation_frame, textvariable=self.context)
+
+        self.speaker = StringVar()
+        self.contact_details = StringVar()
+
+        debate_frame = ttk.Frame(self)
+        debate_check = ttk.Checkbutton(debate_frame, text="Debate")
+        speaker_label = ttk.Label(debate_frame, text="Speaker")
+        speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker)
+        contact_label = ttk.Label(debate_frame, text="Contact details")
+        contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details)
+
 
         # Placing the components
         # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
-        buttons_frame.grid(row=0, column=3, sticky=E)
+        buttons_frame.grid(row=0, column=5, sticky=E)
         back_button.grid(row=0, column=2, pady=5, padx=5, sticky=E)
         save_button.grid(row=0, column=3, pady=5, padx=5, sticky=E)
 
@@ -140,29 +160,44 @@ class EditEventPage(ttk.Frame):
         # ROW 3
 
         # ROW 4
-        pj_label.grid(row=4, column=0, sticky=W, pady=5, padx=5)
-        projection_types.grid(row=4, column=1, sticky=E, pady=5, padx=5)
-        pr_label.grid(row=4, column=2, pady=5, sticky=W, padx=5)
-        projection_rooms.grid(row=4, column=3, sticky=E, pady=5, padx=5)
+        pj_label.grid(row=3, column=0, sticky=W, pady=5, padx=5)
+        projection_types.grid(row=3, column=1, sticky=E, pady=5, padx=5)
+        pr_label.grid(row=3, column=2, pady=5, sticky=W, padx=5)
+        projection_rooms.grid(row=3, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 5
         # self.grid_rowconfigure(7, weight=3)
-        check_frame.grid(row=1, column=4, rowspan=2, columnspan=2, sticky=N+W)
-        room_chbutton.grid(row=5, column=2, sticky=W)
-        equipment_chbutton.grid(row=6, column=2, sticky=W)
-        management_chbutton.grid(row=7, column=2, sticky=W)
-        guest_attendance_chbutton.grid(row=8, column=2, sticky=W)
+        presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2)
+        presentation_check.grid(row=0, column=0, sticky=W)
+        author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
+        author_entry.grid(row=1, column=1, sticky=E)
+        context_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
+        context_entry.grid(row=2, column=1, sticky=E)
+
+
+        debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2)
+        debate_check.grid(row=0, column=0, sticky=W)
+        speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
+        speaker_entry.grid(row=1, column=1, sticky=E)
+        contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
+        contact_entry.grid(row=2, column=1, sticky=E)
+
+        check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W)
+        room_chbutton.grid(row=4, column=2, sticky=W)
+        equipment_chbutton.grid(row=5, column=2, sticky=W)
+        management_chbutton.grid(row=6, column=2, sticky=W)
+        guest_attendance_chbutton.grid(row=7, column=2, sticky=W)
 
         # ROW 6
         # self.grid_rowconfigure(6, weight=0)
-        members_frame.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
-        members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
+        members_frame.grid(row=5, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
+        members_label.grid(row=4, column=0, pady=5, padx=5, sticky=W)
         # members_frame.pack_propagate(0)
         self.members_tree.pack(side=LEFT)
         members_scrollbar.pack()
 
-        categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
-        cats_frame.grid(row=6, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
+        categories_label.grid(row=4, column=2, pady=5, padx=5, sticky=W)
+        cats_frame.grid(row=5, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
         self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
 

@@ -106,7 +106,7 @@ class EditEventPage(ttk.Frame):
         self.cats_tree = tkw.CheckboxTreeview(cats_frame, columns=('Price'), selectmode='none')
         cats_scrollbar.configure(command=self.cats_tree.yview)
         self.cats_tree.column("#0", width=100)
-        self.cats_tree.column("Price", width=50)
+        self.cats_tree.column("Price", width=20, anchor='center')
         self.cats_tree.heading("#0", text="Title")
         self.cats_tree.heading("Price", text="Price")
 
@@ -114,7 +114,11 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.tag_configure('even', background="#FAFAFA")
 
         for i, category in enumerate(categories):
-            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(str(category['price']) + " €"))
+            s = (str(category['price']) + " E").encode('utf-8')
+            print(s)
+            s = '%d%s' % (category['price'], '€')
+            print(s)
+            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s))
 
 
         # Placing the components

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
-<title>src API documentation</title>
+<title>za_warudo.models.events_category API documentation</title>
 <meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
@@ -17,28 +17,100 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Namespace <code>src</code></h1>
+<h1 class="title">Module <code>za_warudo.models.events_category</code></h1>
 </header>
 <section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, Check
+
+from models.category import Category
+from models.event import Event
+from models.projection_room import ProjectionRoom
+
+db = SqliteDatabase(&#34;db/app.db&#34;)
+
+class EventsCategory(Model):
+    &#39;&#39;&#39;
+    An event can have multiple fees, and a fee can belong to many events
+    &#39;&#39;&#39;
+
+    event = ForeignKeyField(Event)
+    category = ForeignKeyField(Category)
+
+    class Meta:
+        database = db
+        table_name = &#34;events_categories&#34;</code></pre>
+</details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="src.boost_list" href="boost_list.html">src.boost_list</a></code></dt>
+<dt id="za_warudo.models.events_category.EventsCategory"><code class="flex name class">
+<span>class <span class="ident">EventsCategory</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>An event can have multiple fees, and a fee can belong to many events</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EventsCategory(Model):
+    &#39;&#39;&#39;
+    An event can have multiple fees, and a fee can belong to many events
+    &#39;&#39;&#39;
+
+    event = ForeignKeyField(Event)
+    category = ForeignKeyField(Category)
+
+    class Meta:
+        database = db
+        table_name = &#34;events_categories&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>peewee.Model</li>
+<li>peewee._metaclass_helper_</li>
+<li>peewee.Node</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="za_warudo.models.events_category.EventsCategory.DoesNotExist"><code class="name">var <span class="ident">DoesNotExist</span></code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+</dd>
+<dt id="za_warudo.models.events_category.EventsCategory.category"><code class="name">var <span class="ident">category</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
-<dt><code class="name"><a title="src.game" href="game.html">src.game</a></code></dt>
+<dt id="za_warudo.models.events_category.EventsCategory.category_id"><code class="name">var <span class="ident">category_id</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="za_warudo.models.events_category.EventsCategory.event"><code class="name">var <span class="ident">event</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="za_warudo.models.events_category.EventsCategory.event_id"><code class="name">var <span class="ident">event_id</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="za_warudo.models.events_category.EventsCategory.id"><code class="name">var <span class="ident">id</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -47,10 +119,24 @@
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src.boost_list" href="boost_list.html">src.boost_list</a></code></li>
-<li><code><a title="src.game" href="game.html">src.game</a></code></li>
+<li><code><a title="za_warudo.models" href="index.html">za_warudo.models</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="za_warudo.models.events_category.EventsCategory" href="#za_warudo.models.events_category.EventsCategory">EventsCategory</a></code></h4>
+<ul class="two-column">
+<li><code><a title="za_warudo.models.events_category.EventsCategory.DoesNotExist" href="#za_warudo.models.events_category.EventsCategory.DoesNotExist">DoesNotExist</a></code></li>
+<li><code><a title="za_warudo.models.events_category.EventsCategory.category" href="#za_warudo.models.events_category.EventsCategory.category">category</a></code></li>
+<li><code><a title="za_warudo.models.events_category.EventsCategory.category_id" href="#za_warudo.models.events_category.EventsCategory.category_id">category_id</a></code></li>
+<li><code><a title="za_warudo.models.events_category.EventsCategory.event" href="#za_warudo.models.events_category.EventsCategory.event">event</a></code></li>
+<li><code><a title="za_warudo.models.events_category.EventsCategory.event_id" href="#za_warudo.models.events_category.EventsCategory.event_id">event_id</a></code></li>
+<li><code><a title="za_warudo.models.events_category.EventsCategory.id" href="#za_warudo.models.events_category.EventsCategory.id">id</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

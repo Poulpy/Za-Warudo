@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
-<title>src.game API documentation</title>
+<title>za_warudo.cli_game API documentation</title>
 <meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
@@ -17,20 +17,22 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.game</code></h1>
+<h1 class="title">Module <code>za_warudo.cli_game</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mystery_number(n: int):
+<pre><code class="python">from random import randint
+
+def mystery_number(n: int):
     &#34;&#34;&#34;
     2
     Game where the user must guess the number generated [0, 100] by the
     computer. The user can try n times, n given in argument
     &#34;&#34;&#34;
-    if n &lt;= 0: return
+    if n &lt;= 0: raise ValueError(&#34;The number of trials can&#39;t be &lt;= 0&#34;)
 
     number_to_guess = randint(0, 100)
     i = 0
@@ -59,12 +61,12 @@ def dice_game(n: int):
     3, the score is multiplied by 2
     5, the player loses 2 points
     &#34;&#34;&#34;
-    if n &lt;= 0: return
+    if n &lt;= 0: raise ValueError(&#34;The score can&#39;t be &lt;= 0&#34;)
 
     player_points = [0, 0]
     current = 0
 
-    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
+    while player_points[0] &lt; n and player_points[1] &lt; n:
         turn_end = False
         print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
 
@@ -89,7 +91,7 @@ def dice_game(n: int):
                 player_points[current] -= 2
 
             print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
-            if player_points[current] &gt; 50:
+            if player_points[current] &gt; n:
                 turn_end = True
 
         current = (current + 1) % 2
@@ -105,7 +107,7 @@ def dice_game(n: int):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="src.game.dice_game"><code class="name flex">
+<dt id="za_warudo.cli_game.dice_game"><code class="name flex">
 <span>def <span class="ident">dice_game</span></span>(<span>n)</span>
 </code></dt>
 <dd>
@@ -130,12 +132,12 @@ An even number increases the player's score
     3, the score is multiplied by 2
     5, the player loses 2 points
     &#34;&#34;&#34;
-    if n &lt;= 0: return
+    if n &lt;= 0: raise ValueError(&#34;The score can&#39;t be &lt;= 0&#34;)
 
     player_points = [0, 0]
     current = 0
 
-    while player_points[0] &lt; 50 and player_points[1] &lt; 50:
+    while player_points[0] &lt; n and player_points[1] &lt; n:
         turn_end = False
         print(&#34;Turn of Player %d (%d)&#34; % (current, player_points[current]))
 
@@ -160,7 +162,7 @@ An even number increases the player's score
                 player_points[current] -= 2
 
             print(&#34;Total points at end of turn : %d&#34; % (player_points[current]))
-            if player_points[current] &gt; 50:
+            if player_points[current] &gt; n:
                 turn_end = True
 
         current = (current + 1) % 2
@@ -169,7 +171,7 @@ An even number increases the player's score
     print(&#34;Scores : &#34; + str(player_points))</code></pre>
 </details>
 </dd>
-<dt id="src.game.mystery_number"><code class="name flex">
+<dt id="za_warudo.cli_game.mystery_number"><code class="name flex">
 <span>def <span class="ident">mystery_number</span></span>(<span>n)</span>
 </code></dt>
 <dd>
@@ -186,7 +188,7 @@ computer. The user can try n times, n given in argument</p></section>
     Game where the user must guess the number generated [0, 100] by the
     computer. The user can try n times, n given in argument
     &#34;&#34;&#34;
-    if n &lt;= 0: return
+    if n &lt;= 0: raise ValueError(&#34;The number of trials can&#39;t be &lt;= 0&#34;)
 
     number_to_guess = randint(0, 100)
     i = 0
@@ -219,13 +221,13 @@ computer. The user can try n times, n given in argument</p></section>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src" href="index.html">src</a></code></li>
+<li><code><a title="za_warudo" href="index.html">za_warudo</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="src.game.dice_game" href="#src.game.dice_game">dice_game</a></code></li>
-<li><code><a title="src.game.mystery_number" href="#src.game.mystery_number">mystery_number</a></code></li>
+<li><code><a title="za_warudo.cli_game.dice_game" href="#za_warudo.cli_game.dice_game">dice_game</a></code></li>
+<li><code><a title="za_warudo.cli_game.mystery_number" href="#za_warudo.cli_game.mystery_number">mystery_number</a></code></li>
 </ul>
 </li>
 </ul>

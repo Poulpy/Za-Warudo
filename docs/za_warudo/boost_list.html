@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
-<title>src.boost_list API documentation</title>
+<title>za_warudo.boost_list API documentation</title>
 <meta name="description" content="" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
@@ -17,20 +17,19 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.boost_list</code></h1>
+<h1 class="title">Module <code>za_warudo.boost_list</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from random import randint
-from math import sqrt
+<pre><code class="python">from math import sqrt
 
 def uniq(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.1
-    Return a list removed form its duplicates
+    Return a list removed from its duplicates
     &#34;&#34;&#34;
     result = []
     i = 0
@@ -45,8 +44,10 @@ def uniq(l: list) -&gt; list:
 def sort_uniq(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.1
-    Remove the duplicates in an sorted list
+    Remove the duplicates in a sorted list
     &#34;&#34;&#34;
+    if len(l) == 0: return l
+
     i = 1
     rst = [l[0]]
 
@@ -76,7 +77,8 @@ def flatten(l: list) -&gt; list:
 def successive_ints(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.3
-    Return a list containing the successive integers in the list given in argument
+    Return a list containing the successive integers in the
+    list given in argument
     &#34;&#34;&#34;
     rst = []
 
@@ -89,11 +91,10 @@ def successive_ints(l: list) -&gt; list:
 def occurrences(l: list) -&gt; dict:
     &#34;&#34;&#34;
     1.4
-    Return a dictionnary, containing the number of occurrences of an int in the
-    list given in argument
+    Return a dictionnary, containing the number of occurrences of
+    an element in a list given in argument
     &#34;&#34;&#34;
     d = dict()
-    numbers = uniq(l)
 
     for el in l:
         d[el] = l.count(el)
@@ -103,15 +104,14 @@ def occurrences(l: list) -&gt; dict:
 def dice_combinations() -&gt; dict:
     &#34;&#34;&#34;
     1.5
-    Returns the combinations of 2 dices. The key is the result, and
-    the value is a 2D list of 2 lengthed list (2 dices)
+    Returns the combinations of 2 dices. The key is the result,
+    and the value is a 2D list of 2 lengthed list (2 dices)
     {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
     &#34;&#34;&#34;
     combinations = {n:[] for n in range(2, 13)}
 
-    for i in range(1, 6 + 1):
-        for j in range(1, 6 + 1):
-            key = str(i + j)
+    for i in range(1, 7):
+        for j in range(1, 7):
             combinations[i + j].append([i, j])
 
     return combinations
@@ -120,14 +120,19 @@ def erathostenes_sieve(n: int) -&gt; dict:
     &#34;&#34;&#34;
     1.6
     Returns a dictionary containing prime numbers
-    It is not recommended to use a list (1) because of reallocation
-    and (2) because of index handling (the primes starts at 2, the
-    list, 0)
+    It is not recommended to use a list (1) because of
+    reallocation and (2) because of index handling : the prime
+    numbers start at 2 and the list, 0; and because some numbers
+    are removed, the index changes too
     &#34;&#34;&#34;
+    if n &lt;= 0: raise ValueError(&#34;Argument can&#39;t be &lt;= 0&#34;)
+
     primes = {n:None for n in range(2, n + 1)}
 
+    # We must convert it as a list, because the size changes
     for prime in list(primes.keys()):
         for number in list(primes.keys()):
+            # It is a composit number if it is a multiple of the prime
             if prime != number and number%prime == 0:
                 del primes[number]
 
@@ -142,25 +147,25 @@ def switch(d: dict) -&gt; dict:
     rst = dict()
 
     for k, v in d.items():
-        rst[str(v)] = k
+        rst[v] = k
 
     return rst
 
 def same_elements(l1: list, l2: list) -&gt; bool:
     &#34;&#34;&#34;
     1.8
-    Check if two lists have the same elements, regardless of the number
-    of elements
+    Check if two lists have the same elements, regardless of the
+    number of elements
     &#34;&#34;&#34;
     return is_anagram(uniq(l1), uniq(l2))
 
 def is_anagram(l1: list, l2: list) -&gt; bool:
     &#34;&#34;&#34;
     1.8
-    Check if two lists are anagrams: same elements but in order or in
-    disorder
+    Check if two lists are anagrams: same elements but in order or
+    in disorder
     &#34;&#34;&#34;
-    return (sorted(l1) == (sorted(l2)))</code></pre>
+    return (occurrences(l1) == (occurrences(l2)))</code></pre>
 </details>
 </section>
 <section>
@@ -170,13 +175,13 @@ def is_anagram(l1: list, l2: list) -&gt; bool:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="src.boost_list.dice_combinations"><code class="name flex">
+<dt id="za_warudo.boost_list.dice_combinations"><code class="name flex">
 <span>def <span class="ident">dice_combinations</span></span>(<span>)</span>
 </code></dt>
 <dd>
 <section class="desc"><p 1: 1_="1]," 2:_2_="2:[[2," 2_="2]]," _1_="[1," class="..">1.5
-Returns the combinations of 2 dices. The key is the result, and
-the value is a 2D list of 2 lengthed list (2 dices)</p></section>
+Returns the combinations of 2 dices. The key is the result,
+and the value is a 2D list of 2 lengthed list (2 dices)</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -184,29 +189,29 @@ the value is a 2D list of 2 lengthed list (2 dices)</p></section>
 <pre><code class="python">def dice_combinations() -&gt; dict:
     &#34;&#34;&#34;
     1.5
-    Returns the combinations of 2 dices. The key is the result, and
-    the value is a 2D list of 2 lengthed list (2 dices)
+    Returns the combinations of 2 dices. The key is the result,
+    and the value is a 2D list of 2 lengthed list (2 dices)
     {1: [[1, 1]], 2:[[2, 1], [1, 2]], ...}
     &#34;&#34;&#34;
     combinations = {n:[] for n in range(2, 13)}
 
-    for i in range(1, 6 + 1):
-        for j in range(1, 6 + 1):
-            key = str(i + j)
+    for i in range(1, 7):
+        for j in range(1, 7):
             combinations[i + j].append([i, j])
 
     return combinations</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.erathostenes_sieve"><code class="name flex">
+<dt id="za_warudo.boost_list.erathostenes_sieve"><code class="name flex">
 <span>def <span class="ident">erathostenes_sieve</span></span>(<span>n)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.6
 Returns a dictionary containing prime numbers
-It is not recommended to use a list (1) because of reallocation
-and (2) because of index handling (the primes starts at 2, the
-list, 0)</p></section>
+It is not recommended to use a list (1) because of
+reallocation and (2) because of index handling : the prime
+numbers start at 2 and the list, 0; and because some numbers
+are removed, the index changes too</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -215,21 +220,26 @@ list, 0)</p></section>
     &#34;&#34;&#34;
     1.6
     Returns a dictionary containing prime numbers
-    It is not recommended to use a list (1) because of reallocation
-    and (2) because of index handling (the primes starts at 2, the
-    list, 0)
+    It is not recommended to use a list (1) because of
+    reallocation and (2) because of index handling : the prime
+    numbers start at 2 and the list, 0; and because some numbers
+    are removed, the index changes too
     &#34;&#34;&#34;
+    if n &lt;= 0: raise ValueError(&#34;Argument can&#39;t be &lt;= 0&#34;)
+
     primes = {n:None for n in range(2, n + 1)}
 
+    # We must convert it as a list, because the size changes
     for prime in list(primes.keys()):
         for number in list(primes.keys()):
+            # It is a composit number if it is a multiple of the prime
             if prime != number and number%prime == 0:
                 del primes[number]
 
     return primes</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.flatten"><code class="name flex">
+<dt id="za_warudo.boost_list.flatten"><code class="name flex">
 <span>def <span class="ident">flatten</span></span>(<span>l)</span>
 </code></dt>
 <dd>
@@ -257,13 +267,13 @@ Flatten a multi dimensional list
     return flat_list</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.is_anagram"><code class="name flex">
+<dt id="za_warudo.boost_list.is_anagram"><code class="name flex">
 <span>def <span class="ident">is_anagram</span></span>(<span>l1, l2)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.8
-Check if two lists are anagrams: same elements but in order or in
-disorder</p></section>
+Check if two lists are anagrams: same elements but in order or
+in disorder</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -271,19 +281,19 @@ disorder</p></section>
 <pre><code class="python">def is_anagram(l1: list, l2: list) -&gt; bool:
     &#34;&#34;&#34;
     1.8
-    Check if two lists are anagrams: same elements but in order or in
-    disorder
+    Check if two lists are anagrams: same elements but in order or
+    in disorder
     &#34;&#34;&#34;
-    return (sorted(l1) == (sorted(l2)))</code></pre>
+    return (occurrences(l1) == (occurrences(l2)))</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.occurrences"><code class="name flex">
+<dt id="za_warudo.boost_list.occurrences"><code class="name flex">
 <span>def <span class="ident">occurrences</span></span>(<span>l)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.4
-Return a dictionnary, containing the number of occurrences of an int in the
-list given in argument</p></section>
+Return a dictionnary, containing the number of occurrences of
+an element in a list given in argument</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -291,11 +301,10 @@ list given in argument</p></section>
 <pre><code class="python">def occurrences(l: list) -&gt; dict:
     &#34;&#34;&#34;
     1.4
-    Return a dictionnary, containing the number of occurrences of an int in the
-    list given in argument
+    Return a dictionnary, containing the number of occurrences of
+    an element in a list given in argument
     &#34;&#34;&#34;
     d = dict()
-    numbers = uniq(l)
 
     for el in l:
         d[el] = l.count(el)
@@ -303,13 +312,13 @@ list given in argument</p></section>
     return d</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.same_elements"><code class="name flex">
+<dt id="za_warudo.boost_list.same_elements"><code class="name flex">
 <span>def <span class="ident">same_elements</span></span>(<span>l1, l2)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.8
-Check if two lists have the same elements, regardless of the number
-of elements</p></section>
+Check if two lists have the same elements, regardless of the
+number of elements</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -317,18 +326,18 @@ of elements</p></section>
 <pre><code class="python">def same_elements(l1: list, l2: list) -&gt; bool:
     &#34;&#34;&#34;
     1.8
-    Check if two lists have the same elements, regardless of the number
-    of elements
+    Check if two lists have the same elements, regardless of the
+    number of elements
     &#34;&#34;&#34;
     return is_anagram(uniq(l1), uniq(l2))</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.sort_uniq"><code class="name flex">
+<dt id="za_warudo.boost_list.sort_uniq"><code class="name flex">
 <span>def <span class="ident">sort_uniq</span></span>(<span>l)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.1
-Remove the duplicates in an sorted list</p></section>
+Remove the duplicates in a sorted list</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -336,8 +345,10 @@ Remove the duplicates in an sorted list</p></section>
 <pre><code class="python">def sort_uniq(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.1
-    Remove the duplicates in an sorted list
+    Remove the duplicates in a sorted list
     &#34;&#34;&#34;
+    if len(l) == 0: return l
+
     i = 1
     rst = [l[0]]
 
@@ -349,12 +360,13 @@ Remove the duplicates in an sorted list</p></section>
     return rst</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.successive_ints"><code class="name flex">
+<dt id="za_warudo.boost_list.successive_ints"><code class="name flex">
 <span>def <span class="ident">successive_ints</span></span>(<span>l)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.3
-Return a list containing the successive integers in the list given in argument</p></section>
+Return a list containing the successive integers in the
+list given in argument</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -362,7 +374,8 @@ Return a list containing the successive integers in the list given in argument</
 <pre><code class="python">def successive_ints(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.3
-    Return a list containing the successive integers in the list given in argument
+    Return a list containing the successive integers in the
+    list given in argument
     &#34;&#34;&#34;
     rst = []
 
@@ -373,7 +386,7 @@ Return a list containing the successive integers in the list given in argument</
     return rst</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.switch"><code class="name flex">
+<dt id="za_warudo.boost_list.switch"><code class="name flex">
 <span>def <span class="ident">switch</span></span>(<span>d)</span>
 </code></dt>
 <dd>
@@ -391,17 +404,17 @@ Switch keys and values of a dictionary given in argument</p></section>
     rst = dict()
 
     for k, v in d.items():
-        rst[str(v)] = k
+        rst[v] = k
 
     return rst</code></pre>
 </details>
 </dd>
-<dt id="src.boost_list.uniq"><code class="name flex">
+<dt id="za_warudo.boost_list.uniq"><code class="name flex">
 <span>def <span class="ident">uniq</span></span>(<span>l)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>1.1
-Return a list removed form its duplicates</p></section>
+Return a list removed from its duplicates</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -409,7 +422,7 @@ Return a list removed form its duplicates</p></section>
 <pre><code class="python">def uniq(l: list) -&gt; list:
     &#34;&#34;&#34;
     1.1
-    Return a list removed form its duplicates
+    Return a list removed from its duplicates
     &#34;&#34;&#34;
     result = []
     i = 0
@@ -435,21 +448,21 @@ Return a list removed form its duplicates</p></section>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src" href="index.html">src</a></code></li>
+<li><code><a title="za_warudo" href="index.html">za_warudo</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
-<li><code><a title="src.boost_list.dice_combinations" href="#src.boost_list.dice_combinations">dice_combinations</a></code></li>
-<li><code><a title="src.boost_list.erathostenes_sieve" href="#src.boost_list.erathostenes_sieve">erathostenes_sieve</a></code></li>
-<li><code><a title="src.boost_list.flatten" href="#src.boost_list.flatten">flatten</a></code></li>
-<li><code><a title="src.boost_list.is_anagram" href="#src.boost_list.is_anagram">is_anagram</a></code></li>
-<li><code><a title="src.boost_list.occurrences" href="#src.boost_list.occurrences">occurrences</a></code></li>
-<li><code><a title="src.boost_list.same_elements" href="#src.boost_list.same_elements">same_elements</a></code></li>
-<li><code><a title="src.boost_list.sort_uniq" href="#src.boost_list.sort_uniq">sort_uniq</a></code></li>
-<li><code><a title="src.boost_list.successive_ints" href="#src.boost_list.successive_ints">successive_ints</a></code></li>
-<li><code><a title="src.boost_list.switch" href="#src.boost_list.switch">switch</a></code></li>
-<li><code><a title="src.boost_list.uniq" href="#src.boost_list.uniq">uniq</a></code></li>
+<li><code><a title="za_warudo.boost_list.dice_combinations" href="#za_warudo.boost_list.dice_combinations">dice_combinations</a></code></li>
+<li><code><a title="za_warudo.boost_list.erathostenes_sieve" href="#za_warudo.boost_list.erathostenes_sieve">erathostenes_sieve</a></code></li>
+<li><code><a title="za_warudo.boost_list.flatten" href="#za_warudo.boost_list.flatten">flatten</a></code></li>
+<li><code><a title="za_warudo.boost_list.is_anagram" href="#za_warudo.boost_list.is_anagram">is_anagram</a></code></li>
+<li><code><a title="za_warudo.boost_list.occurrences" href="#za_warudo.boost_list.occurrences">occurrences</a></code></li>
+<li><code><a title="za_warudo.boost_list.same_elements" href="#za_warudo.boost_list.same_elements">same_elements</a></code></li>
+<li><code><a title="za_warudo.boost_list.sort_uniq" href="#za_warudo.boost_list.sort_uniq">sort_uniq</a></code></li>
+<li><code><a title="za_warudo.boost_list.successive_ints" href="#za_warudo.boost_list.successive_ints">successive_ints</a></code></li>
+<li><code><a title="za_warudo.boost_list.switch" href="#za_warudo.boost_list.switch">switch</a></code></li>
+<li><code><a title="za_warudo.boost_list.uniq" href="#za_warudo.boost_list.uniq">uniq</a></code></li>
 </ul>
 </li>
 </ul>

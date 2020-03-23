@@ -1,4 +1,4 @@
 .PHONY: test
 test:
-	export PYTHONPATH='src/'
-	python3 tests/TestListMethods.py
+	export PYTHONPATH='za_warudo/'
+	python3 tests/test_boost_list.py

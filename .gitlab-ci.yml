@@ -3,8 +3,7 @@ image: python:3.7-alpine
 test:
   stage: test
   script:
-  - export PYTHONPATH="src"
-  - python tests/TestListMethods.py
+  - make test
 
 pages:
   stage: deploy
@@ -14,13 +13,9 @@ pages:
   - export LIBRARY_PATH=/lib:/usr/lib
   - pip install --upgrade pip
   - pip install --upgrade pillow
-  - pip3 install peewee
-  - pip3 install tkcalendar
-  - pip3 install ttkthemes
-  - pip3 install ttkwidgets
-  - pip3 install pdoc3
-  - export PYTHONPATH="src"
-  - pdoc3 --html -o public src --force
+  - pip -r requirements.txt
+  - export PYTHONPATH="za_warudo"
+  - pdoc3 --html -o public za_warudo --force
   artifacts:
     paths:
     - public

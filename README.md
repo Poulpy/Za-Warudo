@@ -15,7 +15,7 @@ python3 src/seed.py desc
 ### Execute the app
 
 ```
-python3 src
+python3 za_warudo
 # TODO change to app/ ?
 ```
 
@@ -23,7 +23,7 @@ python3 src
 ### Execute the tests
 
 ```
-export PYTHONPATH='src/'
+export PYTHONPATH='za_warudo/'
 python3 tests/TestListMethods.py
 ```
 
@@ -52,9 +52,7 @@ add the following lines:
 
 ### TODO
 
-- Makefile
-- __main__.py file
-- unit testing
+- unit testing tkinter
 
 
 

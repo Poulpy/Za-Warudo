@@ -28,6 +28,7 @@ MODELS = (User, ProjectionRoom, Team, Debate, Event, Category,
 
 
 def get_class(kls):
+    '''
     module, klass = kls.split('.')
     return getattr(__import__(module), klass)
     '''
@@ -37,7 +38,6 @@ def get_class(kls):
     for comp in parts[1:]:
         m = getattr(m, comp)
     return m
-    '''
 
 def seed():
     '''
@@ -76,7 +76,7 @@ def seed():
                     seeds.append({fields[i]:data[i] for i in range(len(data))})
 
             log.info("Seeding %s..." % (klass))
-            Table = get_class(klass)
+            Table = get_class('models.' + klass)
             Table.insert_many(seeds).execute()
             log.info("Seeding done for %s" % (klass))
 

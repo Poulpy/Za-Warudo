@@ -77,10 +77,14 @@ class EditEventPage(ttk.Frame):
         members_label = ttk.Label(self, text="Add members")
         user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
 
+        members_frame = ttk.Frame(self)
+        scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
         # List of users; the responsible has to choose among them
         # members that'll participate in the event's organisation
-        self.members_tree = tkw.CheckboxTreeview(self, columns=('Events'), selectmode='browse')
-        self.members_tree.column("Events", width=50)
+        self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=scrollbar.set)
+        scrollbar.configure(command=self.members_tree.yview)
+
+        self.members_tree.column("Events")#, width=50)
         self.members_tree.heading("#0", text="Name")
         self.members_tree.heading("Events", text="Events")
 
@@ -112,11 +116,14 @@ class EditEventPage(ttk.Frame):
         # Placing the components
         # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
-        back_button.grid(row=0, column=3, sticky=E)
+        back_button.grid(row=0, column=3, pady=5, padx=5, sticky=W)
+        save_button.grid(row=0, column=4, pady=5, padx=5, sticky=W)
 
         # ROW 1
         name_label.grid(row=1, column=0, sticky=W, pady=5, padx=5)
         self.name_entry.grid(row=1, column=1, pady=5, padx=5, sticky=E)
+        running_time.grid(row=1, column=2, pady=5, padx=5, sticky=W)
+        running_time_entry.grid(row=1, column=3, pady=5, padx=5, sticky=E)
 
         # ROW 2
         begin.grid(row=2, column=0, sticky=W, pady=5, padx=5)
@@ -125,8 +132,6 @@ class EditEventPage(ttk.Frame):
         hour_entry.grid(row=2, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 3
-        running_time.grid(row=3, column=0, pady=5, padx=5, sticky=W)
-        running_time_entry.grid(row=3, column=1, pady=5, padx=5, sticky=E)
 
         # ROW 4
         pj_label.grid(row=4, column=0, sticky=W, pady=5, padx=5)
@@ -142,12 +147,14 @@ class EditEventPage(ttk.Frame):
         guest_attendance_chbutton.grid(row=8, column=2, sticky=W)
 
         # ROW 6
+        members_frame.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
         members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
-        self.members_tree.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=W)
-        categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
-        self.cats_tree.grid(row=6, column=2, columnspan=2, pady=5, padx=5, sticky=W)
+        self.members_tree.pack(side=LEFT)
+        scrollbar.pack()
 
-        save_button.grid(row=8, column=0, pady=5, padx=5, sticky=W)
+        categories_label.grid(row=5, column=3, pady=5, padx=5, sticky=W)
+        self.cats_tree.grid(row=6, column=3, columnspan=2, pady=5, padx=5, sticky=W+N)
+
 
     def save(self, event=None):
         '''

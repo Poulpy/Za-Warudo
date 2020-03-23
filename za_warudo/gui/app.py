@@ -32,7 +32,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("700x600")
+        self.geometry("900x550")
         self.minsize(300, 300)
         self.title("Za Warudo")
 

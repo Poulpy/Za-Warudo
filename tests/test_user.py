@@ -1,10 +1,12 @@
 import unittest
+
 from peewee import *
-from user import User
+
+from models.user import User
 
 db = SqliteDatabase("db/test.db")
 
-class TestDataBase(unittest.TestCase):
+class TestUser(unittest.TestCase):
 
     def test_connection(self):
         db.connect()

@@ -1,7 +1,7 @@
 from boost_list import *
 import unittest
 
-class TestListMethods(unittest.TestCase):
+class TestBoostList(unittest.TestCase):
 
     def test_sort_uniq(self):
         l1 = [1, 2, 3, 3, 3, 4, 4, 6]

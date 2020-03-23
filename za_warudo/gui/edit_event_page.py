@@ -105,8 +105,8 @@ class EditEventPage(ttk.Frame):
         cats_scrollbar = ttk.Scrollbar(cats_frame, orient=VERTICAL)
         self.cats_tree = tkw.CheckboxTreeview(cats_frame, columns=('Price'), selectmode='none')
         cats_scrollbar.configure(command=self.cats_tree.yview)
-        self.cats_tree.column("#0", width=100)
-        self.cats_tree.column("Price", width=20, anchor='center')
+        self.cats_tree.column("#0", width=140)
+        self.cats_tree.column("Price", anchor='center')
         self.cats_tree.heading("#0", text="Title")
         self.cats_tree.heading("Price", text="Price")
 
@@ -159,7 +159,7 @@ class EditEventPage(ttk.Frame):
         members_scrollbar.pack()
 
         categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
-        cats_frame.grid(row=6, column=2, pady=5, padx=5, sticky=NSEW)
+        cats_frame.grid(row=6, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
         self.cats_tree.pack(side=LEFT)
         cats_scrollbar.pack()
 

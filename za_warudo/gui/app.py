@@ -12,6 +12,7 @@ from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
 from models.projection_room import ProjectionRoom
 from models.user import User
+from models.team import Team
 
 db = SqliteDatabase("db/app.db")
 
@@ -187,7 +188,13 @@ class App(Tk):
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
         event['responsible'] = self.current_user.id
-        Event.create(**event)
+        event_created = Event.create(**event)
 
+        return event_created.id
+
+    def create_team(self, member_names, event_id):
+        team = [{'member':User.get(User.name == name).id, 'event':event_id} for name in member_names]
+        print(team)
+        Team.insert_many(team).execute()
 
 

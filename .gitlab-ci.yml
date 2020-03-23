@@ -13,7 +13,7 @@ pages:
   - export LIBRARY_PATH=/lib:/usr/lib
   - pip install --upgrade pip
   - pip install --upgrade pillow
-  - pip instal -r requirements.txt
+  - pip install -r requirements.txt
   - export PYTHONPATH="za_warudo"
   - pdoc3 --html -o public za_warudo --force
   artifacts:

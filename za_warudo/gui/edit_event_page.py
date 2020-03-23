@@ -66,10 +66,12 @@ class EditEventPage(ttk.Frame):
         projection_rooms.current(0)
 
         # Inputs for the event's status to go 'finished'
-        room_chbutton = ttk.Checkbutton(self, text="Room reserved")
-        equipment_chbutton = ttk.Checkbutton(self, text="Equipment reserved")
-        management_chbutton = ttk.Checkbutton(self, text="Management reserved")
-        guest_attendance_chbutton = ttk.Checkbutton(self, text="Guest attendance confirmed")
+        check_frame = ttk.Frame(self)
+        room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved")
+        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved")
+        management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved")
+        guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed")
+
 
         # TODO the user can assign users to this event
         members_label = ttk.Label(self, text="Choose members")
@@ -97,35 +99,36 @@ class EditEventPage(ttk.Frame):
         back_button.grid(row=0, column=3, sticky=E)
 
         # ROW 1
-        name_label.grid(row=1, column=0, sticky=W)
-        self.name_entry.grid(row=1, column=1)
+        name_label.grid(row=1, column=0, sticky=W, pady=5, padx=5)
+        self.name_entry.grid(row=1, column=1, pady=5, padx=5, sticky=E)
 
         # ROW 2
-        begin.grid(row=2, column=0, sticky=W)
-        begin_entry.grid(row=2, column=1)
+        begin.grid(row=2, column=0, sticky=W, pady=5, padx=5)
+        begin_entry.grid(row=2, column=1, sticky=E, pady=5, padx=5)
+        hour.grid(row=2, column=2, sticky=W, pady=5, padx=5)
+        hour_entry.grid(row=2, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 3
-        hour.grid(row=3, column=0, sticky=W)
-        hour_entry.grid(row=3, column=1, sticky=W)
-        running_time.grid(row=3, column=2)
-        running_time_entry.grid(row=3, column=3)
+        running_time.grid(row=3, column=0, pady=5, padx=5, sticky=W)
+        running_time_entry.grid(row=3, column=1, pady=5, padx=5, sticky=E)
 
         # ROW 4
-        pj_label.grid(row=4, column=0, sticky=W)
-        projection_types.grid(row=4, column=1)
-        pr_label.grid(row=4, column=2)
-        projection_rooms.grid(row=4, column=3)
+        pj_label.grid(row=4, column=0, sticky=W, pady=5, padx=5)
+        projection_types.grid(row=4, column=1, sticky=E, pady=5, padx=5)
+        pr_label.grid(row=4, column=2, pady=5, sticky=W, padx=5)
+        projection_rooms.grid(row=4, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 5
-        room_chbutton.grid(row=5, column=0)
-        equipment_chbutton.grid(row=5, column=1)
-        management_chbutton.grid(row=5, column=2)
-        guest_attendance_chbutton.grid(row=5, column=3)
+        check_frame.grid(row=5, column=2, rowspan=2, columnspan=2, sticky=N+W)
+        room_chbutton.grid(row=5, column=2, sticky=W)
+        equipment_chbutton.grid(row=6, column=2, sticky=W)
+        management_chbutton.grid(row=7, column=2, sticky=W)
+        guest_attendance_chbutton.grid(row=8, column=2, sticky=W)
 
         # ROW 6
-        members_label.grid(row=6, column=0)
-        self.members_tree.grid(row=7, column=0, columnspan=2)
-        save_button.grid(row=8, column=0)
+        members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
+        self.members_tree.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=W)
+        save_button.grid(row=8, column=0, pady=5, padx=5, sticky=W)
 
     def save(self, event=None):
         '''

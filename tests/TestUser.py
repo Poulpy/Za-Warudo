@@ -1,6 +1,8 @@
 import unittest
+
 from peewee import *
-from user import User
+
+from models.user import User
 
 db = SqliteDatabase("db/test.db")
 

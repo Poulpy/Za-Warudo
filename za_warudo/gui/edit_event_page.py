@@ -21,7 +21,11 @@ class EditEventPage(ttk.Frame):
         self.controller = controller
 
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
-        back_button = ttk.Button(self, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
+        buttons_frame = ttk.Frame(self)
+        back_button = ttk.Button(buttons_frame, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
+
+        # And of course, the button to save it all
+        save_button = ttk.Button(buttons_frame, text="Save", command=self.save)
 
         # Event form
         name_label = ttk.Label(self, text="Name")
@@ -78,11 +82,11 @@ class EditEventPage(ttk.Frame):
         user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
 
         members_frame = ttk.Frame(self)
-        scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
+        members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
         # List of users; the responsible has to choose among them
         # members that'll participate in the event's organisation
-        self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=scrollbar.set)
-        scrollbar.configure(command=self.members_tree.yview)
+        self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
+        members_scrollbar.configure(command=self.members_tree.yview)
 
         self.members_tree.column("Events")#, width=50)
         self.members_tree.heading("#0", text="Name")
@@ -97,7 +101,10 @@ class EditEventPage(ttk.Frame):
         categories_label = ttk.Label(self, text="Add categories")
         categories = controller.get_categories().dicts()
 
-        self.cats_tree = tkw.CheckboxTreeview(self, columns=('Price'), selectmode='none')
+        cats_frame = ttk.Frame(self)
+        cats_scrollbar = ttk.Scrollbar(cats_frame, orient=VERTICAL)
+        self.cats_tree = tkw.CheckboxTreeview(cats_frame, columns=('Price'), selectmode='none')
+        cats_scrollbar.configure(command=self.cats_tree.yview)
         self.cats_tree.column("#0", width=100)
         self.cats_tree.column("Price", width=50)
         self.cats_tree.heading("#0", text="Title")
@@ -109,15 +116,13 @@ class EditEventPage(ttk.Frame):
         for i, category in enumerate(categories):
             self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(str(category['price']) + " €"))
 
-        # And of course, the button to save it all
-        save_button = ttk.Button(self, text="Save", command=self.save)
-
 
         # Placing the components
         # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
-        back_button.grid(row=0, column=3, pady=5, padx=5, sticky=W)
-        save_button.grid(row=0, column=4, pady=5, padx=5, sticky=W)
+        buttons_frame.grid(row=0, column=3, sticky=E)
+        back_button.grid(row=0, column=2, pady=5, padx=5, sticky=E)
+        save_button.grid(row=0, column=3, pady=5, padx=5, sticky=E)
 
         # ROW 1
         name_label.grid(row=1, column=0, sticky=W, pady=5, padx=5)
@@ -150,10 +155,12 @@ class EditEventPage(ttk.Frame):
         members_frame.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
         members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
         self.members_tree.pack(side=LEFT)
-        scrollbar.pack()
+        members_scrollbar.pack()
 
-        categories_label.grid(row=5, column=3, pady=5, padx=5, sticky=W)
-        self.cats_tree.grid(row=6, column=3, columnspan=2, pady=5, padx=5, sticky=W+N)
+        categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
+        cats_frame.grid(row=6, column=2, pady=5, padx=5, sticky=NSEW)
+        self.cats_tree.pack(side=LEFT)
+        cats_scrollbar.pack()
 
 
     def save(self, event=None):

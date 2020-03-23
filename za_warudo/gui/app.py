@@ -32,7 +32,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("900x550")
+        self.geometry("1200x550")
         self.minsize(300, 300)
         self.title("Za Warudo")
 
@@ -62,6 +62,7 @@ class App(Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            # frame.grid_propagate(0)
 
         self.show_frame("ConnectionPage")
         self.set_menu(is_connected=False)

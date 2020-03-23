@@ -146,21 +146,24 @@ class EditEventPage(ttk.Frame):
         projection_rooms.grid(row=4, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 5
-        check_frame.grid(row=7, column=2, rowspan=2, columnspan=2, sticky=N+W)
+        # self.grid_rowconfigure(7, weight=3)
+        check_frame.grid(row=1, column=4, rowspan=2, columnspan=2, sticky=N+W)
         room_chbutton.grid(row=5, column=2, sticky=W)
         equipment_chbutton.grid(row=6, column=2, sticky=W)
         management_chbutton.grid(row=7, column=2, sticky=W)
         guest_attendance_chbutton.grid(row=8, column=2, sticky=W)
 
         # ROW 6
+        # self.grid_rowconfigure(6, weight=0)
         members_frame.grid(row=6, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
         members_label.grid(row=5, column=0, pady=5, padx=5, sticky=W)
+        # members_frame.pack_propagate(0)
         self.members_tree.pack(side=LEFT)
         members_scrollbar.pack()
 
         categories_label.grid(row=5, column=2, pady=5, padx=5, sticky=W)
         cats_frame.grid(row=6, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
-        self.cats_tree.pack(side=LEFT)
+        self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
 
 

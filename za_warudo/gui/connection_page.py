@@ -24,7 +24,7 @@ class ConnectionPage(ttk.Frame):
 
         # It's the input for the user's password
         # The password is hidden with *
-        self.password_entry = ttk.Entry(up, show="*")
+        self.password_entry = ttk.Entry(up, show="•")
         self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
         self.password_entry.bind("<Return>", self.controller.check_credentials)
 

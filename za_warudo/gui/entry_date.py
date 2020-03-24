@@ -3,6 +3,7 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle
 from tkcalendar import Calendar, DateEntry
 
+# TODO put in module widgets
 class EntryDate(ttk.Entry):
     '''
     Entry for selecting a date

@@ -9,6 +9,7 @@ from tkcalendar import Calendar, DateEntry
 
 from gui.entry_date import EntryDate
 
+# TODO put in module frames
 class EventsPage(ttk.Frame):
     '''
     Frame showing all events of a day. With the
@@ -23,6 +24,7 @@ class EventsPage(ttk.Frame):
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
+        self.event_selected = None
 
         title = ttk.Label(self, text="Events", font=("TkDefaultFont", "15"))
 
@@ -61,7 +63,8 @@ class EventsPage(ttk.Frame):
         self.events_tree.tag_configure('even', background="#FAFAFA")
         self.events_tree.tag_configure('select')
 
-        self.events_tree.tag_bind('select', '<Button-1>', self.item_clicked)
+        #self.events_tree.tag_bind('select', '<Button-1>', self.item_clicked)
+        self.events_tree.bind('<<TreeviewSelect>>', self.select_event)
 
         style = ttk.Style()
 
@@ -87,12 +90,15 @@ class EventsPage(ttk.Frame):
         self.events_tree.grid(row=1, column=0, rowspan=5, sticky=NSEW)
         self.grid_columnconfigure(0, weight=2)
 
+    def select_event(self, event=None):
+        self.event_selected = event.widget.selection()
 
     def item_clicked(self, event=None):
         print('item clicked')
         it = self.events_tree.focus()
-        self.events_tree.focus(it)
-        self.events_tree.selection_set(it)
+        print(it)
+        #self.events_tree.focus(it)
+        #self.events_tree.selection_set(it)
 
     def set_displayed_events(self):
         '''
@@ -116,6 +122,12 @@ class EventsPage(ttk.Frame):
         '''
         Pop up window to confirm an event deletion
         '''
-        messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
+        if self.event_selected != None:
+            log.info('Confirm delete of event %s' % (self.events_tree.item(self.event_selected)['text']))
+            rst = messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
+            print(rst)
+            if rst == 'yes':
+                print(self.controller.delete_event(event_name=self.events_tree.item(self.event_selected)['text']))
+                self.controller.update_events_page()
 
 

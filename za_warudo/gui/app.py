@@ -215,11 +215,17 @@ class App(Tk):
         return event_created.id
 
     def create_team(self, member_names, event_id):
+        '''
+        Associates a user with an event : (user, event)
+        '''
         team = [{'member':User.get(User.name == name).id, 'event':event_id} for name in member_names]
         print(team)
         Team.insert_many(team).execute()
 
     def create_events_categories(self, cat_titles, event_id):
+        '''
+        Associates a category with an event
+        '''
         cats = [{'category':Category.get(Category.title == title).id, 'event':event_id} for title in cat_titles]
         print(cats)
         EventsCategory.insert_many(cats).execute()

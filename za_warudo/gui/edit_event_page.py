@@ -80,9 +80,7 @@ class EditEventPage(ttk.Frame):
         guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed")
 
 
-        # TODO the user can assign users to this event
         members_label = ttk.Label(self, text="Add members")
-        #user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
         users = controller.get_events_per_user()
 
         members_frame = ttk.Frame(self)
@@ -187,15 +185,12 @@ class EditEventPage(ttk.Frame):
         hour_entry.grid(row=2, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 3
-
-        # ROW 4
         pj_label.grid(row=3, column=0, sticky=W, pady=5, padx=5)
         projection_types.grid(row=3, column=1, sticky=E, pady=5, padx=5)
         pr_label.grid(row=3, column=2, pady=5, sticky=W, padx=5)
         projection_rooms.grid(row=3, column=3, sticky=E, pady=5, padx=5)
 
-        # ROW 5
-        # self.grid_rowconfigure(7, weight=3)
+        # ROW 0 RIGHT SIDE
         presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2, pady=5, padx=5)
         presentation_check.grid(row=0, column=0, sticky=W)
         author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
@@ -204,6 +199,7 @@ class EditEventPage(ttk.Frame):
         self.context_entry.grid(row=2, column=1, sticky=E)
 
 
+        # ROW 3 RIGHT SIDE
         debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2, pady=5, padx=5)
         debate_check.grid(row=0, column=0, sticky=W)
         speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
@@ -211,6 +207,7 @@ class EditEventPage(ttk.Frame):
         contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
         self.contact_entry.grid(row=2, column=1, sticky=E)
 
+        # ROW 5 RIGHT SIDE
         check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W, pady=5, padx=5)
         room_chbutton.grid(row=4, column=2, sticky=W)
         equipment_chbutton.grid(row=5, column=2, sticky=W)
@@ -218,10 +215,8 @@ class EditEventPage(ttk.Frame):
         guest_attendance_chbutton.grid(row=7, column=2, sticky=W)
 
         # ROW 6
-        # self.grid_rowconfigure(6, weight=0)
         members_frame.grid(row=5, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
         members_label.grid(row=4, column=0, pady=5, padx=5, sticky=W)
-        # members_frame.pack_propagate(0)
         self.members_tree.pack(side=LEFT)
         members_scrollbar.pack()
 
@@ -318,12 +313,16 @@ class EditEventPage(ttk.Frame):
         new_event['running_time'] = self.running_time_text.get()
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
+
+        '''
         if self.debate.get() == 1:
             new_event['speaker'] = self.speaker.get()
             new_event['contact_details'] = self.contact_details.get()
         if self.presentation.get() == 1:
             new_event['author'] = self.author.get()
             new_event['context'] = self.context.get()
+        '''
+
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
         cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
         event_id = self.controller.create_event(new_event)
@@ -332,8 +331,6 @@ class EditEventPage(ttk.Frame):
         self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
-
-        # ^(2[0-4]|1[0-9]|[1-9])$
 
 class Spinbox(ttk.Entry):
 

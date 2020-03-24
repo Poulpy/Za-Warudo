@@ -230,5 +230,7 @@ class App(Tk):
         print(cats)
         EventsCategory.insert_many(cats).execute()
 
+    def delete_event(self, event_name):
+        return Event.delete().where(Event.name == event_name).execute()
 
 

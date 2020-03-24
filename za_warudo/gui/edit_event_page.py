@@ -82,7 +82,8 @@ class EditEventPage(ttk.Frame):
 
         # TODO the user can assign users to this event
         members_label = ttk.Label(self, text="Add members")
-        user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
+        #user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
+        users = controller.get_events_per_user()
 
         members_frame = ttk.Frame(self)
         members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
@@ -97,8 +98,8 @@ class EditEventPage(ttk.Frame):
 
         self.members_tree.tag_configure('odd', background="#F0F0F0")
         self.members_tree.tag_configure('even', background="#FAFAFA")
-        for i, user in enumerate(user_names):
-            self.members_tree.insert('', 'end', text=user, tags=('even' if i % 2 else 'odd',))
+        for i in range(len(users)):
+            self.members_tree.insert('', 'end', text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
 
         # CATEGORIES
         categories_label = ttk.Label(self, text="Add categories")
@@ -317,6 +318,12 @@ class EditEventPage(ttk.Frame):
         new_event['running_time'] = self.running_time_text.get()
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
+        if self.debate.get() == 1:
+            new_event['speaker'] = self.speaker.get()
+            new_event['contact_details'] = self.contact_details.get()
+        if self.presentation.get() == 1:
+            new_event['author'] = self.author.get()
+            new_event['context'] = self.context.get()
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
         cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
         event_id = self.controller.create_event(new_event)

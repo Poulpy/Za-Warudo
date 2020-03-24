@@ -137,6 +137,13 @@ class App(Tk):
 
         return proj_rooms
 
+    def get_events_per_user(self):
+        db.connect()
+        epu =[{'user':user.name, 'events':Team.select().where(Team.member == user).count()} for user in User.select()]
+        db.close()
+
+        return epu
+
     def get_users(self):
         '''
         Return all users

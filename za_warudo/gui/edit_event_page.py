@@ -20,7 +20,10 @@ class EditEventPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
+        self.error_text = StringVar()
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
+        error_label = ttk.Label(self, textvariable=self.error_text, font=("TkDefaultFont", "7"))
+        error_label.configure(style="Red.TLabel")
         buttons_frame = ttk.Frame(self)
         back_button = ttk.Button(buttons_frame, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
 
@@ -165,6 +168,7 @@ class EditEventPage(ttk.Frame):
         # Placing the components
         # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
+        error_label.grid(row=0, column=1, sticky=W+N+S, columnspan=3, padx=(10, 0))
         buttons_frame.grid(row=0, column=5, sticky=E)
         back_button.grid(row=0, column=2, pady=5, padx=5, sticky=E)
         save_button.grid(row=0, column=3, pady=5, padx=5, sticky=E)
@@ -269,16 +273,16 @@ class EditEventPage(ttk.Frame):
         if len(self.cats_tree.get_checked()) == 0:
             error_msg.append('Categories (at least one)')
 
-        if self.debate.get() == 0:
-            if self.author.get() == '':
-                error_msg.append('Author')
-            if self.context.get() == '':
-                error_msg.append('Context')
-        if self.presentation.get() == 0:
+        if self.debate.get() == 1:
             if self.speaker.get() == '':
                 error_msg.append('Speaker')
             if self.contact_details.get() == '':
                 error_msg.append('Contact details')
+        if self.presentation.get() == 1:
+            if self.author.get() == '':
+                error_msg.append('Author')
+            if self.context.get() == '':
+                error_msg.append('Context')
 
         if len(error_msg) == 0:
             return None
@@ -294,6 +298,7 @@ class EditEventPage(ttk.Frame):
 
         if error_msg != None:
             print(error_msg)
+            self.error_text.set(error_msg)
             return
 
 

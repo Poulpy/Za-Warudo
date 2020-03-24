@@ -14,6 +14,7 @@ from models.projection_room import ProjectionRoom
 from models.user import User
 from models.team import Team
 from models.category import Category
+from models.events_category import EventsCategory
 
 db = SqliteDatabase("db/app.db")
 
@@ -210,5 +211,11 @@ class App(Tk):
         team = [{'member':User.get(User.name == name).id, 'event':event_id} for name in member_names]
         print(team)
         Team.insert_many(team).execute()
+
+    def create_events_categories(self, cat_titles, event_id):
+        cats = [{'category':Category.get(Category.title == title).id, 'event':event_id} for title in cat_titles]
+        print(cats)
+        EventsCategory.insert_many(cats).execute()
+
 
 

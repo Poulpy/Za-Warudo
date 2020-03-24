@@ -318,9 +318,11 @@ class EditEventPage(ttk.Frame):
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
+        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
         event_id = self.controller.create_event(new_event)
 
         self.controller.create_team(member_names, event_id)
+        self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
 

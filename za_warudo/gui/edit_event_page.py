@@ -246,22 +246,63 @@ class EditEventPage(ttk.Frame):
             self.speaker_entry['state'] = 'normal'
             self.contact_entry['state'] = 'normal'
 
+    def check_missing_or_incorrect_input(self):
+        '''
+        Name, day, hour, running time, must not be empty
+        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
+        if p.match(self.hour_text.get()) == None:
+            print("Wrong hour format")
+        '''
+        error_msg = []
+
+        if self.name_entry.get() == '':
+            error_msg.append('Name')
+        if self.begin_text.get() == '':
+            error_msg.append('Day')
+        if self.hour_text.get() == '':
+            error_msg.append('Hour')
+        if self.running_time_text.get() == '':
+            error_msg.append('Running time')
+
+        if len(self.members_tree.get_checked()) == 0:
+            error_msg.append('Members (at least one)')
+        if len(self.cats_tree.get_checked()) == 0:
+            error_msg.append('Categories (at least one)')
+
+        if self.debate.get() == 0:
+            if self.author.get() == '':
+                error_msg.append('Author')
+            if self.context.get() == '':
+                error_msg.append('Context')
+        if self.presentation.get() == 0:
+            if self.speaker.get() == '':
+                error_msg.append('Speaker')
+            if self.contact_details.get() == '':
+                error_msg.append('Contact details')
+
+        if len(error_msg) == 0:
+            return None
+        else:
+            return ' '.join(['Missing or incorrect fields :', ', '.join(error_msg)])
+
     def save(self, event=None):
         '''
         Get all the datas from the form to create an
         event. Redirects to the events page
         '''
+        error_msg = self.check_missing_or_incorrect_input()
+
+        if error_msg != None:
+            print(error_msg)
+            return
+
+
         new_event = dict()
 
         log.info("Name " + self.name_entry.get())
         log.info("Day " + self.begin_text.get())
         log.info("Hour " + self.hour_text.get())
         log.info("Running time " + self.running_time_text.get())
-        '''
-        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
-        if p.match(self.hour_text.get()) == None:
-            print("Wrong hour format")
-        '''
 
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())

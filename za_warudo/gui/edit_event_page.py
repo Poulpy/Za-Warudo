@@ -73,11 +73,16 @@ class EditEventPage(ttk.Frame):
         projection_rooms.current(0)
 
         # Inputs for the event's status to go 'finished'
+        self.room_reserved = IntVar()
+        self.management = IntVar()
+        self.equipement_reserved = IntVar()
+        self.guest_attendance = IntVar()
+
         check_frame = ttk.Frame(self)
-        room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved")
-        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved")
-        management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved")
-        guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed")
+        room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved", variable=self.room_reserved)
+        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipement_reserved)
+        management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved", variable=self.management)
+        guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed", variable=self.guest_attendance)
 
 
         members_label = ttk.Label(self, text="Add members")
@@ -322,6 +327,11 @@ class EditEventPage(ttk.Frame):
             new_event['author'] = self.author.get()
             new_event['context'] = self.context.get()
         '''
+
+        if self.room_reserved.get() == 1: new_event['room_reserved'] = True
+        if self.management.get() == 1: new_event['management'] = True
+        if self.equipement_reserved.get() == 1: new_event['equipement_reserved'] = True
+        if self.guest_attendance.get() == 1: new_event['guest_attendance'] = True
 
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
         cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]

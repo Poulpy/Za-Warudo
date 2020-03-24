@@ -117,25 +117,37 @@ class EditEventPage(ttk.Frame):
             s = '%d%s' % (category['price'], ' €')
             self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
 
+        # PRESENTATION
+        self.presentation = IntVar()
         self.author = StringVar()
         self.context = StringVar()
 
         presentation_frame = ttk.Frame(self)
-        presentation_check = ttk.Checkbutton(presentation_frame, text="Author presentation")
+        presentation_check = ttk.Checkbutton(presentation_frame,
+                                             text="Author presentation",
+                                             variable=self.presentation,
+                                             command=lambda: self.handle_presesentation_frame)
+        presentation_check.bind('<1>', self.handle_presesentation_frame)
         author_label = ttk.Label(presentation_frame, text="Author")
-        author_entry = ttk.Entry(presentation_frame, textvariable=self.author)
+        self.author_entry = ttk.Entry(presentation_frame, textvariable=self.author, state='disabled')
         context_label = ttk.Label(presentation_frame, text="Context")
-        context_entry = ttk.Entry(presentation_frame, textvariable=self.context)
+        self.context_entry = ttk.Entry(presentation_frame, textvariable=self.context, state='disabled')
 
+        # DEBATE
+        self.debate = IntVar()
         self.speaker = StringVar()
         self.contact_details = StringVar()
 
         debate_frame = ttk.Frame(self)
-        debate_check = ttk.Checkbutton(debate_frame, text="Debate")
+        debate_check = ttk.Checkbutton(debate_frame,
+                                       text="Debate",
+                                       variable=self.debate,
+                                       command=lambda: self.handle_debate_frame)
+        debate_check.bind('<1>', self.handle_debate_frame)
         speaker_label = ttk.Label(debate_frame, text="Speaker")
-        speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker)
+        self.speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker, state='disabled')
         contact_label = ttk.Label(debate_frame, text="Contact details")
-        contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details)
+        self.contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details, state='disabled')
 
 
         # Placing the components
@@ -170,17 +182,17 @@ class EditEventPage(ttk.Frame):
         presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2)
         presentation_check.grid(row=0, column=0, sticky=W)
         author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
-        author_entry.grid(row=1, column=1, sticky=E)
+        self.author_entry.grid(row=1, column=1, sticky=E)
         context_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
-        context_entry.grid(row=2, column=1, sticky=E)
+        self.context_entry.grid(row=2, column=1, sticky=E)
 
 
         debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2)
         debate_check.grid(row=0, column=0, sticky=W)
         speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
-        speaker_entry.grid(row=1, column=1, sticky=E)
+        self.speaker_entry.grid(row=1, column=1, sticky=E)
         contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
-        contact_entry.grid(row=2, column=1, sticky=E)
+        self.contact_entry.grid(row=2, column=1, sticky=E)
 
         check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W)
         room_chbutton.grid(row=4, column=2, sticky=W)
@@ -201,6 +213,25 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
 
+    # 1 : unchecked
+    # 0 : checked
+    def handle_presesentation_frame(self, event=None):
+        print("Value of checkbox : " + str(self.presentation.get()))
+        if self.presentation.get() == 1:
+            self.author_entry['state'] = 'disabled'
+            self.context_entry['state'] = 'disabled'
+        else:
+            self.author_entry['state'] = 'normal'
+            self.context_entry['state'] = 'normal'
+
+    def handle_debate_frame(self, event=None):
+        print("Value of checkbox : " + str(self.debate.get()))
+        if self.debate.get() == 1:
+            self.speaker_entry['state'] = 'disabled'
+            self.contact_entry['state'] = 'disabled'
+        else:
+            self.speaker_entry['state'] = 'normal'
+            self.contact_entry['state'] = 'normal'
 
     def save(self, event=None):
         '''

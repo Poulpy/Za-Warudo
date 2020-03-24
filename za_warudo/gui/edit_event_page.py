@@ -126,8 +126,8 @@ class EditEventPage(ttk.Frame):
         presentation_check = ttk.Checkbutton(presentation_frame,
                                              text="Author presentation",
                                              variable=self.presentation,
-                                             command=lambda: self.handle_presesentation_frame)
-        presentation_check.bind('<1>', self.handle_presesentation_frame)
+                                             command=lambda: self.handle_presentation_frame)
+        presentation_check.bind('<1>', self.handle_presentation_frame)
         author_label = ttk.Label(presentation_frame, text="Author")
         self.author_entry = ttk.Entry(presentation_frame, textvariable=self.author, state='disabled')
         context_label = ttk.Label(presentation_frame, text="Context")
@@ -148,6 +148,18 @@ class EditEventPage(ttk.Frame):
         self.speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker, state='disabled')
         contact_label = ttk.Label(debate_frame, text="Contact details")
         self.contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details, state='disabled')
+
+        '''
+        periodicity_label = ttk.Label(self, text="Periodicity")
+        self.periodicity_choosen = StringVar()
+        periodicities = ttk.Combobox(self,
+                                     textvariable=self.periodicity_choosen,
+                                     state='readonly',
+                                     command=lambda: self.handle_periodicity_frame)
+        periodicities['values'] = ["None", "One week", "Two weeks", "One month"]
+        periodicities.current(0)
+        week_end_check = ttk.Checkbutton(self, text="Weekend included", variable=self.week_ends)
+        '''
 
 
         # Placing the components
@@ -179,7 +191,7 @@ class EditEventPage(ttk.Frame):
 
         # ROW 5
         # self.grid_rowconfigure(7, weight=3)
-        presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2)
+        presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2, pady=5, padx=5)
         presentation_check.grid(row=0, column=0, sticky=W)
         author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
         self.author_entry.grid(row=1, column=1, sticky=E)
@@ -187,14 +199,14 @@ class EditEventPage(ttk.Frame):
         self.context_entry.grid(row=2, column=1, sticky=E)
 
 
-        debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2)
+        debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2, pady=5, padx=5)
         debate_check.grid(row=0, column=0, sticky=W)
         speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
         self.speaker_entry.grid(row=1, column=1, sticky=E)
         contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
         self.contact_entry.grid(row=2, column=1, sticky=E)
 
-        check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W)
+        check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W, pady=5, padx=5)
         room_chbutton.grid(row=4, column=2, sticky=W)
         equipment_chbutton.grid(row=5, column=2, sticky=W)
         management_chbutton.grid(row=6, column=2, sticky=W)
@@ -213,9 +225,10 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
 
+
     # 1 : unchecked
     # 0 : checked
-    def handle_presesentation_frame(self, event=None):
+    def handle_presentation_frame(self, event=None):
         print("Value of checkbox : " + str(self.presentation.get()))
         if self.presentation.get() == 1:
             self.author_entry['state'] = 'disabled'

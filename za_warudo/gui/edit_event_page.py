@@ -20,8 +20,15 @@ class EditEventPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
+        self.error_text = StringVar()
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
-        back_button = ttk.Button(self, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
+        error_label = ttk.Label(self, textvariable=self.error_text, font=("TkDefaultFont", "7"))
+        error_label.configure(style="Red.TLabel")
+        buttons_frame = ttk.Frame(self)
+        back_button = ttk.Button(buttons_frame, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
+
+        # And of course, the button to save it all
+        save_button = ttk.Button(buttons_frame, text="Save", command=self.save)
 
         # Event form
         name_label = ttk.Label(self, text="Name")
@@ -66,83 +73,242 @@ class EditEventPage(ttk.Frame):
         projection_rooms.current(0)
 
         # Inputs for the event's status to go 'finished'
-        room_chbutton = ttk.Checkbutton(self, text="Room reserved")
-        equipment_chbutton = ttk.Checkbutton(self, text="Equipment reserved")
-        management_chbutton = ttk.Checkbutton(self, text="Management reserved")
-        guest_attendance_chbutton = ttk.Checkbutton(self, text="Guest attendance confirmed")
+        self.room_reserved = IntVar()
+        self.management = IntVar()
+        self.equipement_reserved = IntVar()
+        self.guest_attendance = IntVar()
 
-        # TODO the user can assign users to this event
-        members_label = ttk.Label(self, text="Choose members")
-        user_names = [u['name'] for u in controller.get_users().dicts() if not u['is_admin']]
+        check_frame = ttk.Frame(self)
+        room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved", variable=self.room_reserved)
+        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipement_reserved)
+        management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved", variable=self.management)
+        guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed", variable=self.guest_attendance)
 
+
+        members_label = ttk.Label(self, text="Add members")
+        users = controller.get_events_per_user()
+
+        members_frame = ttk.Frame(self)
+        members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
         # List of users; the responsible has to choose among them
         # members that'll participate in the event's organisation
-        self.members_tree = tkw.CheckboxTreeview(self, columns=('Events'), selectmode='browse')
-        self.members_tree.column("Events", width=50)
+        self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
+        members_scrollbar.configure(command=self.members_tree.yview)
+
+        self.members_tree.column("Events")#, width=50)
         self.members_tree.heading("#0", text="Name")
         self.members_tree.heading("Events", text="Events")
 
         self.members_tree.tag_configure('odd', background="#F0F0F0")
         self.members_tree.tag_configure('even', background="#FAFAFA")
-        for i, user in enumerate(user_names):
-            self.members_tree.insert('', 'end', text=user, tags=('even' if i % 2 else 'odd',))
+        for i in range(len(users)):
+            self.members_tree.insert('', 'end', text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
 
-        # And of course, the button to save it all
-        save_button = ttk.Button(self, text="Save", command=self.save)
+        # CATEGORIES
+        categories_label = ttk.Label(self, text="Add categories")
+        categories = controller.get_categories().dicts()
+
+        cats_frame = ttk.Frame(self)
+        cats_scrollbar = ttk.Scrollbar(cats_frame, orient=VERTICAL)
+        self.cats_tree = tkw.CheckboxTreeview(cats_frame, columns=('Price'), selectmode='none')
+        cats_scrollbar.configure(command=self.cats_tree.yview)
+        self.cats_tree.column("#0", width=140)
+        self.cats_tree.column("Price", anchor='center')
+        self.cats_tree.heading("#0", text="Title")
+        self.cats_tree.heading("Price", text="Price")
+
+        self.cats_tree.tag_configure('odd', background="#F0F0F0")
+        self.cats_tree.tag_configure('even', background="#FAFAFA")
+
+        for i, category in enumerate(categories):
+            s = '%d%s' % (category['price'], ' €')
+            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
+
+        # PRESENTATION
+        self.presentation = IntVar()
+        self.author = StringVar()
+        self.context = StringVar()
+
+        presentation_frame = ttk.Frame(self)
+        presentation_check = ttk.Checkbutton(presentation_frame,
+                                             text="Author presentation",
+                                             variable=self.presentation,
+                                             command=lambda: self.handle_presentation_frame)
+        presentation_check.bind('<1>', self.handle_presentation_frame)
+        author_label = ttk.Label(presentation_frame, text="Author")
+        self.author_entry = ttk.Entry(presentation_frame, textvariable=self.author, state='disabled')
+        context_label = ttk.Label(presentation_frame, text="Context")
+        self.context_entry = ttk.Entry(presentation_frame, textvariable=self.context, state='disabled')
+
+        # DEBATE
+        self.debate = IntVar()
+        self.speaker = StringVar()
+        self.contact_details = StringVar()
+
+        debate_frame = ttk.Frame(self)
+        debate_check = ttk.Checkbutton(debate_frame,
+                                       text="Debate",
+                                       variable=self.debate,
+                                       command=lambda: self.handle_debate_frame)
+        debate_check.bind('<1>', self.handle_debate_frame)
+        speaker_label = ttk.Label(debate_frame, text="Speaker")
+        self.speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker, state='disabled')
+        contact_label = ttk.Label(debate_frame, text="Contact details")
+        self.contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details, state='disabled')
+
+        '''
+        periodicity_label = ttk.Label(self, text="Periodicity")
+        self.periodicity_choosen = StringVar()
+        periodicities = ttk.Combobox(self,
+                                     textvariable=self.periodicity_choosen,
+                                     state='readonly',
+                                     command=lambda: self.handle_periodicity_frame)
+        periodicities['values'] = ["None", "One week", "Two weeks", "One month"]
+        periodicities.current(0)
+        week_end_check = ttk.Checkbutton(self, text="Weekend included", variable=self.week_ends)
+        '''
 
 
         # Placing the components
         # ROW 0
         title.grid(row=0, column=0, sticky=(W+N))
-        back_button.grid(row=0, column=3, sticky=E)
+        error_label.grid(row=0, column=1, sticky=W+N+S, columnspan=3, padx=(10, 0))
+        buttons_frame.grid(row=0, column=5, sticky=E)
+        back_button.grid(row=0, column=2, pady=5, padx=5, sticky=E)
+        save_button.grid(row=0, column=3, pady=5, padx=5, sticky=E)
 
         # ROW 1
-        name_label.grid(row=1, column=0, sticky=W)
-        self.name_entry.grid(row=1, column=1)
+        name_label.grid(row=1, column=0, sticky=W, pady=5, padx=5)
+        self.name_entry.grid(row=1, column=1, pady=5, padx=5, sticky=E)
+        running_time.grid(row=1, column=2, pady=5, padx=5, sticky=W)
+        running_time_entry.grid(row=1, column=3, pady=5, padx=5, sticky=E)
 
         # ROW 2
-        begin.grid(row=2, column=0, sticky=W)
-        begin_entry.grid(row=2, column=1)
+        begin.grid(row=2, column=0, sticky=W, pady=5, padx=5)
+        begin_entry.grid(row=2, column=1, sticky=E, pady=5, padx=5)
+        hour.grid(row=2, column=2, sticky=W, pady=5, padx=5)
+        hour_entry.grid(row=2, column=3, sticky=E, pady=5, padx=5)
 
         # ROW 3
-        hour.grid(row=3, column=0, sticky=W)
-        hour_entry.grid(row=3, column=1, sticky=W)
-        running_time.grid(row=3, column=2)
-        running_time_entry.grid(row=3, column=3)
+        pj_label.grid(row=3, column=0, sticky=W, pady=5, padx=5)
+        projection_types.grid(row=3, column=1, sticky=E, pady=5, padx=5)
+        pr_label.grid(row=3, column=2, pady=5, sticky=W, padx=5)
+        projection_rooms.grid(row=3, column=3, sticky=E, pady=5, padx=5)
 
-        # ROW 4
-        pj_label.grid(row=4, column=0, sticky=W)
-        projection_types.grid(row=4, column=1)
-        pr_label.grid(row=4, column=2)
-        projection_rooms.grid(row=4, column=3)
+        # ROW 0 RIGHT SIDE
+        presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2, pady=5, padx=5)
+        presentation_check.grid(row=0, column=0, sticky=W)
+        author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
+        self.author_entry.grid(row=1, column=1, sticky=E)
+        context_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
+        self.context_entry.grid(row=2, column=1, sticky=E)
 
-        # ROW 5
-        room_chbutton.grid(row=5, column=0)
-        equipment_chbutton.grid(row=5, column=1)
-        management_chbutton.grid(row=5, column=2)
-        guest_attendance_chbutton.grid(row=5, column=3)
+
+        # ROW 3 RIGHT SIDE
+        debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2, pady=5, padx=5)
+        debate_check.grid(row=0, column=0, sticky=W)
+        speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
+        self.speaker_entry.grid(row=1, column=1, sticky=E)
+        contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
+        self.contact_entry.grid(row=2, column=1, sticky=E)
+
+        # ROW 5 RIGHT SIDE
+        check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W, pady=5, padx=5)
+        room_chbutton.grid(row=4, column=2, sticky=W)
+        equipment_chbutton.grid(row=5, column=2, sticky=W)
+        management_chbutton.grid(row=6, column=2, sticky=W)
+        guest_attendance_chbutton.grid(row=7, column=2, sticky=W)
 
         # ROW 6
-        members_label.grid(row=6, column=0)
-        self.members_tree.grid(row=7, column=0, columnspan=2)
-        save_button.grid(row=8, column=0)
+        members_frame.grid(row=5, column=0, columnspan=2, pady=5, padx=5, sticky=NSEW)
+        members_label.grid(row=4, column=0, pady=5, padx=5, sticky=W)
+        self.members_tree.pack(side=LEFT)
+        members_scrollbar.pack()
+
+        categories_label.grid(row=4, column=2, pady=5, padx=5, sticky=W)
+        cats_frame.grid(row=5, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
+        self.cats_tree.pack(side=LEFT, expand=True)
+        cats_scrollbar.pack()
+
+
+    # 1 : unchecked
+    # 0 : checked
+    def handle_presentation_frame(self, event=None):
+        print("Value of checkbox : " + str(self.presentation.get()))
+        if self.presentation.get() == 1:
+            self.author_entry['state'] = 'disabled'
+            self.context_entry['state'] = 'disabled'
+        else:
+            self.author_entry['state'] = 'normal'
+            self.context_entry['state'] = 'normal'
+
+    def handle_debate_frame(self, event=None):
+        print("Value of checkbox : " + str(self.debate.get()))
+        if self.debate.get() == 1:
+            self.speaker_entry['state'] = 'disabled'
+            self.contact_entry['state'] = 'disabled'
+        else:
+            self.speaker_entry['state'] = 'normal'
+            self.contact_entry['state'] = 'normal'
+
+    def check_missing_or_incorrect_input(self):
+        '''
+        Name, day, hour, running time, must not be empty
+        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
+        if p.match(self.hour_text.get()) == None:
+            print("Wrong hour format")
+        '''
+        error_msg = []
+
+        if self.name_entry.get() == '':
+            error_msg.append('Name')
+        if self.begin_text.get() == '':
+            error_msg.append('Day')
+        if self.hour_text.get() == '':
+            error_msg.append('Hour')
+        if self.running_time_text.get() == '':
+            error_msg.append('Running time')
+
+        if len(self.members_tree.get_checked()) == 0:
+            error_msg.append('Members (at least one)')
+        if len(self.cats_tree.get_checked()) == 0:
+            error_msg.append('Categories (at least one)')
+
+        if self.debate.get() == 1:
+            if self.speaker.get() == '':
+                error_msg.append('Speaker')
+            if self.contact_details.get() == '':
+                error_msg.append('Contact details')
+        if self.presentation.get() == 1:
+            if self.author.get() == '':
+                error_msg.append('Author')
+            if self.context.get() == '':
+                error_msg.append('Context')
+
+        if len(error_msg) == 0:
+            return None
+        else:
+            return ' '.join(['Missing or incorrect fields :', ', '.join(error_msg)])
 
     def save(self, event=None):
         '''
         Get all the datas from the form to create an
         event. Redirects to the events page
         '''
+        error_msg = self.check_missing_or_incorrect_input()
+
+        if error_msg != None:
+            print(error_msg)
+            self.error_text.set(error_msg)
+            return
+
+
         new_event = dict()
 
         log.info("Name " + self.name_entry.get())
         log.info("Day " + self.begin_text.get())
         log.info("Hour " + self.hour_text.get())
         log.info("Running time " + self.running_time_text.get())
-        '''
-        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
-        if p.match(self.hour_text.get()) == None:
-            print("Wrong hour format")
-        '''
 
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
@@ -152,11 +318,29 @@ class EditEventPage(ttk.Frame):
         new_event['running_time'] = self.running_time_text.get()
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
-        self.controller.create_event(new_event)
+
+        '''
+        if self.debate.get() == 1:
+            new_event['speaker'] = self.speaker.get()
+            new_event['contact_details'] = self.contact_details.get()
+        if self.presentation.get() == 1:
+            new_event['author'] = self.author.get()
+            new_event['context'] = self.context.get()
+        '''
+
+        if self.room_reserved.get() == 1: new_event['room_reserved'] = True
+        if self.management.get() == 1: new_event['management'] = True
+        if self.equipement_reserved.get() == 1: new_event['equipement_reserved'] = True
+        if self.guest_attendance.get() == 1: new_event['guest_attendance'] = True
+
+        member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
+        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
+        event_id = self.controller.create_event(new_event)
+
+        self.controller.create_team(member_names, event_id)
+        self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
-
-        # ^(2[0-4]|1[0-9]|[1-9])$
 
 class Spinbox(ttk.Entry):
 

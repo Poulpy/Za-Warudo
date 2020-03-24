@@ -12,6 +12,9 @@ from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
 from models.projection_room import ProjectionRoom
 from models.user import User
+from models.team import Team
+from models.category import Category
+from models.events_category import EventsCategory
 
 db = SqliteDatabase("db/app.db")
 
@@ -30,7 +33,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("700x600")
+        self.geometry("1200x550")
         self.minsize(300, 300)
         self.title("Za Warudo")
 
@@ -45,6 +48,7 @@ class App(Tk):
         # Styles
         s = ttk.Style()
         s.configure("Red.TLabel", foreground="red")
+        s.configure("Treeview", rowheight=30)
 
         # All frames of the application
         # TODO make it dynamic
@@ -59,6 +63,7 @@ class App(Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
+            # frame.grid_propagate(0)
 
         self.show_frame("ConnectionPage")
         self.set_menu(is_connected=False)
@@ -110,6 +115,17 @@ class App(Tk):
 
         return events
 
+    def get_categories(self):
+        '''
+        Return all categories
+        '''
+        db.connect()
+        categories = Category.select()
+        db.close()
+
+        return categories
+
+
     def get_projection_rooms(self):
         '''
         Return all projection rooms
@@ -120,6 +136,13 @@ class App(Tk):
         db.close()
 
         return proj_rooms
+
+    def get_events_per_user(self):
+        db.connect()
+        epu =[{'user':user.name, 'events':Team.select().where(Team.member == user).count()} for user in User.select()]
+        db.close()
+
+        return epu
 
     def get_users(self):
         '''
@@ -187,7 +210,25 @@ class App(Tk):
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
         event['responsible'] = self.current_user.id
-        Event.create(**event)
+        event_created = Event.create(**event)
+
+        return event_created.id
+
+    def create_team(self, member_names, event_id):
+        '''
+        Associates a user with an event : (user, event)
+        '''
+        team = [{'member':User.get(User.name == name).id, 'event':event_id} for name in member_names]
+        print(team)
+        Team.insert_many(team).execute()
+
+    def create_events_categories(self, cat_titles, event_id):
+        '''
+        Associates a category with an event
+        '''
+        cats = [{'category':Category.get(Category.title == title).id, 'event':event_id} for title in cat_titles]
+        print(cats)
+        EventsCategory.insert_many(cats).execute()
 
 
 

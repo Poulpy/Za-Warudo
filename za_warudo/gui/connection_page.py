@@ -14,7 +14,7 @@ class ConnectionPage(ttk.Frame):
         up = ttk.Frame(self, padding=(5, 5, 5, 5))
         down = ttk.Frame(self)
 
-        connection_label = ttk.Label(up, text="Connection")
+        connection_label = ttk.Label(up, text="Connection", font=("TkDefaultFont", "15"))
         connection_label.grid(row=0, column=1, sticky=S)
 
         # It's the input for the user's login

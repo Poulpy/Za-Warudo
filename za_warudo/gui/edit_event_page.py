@@ -89,10 +89,9 @@ class EditEventPage(ttk.Frame):
         guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed", variable=self.guest_attendance)
 
 
-        members_label = ttk.Label(self, text="Add members")
-        users = controller.get_events_per_user()
 
         members_frame = ttk.Frame(self)
+        members_label = ttk.Label(self, text="Add members")
         members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
         # List of users; the responsible has to choose among them
         # members that'll participate in the event's organisation
@@ -105,8 +104,7 @@ class EditEventPage(ttk.Frame):
 
         self.members_tree.tag_configure('odd', background="#F0F0F0")
         self.members_tree.tag_configure('even', background="#FAFAFA")
-        for i in range(len(users)):
-            self.members_tree.insert('', 'end', text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
+        self.display_members(event_id=None)
 
         # CATEGORIES
         categories_label = ttk.Label(self, text="Add categories")
@@ -395,11 +393,11 @@ class EditEventPage(ttk.Frame):
         else:
             self.guest_attendance.set(0)
 
-        self.set_displayed_members(event_id=event['id'])
+        self.display_members(event_id=event['id'])
         self.display_categories(event_id=event['id'])
         self.event_id = event['id']
 
-    def set_displayed_members(self, event_id=None):
+    def display_members(self, event_id=None):
 
         self.members_tree.delete(*self.members_tree.get_children())
         users = self.controller.get_events_per_user(event_id)

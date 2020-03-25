@@ -35,7 +35,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("1100x550")
+        self.geometry("1200x550")
         self.minsize(300, 300)
         self.title("Za Warudo")
 
@@ -186,7 +186,7 @@ class App(Tk):
         Update the events displayed in the events page
         '''
 
-        self.frames["EventsPage"].set_displayed_events()
+        self.frames["EventsPage"].display_events()
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''

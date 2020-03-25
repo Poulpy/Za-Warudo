@@ -38,7 +38,7 @@ class EventsPage(ttk.Frame):
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
         # Each time the date changes, the events of the
         # date in the input are shown
-        self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.set_displayed_events())
+        self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.display_events())
 
         ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
@@ -61,7 +61,7 @@ class EventsPage(ttk.Frame):
         self.events_tree.heading("Type", text="Type")
         self.events_tree.heading("Place", text="Place")
         self.events_tree.heading("Seats", text="Seats left")
-        self.set_displayed_events()
+        self.display_events()
 
         self.events_tree.tag_configure('odd', background="#F0F0F0")
         self.events_tree.tag_configure('even', background="#FAFAFA")
@@ -96,7 +96,7 @@ class EventsPage(ttk.Frame):
     def select_event(self, event=None):
         self.event_selected = event.widget.selection()
 
-    def set_displayed_events(self):
+    def display_events(self):
         '''
         Show the events according to the date of the input
         '''

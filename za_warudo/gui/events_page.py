@@ -38,7 +38,7 @@ class EventsPage(ttk.Frame):
         self.date_text.set(datetime.now().strftime("%Y-%m-%d"))
         # Each time the date changes, the events of the
         # date in the input are shown
-        self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.set_displayed_events())
+        self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.display_events())
 
         ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
@@ -49,21 +49,24 @@ class EventsPage(ttk.Frame):
         # The events are shown in a table. The columns shows:
         # the name, the date the event starts, the date the event
         # ends, and the type of the projection
-        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
-        self.events_tree.column("Begin", width=50)
-        self.events_tree.column("End", width=50)
-        self.events_tree.column("Type", width=50)
+        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type', 'Place', 'Seats'), selectmode='browse')
+        self.events_tree.column("Begin", width=20, anchor='center')
+        self.events_tree.column("End", width=20, anchor='center')
+        self.events_tree.column("Type", width=20, anchor='center')
+        self.events_tree.column("Place", width=20, anchor='center')
+        self.events_tree.column("Seats", width=20, anchor='center')
         self.events_tree.heading("#0", text="Name")
         self.events_tree.heading("Begin", text="Begin")
         self.events_tree.heading("End", text="End")
         self.events_tree.heading("Type", text="Type")
-        self.set_displayed_events()
+        self.events_tree.heading("Place", text="Place")
+        self.events_tree.heading("Seats", text="Seats left")
+        self.display_events()
 
         self.events_tree.tag_configure('odd', background="#F0F0F0")
         self.events_tree.tag_configure('even', background="#FAFAFA")
         self.events_tree.tag_configure('select')
 
-        #self.events_tree.tag_bind('select', '<Button-1>', self.item_clicked)
         self.events_tree.bind('<<TreeviewSelect>>', self.select_event)
 
         style = ttk.Style()
@@ -93,14 +96,7 @@ class EventsPage(ttk.Frame):
     def select_event(self, event=None):
         self.event_selected = event.widget.selection()
 
-    def item_clicked(self, event=None):
-        print('item clicked')
-        it = self.events_tree.focus()
-        print(it)
-        #self.events_tree.focus(it)
-        #self.events_tree.selection_set(it)
-
-    def set_displayed_events(self):
+    def display_events(self):
         '''
         Show the events according to the date of the input
         '''
@@ -116,7 +112,9 @@ class EventsPage(ttk.Frame):
             tid = self.events_tree.insert("", 'end', text=event['name'],
                                           values=(event['begin'].strftime("%H:%M"),
                                                   (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
-                                                  event['projection_type']), tags=(tag, 'select'))
+                                                  event['projection_type'],
+                                                  self.controller.get_location(event['projection_room']),
+                                                  self.controller.get_seats_left(event['id'])), tags=(tag, 'select'))
     def edit_event(self):
         if self.event_selected != None:
             log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))

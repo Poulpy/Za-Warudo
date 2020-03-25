@@ -28,6 +28,8 @@ class App(Tk):
         Tk.__init__(self, *args, **kwargs)
 
         container = ttk.Frame(self)
+        db.connect()
+        self.protocol('WM_DELETE_WINDOW', self.app_will_quit)
         # We use the 'breeze' theme because it's the most beautiful
         # theme along with 'arc'
         style = ThemedStyle(self)
@@ -107,50 +109,35 @@ class App(Tk):
         TODO pass the format in argument for flexibility
         '''
 
-        db.connect()
 
         log.info(date_str)
 
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        events = Event.select().where((Event.begin.year == date.year)
+        return Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day)).order_by(Event.begin)
 
-        db.close()
 
-        return events
 
     def get_categories(self):
         '''
         Return all categories
         '''
-        db.connect()
-        categories = Category.select()
-        db.close()
+        return Category.select()
 
-        return categories
 
     def get_events_categories(self, event_id=None):
-        db.connect()
-        ec = []
         if event_id == None:
-            ec = [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
+            return [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
         else:
+            ec = []
             for c in Category.select():
                 checked = 'unchecked'
                 if EventsCategory.select().where((EventsCategory.category == c.id) & (EventsCategory.event == event_id)):
                     checked = 'checked'
                 ec.append({'title':c.title, 'price':c.price, 'checked':checked})
 
-        '''
-        events_categories = (Category.select()
-                                    .join(EventsCategory)
-                                    .where((EventsCategory.category == Category.id)
-                                           & (EventsCategory.event == event_id)))
-        '''
-        db.close()
-
-        return ec
+            return ec
 
 
     def get_projection_rooms(self):
@@ -158,16 +145,11 @@ class App(Tk):
         Return all projection rooms
         '''
 
-        db.connect()
-        proj_rooms = ProjectionRoom.select()
-        db.close()
-
-        return proj_rooms
+        return ProjectionRoom.select()
 
     def get_events_per_user(self, event_id=None):
-        db.connect()
         if event_id == None:
-            epu = [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
+            return [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
         else:
             epu = []
             for u in User.select():
@@ -176,31 +158,28 @@ class App(Tk):
                     checked = 'checked'
                 epu.append({'user':u.name, 'events':Team.select().where(Team.member == u).count(), 'checked':checked})
 
-        db.close()
+            return epu
 
-        return epu
 
     def get_users(self):
         '''
         Return all users
         '''
 
-        db.connect()
-        users = User.select()
-        db.close()
+        return User.select()
 
-        return users
 
     def update_events_page(self):
         '''
         Update the events displayed in the events page
         '''
 
-        self.frames["EventsPage"].set_displayed_events()
+        self.frames["EventsPage"].display_events()
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
 
+        log.info('Go to frame %s' % (page_name))
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -216,7 +195,6 @@ class App(Tk):
         Event raised when the user click on the login button
         on the connection page
         '''
-        db.connect()
 
         # We get the user input : login and password
         login = self.frames["ConnectionPage"].login_entry.get()
@@ -237,7 +215,6 @@ class App(Tk):
             else:
                 self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
 
-        db.close()
 
     def create_event(self, event):
         '''
@@ -293,5 +270,19 @@ class App(Tk):
         self.frames['EditEventPage'].set_inputs(event=event_to_edit)
         self.show_frame('EditEventPage')
 
+    def get_location(self, projection_room_id):
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
+
+    def get_total_seats_for_event(self, projection_room_id):
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
+
+    def get_seats_left(self, event_id):
+        event = Event.get(Event.id == event_id)
+        return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
+
+    def app_will_quit(self):
+        log.info('Application will terminate')
+        db.close()
+        self.destroy()
 
 

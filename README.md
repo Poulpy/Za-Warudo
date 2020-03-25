@@ -56,6 +56,9 @@ add the following lines:
 ### TODO
 
 - unit testing tkinter
+- clean inputs after an edit or a new
+- details frame
+- ticketing frame
 
 
 

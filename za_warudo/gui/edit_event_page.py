@@ -20,6 +20,9 @@ class EditEventPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
+        self.edit_mode = False
+        self.event_id = None
+
         self.error_text = StringVar()
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
         error_label = ttk.Label(self, textvariable=self.error_text, font=("TkDefaultFont", "7"))
@@ -306,6 +309,26 @@ class EditEventPage(ttk.Frame):
 
         new_event = dict()
 
+        if self.room_reserved.get() == 1:
+            new_event['room_reserved'] = True
+        else:
+            new_event['room_reserved'] = False
+        if self.management.get() == 1:
+            new_event['management'] = True
+        else:
+            new_event['management'] = False
+        if self.equipment_reserved.get() == 1:
+            new_event['equipment_reserved'] = True
+        else:
+            new_event['equipment_reserved'] = False
+        if self.guest_attendance.get() == 1:
+            new_event['guest_attendance'] = True
+        else:
+            new_event['guest_attendance'] = False
+
+        member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
+        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
+
         log.info("Name " + self.name_entry.get())
         log.info("Day " + self.begin_text.get())
         log.info("Hour " + self.hour_text.get())
@@ -313,6 +336,9 @@ class EditEventPage(ttk.Frame):
 
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
+
+        log.info(member_names)
+        log.info(cat_titles)
 
         new_event['name'] = self.name_entry.get()
         new_event['begin'] = self.begin_text.get() + ' ' + self.hour_text.get() + ':00'
@@ -329,17 +355,14 @@ class EditEventPage(ttk.Frame):
             new_event['context'] = self.context.get()
         '''
 
-        if self.room_reserved.get() == 1: new_event['room_reserved'] = True
-        if self.management.get() == 1: new_event['management'] = True
-        if self.equipment_reserved.get() == 1: new_event['equipment_reserved'] = True
-        if self.guest_attendance.get() == 1: new_event['guest_attendance'] = True
-
-        member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
-        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
-        event_id = self.controller.create_event(new_event)
-
-        self.controller.create_team(member_names, event_id)
-        self.controller.create_events_categories(cat_titles, event_id)
+        if self.edit_mode:
+            self.controller.update_event(new_event, self.event_id)
+            self.controller.update_team(member_names, self.event_id)
+            self.controller.update_events_categories(cat_titles, self.event_id)
+        else:
+            event_id = self.controller.create_event(new_event)
+            self.controller.create_team(member_names, event_id)
+            self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
 
@@ -377,6 +400,7 @@ class EditEventPage(ttk.Frame):
 
         self.set_displayed_members(event_id=event['id'])
         self.display_categories(event_id=event['id'])
+        self.event_id = event['id']
 
     def set_displayed_members(self, event_id=None):
 
@@ -398,6 +422,12 @@ class EditEventPage(ttk.Frame):
             s = '%d%s' % (category['price'], ' €')
             self.cats_tree.insert('', 'end', iid=str(i), text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
             self.cats_tree.change_state(str(i), category['checked'])
+
+    def set_edit_mode(self):
+        self.edit_mode = True
+
+    def set_new_mode(self):
+        self.edit_mode = False
 
 class Spinbox(ttk.Entry):
 

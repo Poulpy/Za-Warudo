@@ -16,7 +16,6 @@ python3 src/seed.py desc
 
 ```
 python3 za_warudo
-# TODO change to app/ ?
 ```
 
 

@@ -68,6 +68,11 @@ class App(Tk):
         self.show_frame("ConnectionPage")
         self.set_menu(is_connected=False)
 
+    def new_event(self):
+        log.info('New event')
+        self.frames['EditEventPage'].set_new_mode()
+        self.show_frame('EditEventPage')
+
 
     def set_menu(self, is_connected: bool):
         '''
@@ -245,6 +250,22 @@ class App(Tk):
 
         return event_created.id
 
+    def update_event(self, event, event_id):
+        event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
+        event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
+        event['responsible'] = self.current_user.id
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def update_team(self, member_names, event_id):
+        log.info('Updating team for the event %d' % (event_id))
+        Team.delete().where(Team.event == event_id)
+        self.create_team(member_names, event_id)
+
+    def update_events_categories(self, cat_titles, event_id):
+        log.info('Updating events categories for event %d' % (event_id))
+        EventsCategory.delete().where(EventsCategory.event == event_id)
+        self.create_events_categories(cat_titles, event_id)
+
     def create_team(self, member_names, event_id):
         '''
         Associates a user with an event : (user, event)
@@ -268,6 +289,7 @@ class App(Tk):
         event_to_edit = Event.select().where(Event.name == name).dicts().get()
         print(event_to_edit)
         event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
+        self.frames['EditEventPage'].set_edit_mode()
         self.frames['EditEventPage'].set_inputs(event=event_to_edit)
         self.show_frame('EditEventPage')
 

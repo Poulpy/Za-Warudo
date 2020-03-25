@@ -30,7 +30,7 @@ class EventsPage(ttk.Frame):
 
         # Creation of of an event : clicking on that button
         # will redirect the user on the edit event frame
-        new_event_button = ttk.Button(self, text="New event", command=lambda: controller.show_frame("EditEventPage"))
+        new_event_button = ttk.Button(self, text="New event", command=lambda: controller.new_event())
 
         self.date_text = StringVar()
         self.date_entry = EntryDate(self, textvariable=self.date_text)

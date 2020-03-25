@@ -113,40 +113,31 @@ class App(Tk):
         log.info(date_str)
 
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        events = Event.select().where((Event.begin.year == date.year)
+        return Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day)).order_by(Event.begin)
 
 
-        return events
 
     def get_categories(self):
         '''
         Return all categories
         '''
-        categories = Category.select()
+        return Category.select()
 
-        return categories
 
     def get_events_categories(self, event_id=None):
-        ec = []
         if event_id == None:
-            ec = [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
+            return [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
         else:
+            ec = []
             for c in Category.select():
                 checked = 'unchecked'
                 if EventsCategory.select().where((EventsCategory.category == c.id) & (EventsCategory.event == event_id)):
                     checked = 'checked'
                 ec.append({'title':c.title, 'price':c.price, 'checked':checked})
 
-        '''
-        events_categories = (Category.select()
-                                    .join(EventsCategory)
-                                    .where((EventsCategory.category == Category.id)
-                                           & (EventsCategory.event == event_id)))
-        '''
-
-        return ec
+            return ec
 
 
     def get_projection_rooms(self):
@@ -154,13 +145,11 @@ class App(Tk):
         Return all projection rooms
         '''
 
-        proj_rooms = ProjectionRoom.select()
-
-        return proj_rooms
+        return ProjectionRoom.select()
 
     def get_events_per_user(self, event_id=None):
         if event_id == None:
-            epu = [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
+            return [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
         else:
             epu = []
             for u in User.select():
@@ -169,17 +158,16 @@ class App(Tk):
                     checked = 'checked'
                 epu.append({'user':u.name, 'events':Team.select().where(Team.member == u).count(), 'checked':checked})
 
+            return epu
 
-        return epu
 
     def get_users(self):
         '''
         Return all users
         '''
 
-        users = User.select()
+        return User.select()
 
-        return users
 
     def update_events_page(self):
         '''
@@ -191,6 +179,7 @@ class App(Tk):
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
 
+        log.info('Go to frame %s' % (page_name))
         frame = self.frames[page_name]
         frame.tkraise()
 

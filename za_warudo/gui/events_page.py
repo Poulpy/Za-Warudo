@@ -49,14 +49,16 @@ class EventsPage(ttk.Frame):
         # The events are shown in a table. The columns shows:
         # the name, the date the event starts, the date the event
         # ends, and the type of the projection
-        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type'), selectmode='browse')
-        self.events_tree.column("Begin", width=50)
-        self.events_tree.column("End", width=50)
-        self.events_tree.column("Type", width=50)
+        self.events_tree = ttk.Treeview(self, columns=('Begin', 'End', 'Type', 'Place'), selectmode='browse')
+        self.events_tree.column("Begin", width=50, anchor='center')
+        self.events_tree.column("End", width=50, anchor='center')
+        self.events_tree.column("Type", width=50, anchor='center')
+        self.events_tree.column("Place", width=50, anchor='center')
         self.events_tree.heading("#0", text="Name")
         self.events_tree.heading("Begin", text="Begin")
         self.events_tree.heading("End", text="End")
         self.events_tree.heading("Type", text="Type")
+        self.events_tree.heading("Place", text="Place")
         self.set_displayed_events()
 
         self.events_tree.tag_configure('odd', background="#F0F0F0")
@@ -116,7 +118,8 @@ class EventsPage(ttk.Frame):
             tid = self.events_tree.insert("", 'end', text=event['name'],
                                           values=(event['begin'].strftime("%H:%M"),
                                                   (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
-                                                  event['projection_type']), tags=(tag, 'select'))
+                                                  event['projection_type'],
+                                                  self.controller.get_location_for_event(event['projection_room'])), tags=(tag, 'select'))
     def edit_event(self):
         if self.event_selected != None:
             log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))

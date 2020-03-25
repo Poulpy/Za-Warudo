@@ -281,6 +281,9 @@ class App(Tk):
         self.frames['EditEventPage'].set_inputs(event=event_to_edit)
         self.show_frame('EditEventPage')
 
+    def get_location_for_event(self, projection_room_id):
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
+
     def app_will_quit(self):
         log.info('Application will terminate')
         db.close()

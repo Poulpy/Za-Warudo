@@ -110,7 +110,6 @@ class EditEventPage(ttk.Frame):
 
         # CATEGORIES
         categories_label = ttk.Label(self, text="Add categories")
-        categories = controller.get_categories().dicts()
 
         cats_frame = ttk.Frame(self)
         cats_scrollbar = ttk.Scrollbar(cats_frame, orient=VERTICAL)
@@ -124,9 +123,7 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.tag_configure('odd', background="#F0F0F0")
         self.cats_tree.tag_configure('even', background="#FAFAFA")
 
-        for i, category in enumerate(categories):
-            s = '%d%s' % (category['price'], ' €')
-            self.cats_tree.insert('', 'end', text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
+        self.display_categories(event_id=None)
 
         # PRESENTATION
         self.presentation = IntVar()

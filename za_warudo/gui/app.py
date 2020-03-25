@@ -109,7 +109,7 @@ class App(Tk):
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
         events = Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
-                                    & (Event.begin.day == date.day))
+                                    & (Event.begin.day == date.day)).order_by(Event.begin)
 
         db.close()
 

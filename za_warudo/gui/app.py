@@ -35,7 +35,7 @@ class App(Tk):
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
-        self.geometry("1200x550")
+        self.geometry("1100x550")
         self.minsize(300, 300)
         self.title("Za Warudo")
 
@@ -281,8 +281,15 @@ class App(Tk):
         self.frames['EditEventPage'].set_inputs(event=event_to_edit)
         self.show_frame('EditEventPage')
 
-    def get_location_for_event(self, projection_room_id):
+    def get_location(self, projection_room_id):
         return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
+
+    def get_total_seats_for_event(self, projection_room_id):
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
+
+    def get_seats_left(self, event_id):
+        event = Event.get(Event.id == event_id)
+        return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
     def app_will_quit(self):
         log.info('Application will terminate')

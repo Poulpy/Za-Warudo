@@ -6,5 +6,5 @@ docs:
 	export PYTHONPATH='za_warudo'; pdoc3 --html -o docs za_warudo --force
 
 clean:
-	rm -r za_warudo/*.pyc za_warudo/__pycache__
+	rm -r za_warudo/__pycache__ za_warudo/*/__pycache__
 	rm log/*

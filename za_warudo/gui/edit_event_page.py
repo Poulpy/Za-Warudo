@@ -355,10 +355,26 @@ class EditEventPage(ttk.Frame):
         self.projection_room_choosen.set(event['projection_room'])
 
 
-        if event['room_reserved']: self.room_reserved.set(1)
-        if event['management']: self.management.set(1)
-        if event['equipment_reserved']: self.equipment_reserved.set(1)
-        if event['guest_attendance']: self.guest_attendance.set(1)
+        if event['room_reserved']:
+            self.room_reserved.set(1)
+        else:
+            self.room_reserved.set(0)
+
+        if event['management']:
+            self.management.set(1)
+        else:
+            self.management.set(0)
+
+        if event['equipment_reserved']:
+            self.equipment_reserved.set(1)
+        else:
+            self.equipment_reserved.set(0)
+
+        if event['guest_attendance']:
+            self.guest_attendance.set(1)
+        else:
+            self.guest_attendance.set(0)
+
         self.set_displayed_members(event_id=event['id'])
         self.display_categories(event_id=event['id'])
 

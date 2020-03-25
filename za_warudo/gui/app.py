@@ -28,6 +28,8 @@ class App(Tk):
         Tk.__init__(self, *args, **kwargs)
 
         container = ttk.Frame(self)
+        db.connect()
+        self.protocol('WM_DELETE_WINDOW', self.app_will_quit)
         # We use the 'breeze' theme because it's the most beautiful
         # theme along with 'arc'
         style = ThemedStyle(self)
@@ -107,7 +109,6 @@ class App(Tk):
         TODO pass the format in argument for flexibility
         '''
 
-        db.connect()
 
         log.info(date_str)
 
@@ -116,7 +117,6 @@ class App(Tk):
                                     & (Event.begin.month == date.month)
                                     & (Event.begin.day == date.day)).order_by(Event.begin)
 
-        db.close()
 
         return events
 
@@ -124,14 +124,11 @@ class App(Tk):
         '''
         Return all categories
         '''
-        db.connect()
         categories = Category.select()
-        db.close()
 
         return categories
 
     def get_events_categories(self, event_id=None):
-        db.connect()
         ec = []
         if event_id == None:
             ec = [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
@@ -148,7 +145,6 @@ class App(Tk):
                                     .where((EventsCategory.category == Category.id)
                                            & (EventsCategory.event == event_id)))
         '''
-        db.close()
 
         return ec
 
@@ -158,14 +154,11 @@ class App(Tk):
         Return all projection rooms
         '''
 
-        db.connect()
         proj_rooms = ProjectionRoom.select()
-        db.close()
 
         return proj_rooms
 
     def get_events_per_user(self, event_id=None):
-        db.connect()
         if event_id == None:
             epu = [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
         else:
@@ -176,7 +169,6 @@ class App(Tk):
                     checked = 'checked'
                 epu.append({'user':u.name, 'events':Team.select().where(Team.member == u).count(), 'checked':checked})
 
-        db.close()
 
         return epu
 
@@ -185,9 +177,7 @@ class App(Tk):
         Return all users
         '''
 
-        db.connect()
         users = User.select()
-        db.close()
 
         return users
 
@@ -216,7 +206,6 @@ class App(Tk):
         Event raised when the user click on the login button
         on the connection page
         '''
-        db.connect()
 
         # We get the user input : login and password
         login = self.frames["ConnectionPage"].login_entry.get()
@@ -237,7 +226,6 @@ class App(Tk):
             else:
                 self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
 
-        db.close()
 
     def create_event(self, event):
         '''
@@ -293,5 +281,9 @@ class App(Tk):
         self.frames['EditEventPage'].set_inputs(event=event_to_edit)
         self.show_frame('EditEventPage')
 
+    def app_will_quit(self):
+        log.info('Application will terminate')
+        db.close()
+        self.destroy()
 
 

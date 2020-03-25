@@ -359,6 +359,16 @@ class EditEventPage(ttk.Frame):
         if event['management']: self.management.set(1)
         if event['equipment_reserved']: self.equipment_reserved.set(1)
         if event['guest_attendance']: self.guest_attendance.set(1)
+        self.set_displayed_members(event_id=event['id'])
+
+    def set_displayed_members(self, event_id=None):
+
+        self.members_tree.delete(*self.members_tree.get_children())
+        users = self.controller.get_events_per_user(event_id)
+
+        for i in range(len(users)):
+            self.members_tree.insert('', 'end', iid=str(i), text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
+            self.members_tree.change_state(str(i), users[i]['checked'])
 
 class Spinbox(ttk.Entry):
 

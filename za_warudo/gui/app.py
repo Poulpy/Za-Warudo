@@ -137,10 +137,32 @@ class App(Tk):
 
         return proj_rooms
 
-    def get_events_per_user(self):
+    def get_events_per_user(self, event_id=None):
         db.connect()
-        epu =[{'user':user.name, 'events':Team.select().where(Team.member == user).count()} for user in User.select()]
+        if event_id == None:
+            epu = [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
+        else:
+            epu = []
+            #epu = [{'user':t.member, 'events': Team.select().where(Team.member == t.member).count()} for t in Team.select().where(Team.event.id == event_id)]
+            print(event_id)
+            for u in User.select():
+                checked = 'unchecked'
+                q = Team.select().where((Team.member == u) & (Team.event == event_id))
+                print(q)
+                if q:
+                    print('CHECKED')
+                    checked = 'checked'
+                epu.append({'user':u.name, 'events':Team.select().where(Team.member == u).count(), 'checked':checked})
+
+            '''
+            for t in Team.select():
+                checked = 'checked'
+                if t.event == event_id:
+                    checked = 'unchecked'
+                epu.append({'user':t.member.name, 'events':Team.select().where(Team.member == t.member).count(), 'checked':checked})
+            '''
         db.close()
+        print(epu)
 
         return epu
 

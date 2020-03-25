@@ -125,6 +125,28 @@ class App(Tk):
 
         return categories
 
+    def get_events_categories(self, event_id=None):
+        db.connect()
+        ec = []
+        if event_id == None:
+            ec = [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
+        else:
+            for c in Category.select():
+                checked = 'unchecked'
+                if EventsCategory.select().where((EventsCategory.category == c.id) & (EventsCategory.event == event_id)):
+                    checked = 'checked'
+                ec.append({'title':c.title, 'price':c.price, 'checked':checked})
+
+        '''
+        events_categories = (Category.select()
+                                    .join(EventsCategory)
+                                    .where((EventsCategory.category == Category.id)
+                                           & (EventsCategory.event == event_id)))
+        '''
+        db.close()
+
+        return ec
+
 
     def get_projection_rooms(self):
         '''

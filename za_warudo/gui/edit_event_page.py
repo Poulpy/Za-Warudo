@@ -360,6 +360,7 @@ class EditEventPage(ttk.Frame):
         if event['equipment_reserved']: self.equipment_reserved.set(1)
         if event['guest_attendance']: self.guest_attendance.set(1)
         self.set_displayed_members(event_id=event['id'])
+        self.display_categories(event_id=event['id'])
 
     def set_displayed_members(self, event_id=None):
 
@@ -369,6 +370,18 @@ class EditEventPage(ttk.Frame):
         for i in range(len(users)):
             self.members_tree.insert('', 'end', iid=str(i), text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
             self.members_tree.change_state(str(i), users[i]['checked'])
+
+    def display_categories(self, event_id=None):
+
+        # The tree is cleaned
+        self.cats_tree.delete(*self.cats_tree.get_children())
+        # We get the categories realted to the event
+        categories = self.controller.get_events_categories(event_id)
+
+        for i, category in enumerate(categories):
+            s = '%d%s' % (category['price'], ' €')
+            self.cats_tree.insert('', 'end', iid=str(i), text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
+            self.cats_tree.change_state(str(i), category['checked'])
 
 class Spinbox(ttk.Entry):
 

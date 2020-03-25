@@ -11,8 +11,8 @@ class Team(Model):
     event : that's a member of a team
     '''
 
-    member = ForeignKeyField(User)
-    event = ForeignKeyField(Event)
+    member = ForeignKeyField(User, backref='teams')
+    event = ForeignKeyField(Event, backref='teams')
 
     def __str__(self):
         return "[User] name: " + self.name + ", login: " + self.login

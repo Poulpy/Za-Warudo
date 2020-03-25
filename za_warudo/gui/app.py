@@ -68,6 +68,11 @@ class App(Tk):
         self.show_frame("ConnectionPage")
         self.set_menu(is_connected=False)
 
+    def new_event(self):
+        log.info('New event')
+        self.frames['EditEventPage'].set_new_mode()
+        self.show_frame('EditEventPage')
+
 
     def set_menu(self, is_connected: bool):
         '''
@@ -109,7 +114,7 @@ class App(Tk):
         date = datetime.strptime(date_str, "%Y-%m-%d").date()
         events = Event.select().where((Event.begin.year == date.year)
                                     & (Event.begin.month == date.month)
-                                    & (Event.begin.day == date.day))
+                                    & (Event.begin.day == date.day)).order_by(Event.begin)
 
         db.close()
 
@@ -125,6 +130,28 @@ class App(Tk):
 
         return categories
 
+    def get_events_categories(self, event_id=None):
+        db.connect()
+        ec = []
+        if event_id == None:
+            ec = [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
+        else:
+            for c in Category.select():
+                checked = 'unchecked'
+                if EventsCategory.select().where((EventsCategory.category == c.id) & (EventsCategory.event == event_id)):
+                    checked = 'checked'
+                ec.append({'title':c.title, 'price':c.price, 'checked':checked})
+
+        '''
+        events_categories = (Category.select()
+                                    .join(EventsCategory)
+                                    .where((EventsCategory.category == Category.id)
+                                           & (EventsCategory.event == event_id)))
+        '''
+        db.close()
+
+        return ec
+
 
     def get_projection_rooms(self):
         '''
@@ -137,9 +164,18 @@ class App(Tk):
 
         return proj_rooms
 
-    def get_events_per_user(self):
+    def get_events_per_user(self, event_id=None):
         db.connect()
-        epu =[{'user':user.name, 'events':Team.select().where(Team.member == user).count()} for user in User.select()]
+        if event_id == None:
+            epu = [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
+        else:
+            epu = []
+            for u in User.select():
+                checked = 'unchecked'
+                if Team.select().where((Team.member == u) & (Team.event == event_id)):
+                    checked = 'checked'
+                epu.append({'user':u.name, 'events':Team.select().where(Team.member == u).count(), 'checked':checked})
+
         db.close()
 
         return epu
@@ -214,6 +250,22 @@ class App(Tk):
 
         return event_created.id
 
+    def update_event(self, event, event_id):
+        event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
+        event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
+        event['responsible'] = self.current_user.id
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def update_team(self, member_names, event_id):
+        log.info('Updating team for the event %d' % (event_id))
+        Team.delete().where(Team.event == event_id)
+        self.create_team(member_names, event_id)
+
+    def update_events_categories(self, cat_titles, event_id):
+        log.info('Updating events categories for event %d' % (event_id))
+        EventsCategory.delete().where(EventsCategory.event == event_id)
+        self.create_events_categories(cat_titles, event_id)
+
     def create_team(self, member_names, event_id):
         '''
         Associates a user with an event : (user, event)
@@ -232,5 +284,14 @@ class App(Tk):
 
     def delete_event(self, event_name):
         return Event.delete().where(Event.name == event_name).execute()
+
+    def edit_event(self, name):
+        event_to_edit = Event.select().where(Event.name == name).dicts().get()
+        print(event_to_edit)
+        event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
+        self.frames['EditEventPage'].set_edit_mode()
+        self.frames['EditEventPage'].set_inputs(event=event_to_edit)
+        self.show_frame('EditEventPage')
+
 
 

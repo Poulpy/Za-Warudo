@@ -20,6 +20,9 @@ class EditEventPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
+        self.edit_mode = False
+        self.event_id = None
+
         self.error_text = StringVar()
         title = ttk.Label(self, text="Create event", font=("TkDefaultFont", "15"))
         error_label = ttk.Label(self, textvariable=self.error_text, font=("TkDefaultFont", "7"))
@@ -31,8 +34,9 @@ class EditEventPage(ttk.Frame):
         save_button = ttk.Button(buttons_frame, text="Save", command=self.save)
 
         # Event form
+        self.name = StringVar()
         name_label = ttk.Label(self, text="Name")
-        self.name_entry = ttk.Entry(self)
+        self.name_entry = ttk.Entry(self, textvariable=self.name)
 
         # Variables to get the values after input
         self.begin_text = StringVar()
@@ -75,12 +79,12 @@ class EditEventPage(ttk.Frame):
         # Inputs for the event's status to go 'finished'
         self.room_reserved = IntVar()
         self.management = IntVar()
-        self.equipement_reserved = IntVar()
+        self.equipment_reserved = IntVar()
         self.guest_attendance = IntVar()
 
         check_frame = ttk.Frame(self)
         room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved", variable=self.room_reserved)
-        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipement_reserved)
+        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipment_reserved)
         management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved", variable=self.management)
         guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed", variable=self.guest_attendance)
 
@@ -305,6 +309,26 @@ class EditEventPage(ttk.Frame):
 
         new_event = dict()
 
+        if self.room_reserved.get() == 1:
+            new_event['room_reserved'] = True
+        else:
+            new_event['room_reserved'] = False
+        if self.management.get() == 1:
+            new_event['management'] = True
+        else:
+            new_event['management'] = False
+        if self.equipment_reserved.get() == 1:
+            new_event['equipment_reserved'] = True
+        else:
+            new_event['equipment_reserved'] = False
+        if self.guest_attendance.get() == 1:
+            new_event['guest_attendance'] = True
+        else:
+            new_event['guest_attendance'] = False
+
+        member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
+        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
+
         log.info("Name " + self.name_entry.get())
         log.info("Day " + self.begin_text.get())
         log.info("Hour " + self.hour_text.get())
@@ -312,6 +336,9 @@ class EditEventPage(ttk.Frame):
 
         log.info("Projection type " + self.projection_type_choosen.get())
         log.info("Projection room " + self.projection_room_choosen.get())
+
+        log.info(member_names)
+        log.info(cat_titles)
 
         new_event['name'] = self.name_entry.get()
         new_event['begin'] = self.begin_text.get() + ' ' + self.hour_text.get() + ':00'
@@ -328,19 +355,79 @@ class EditEventPage(ttk.Frame):
             new_event['context'] = self.context.get()
         '''
 
-        if self.room_reserved.get() == 1: new_event['room_reserved'] = True
-        if self.management.get() == 1: new_event['management'] = True
-        if self.equipement_reserved.get() == 1: new_event['equipement_reserved'] = True
-        if self.guest_attendance.get() == 1: new_event['guest_attendance'] = True
-
-        member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
-        cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
-        event_id = self.controller.create_event(new_event)
-
-        self.controller.create_team(member_names, event_id)
-        self.controller.create_events_categories(cat_titles, event_id)
+        if self.edit_mode:
+            self.controller.update_event(new_event, self.event_id)
+            self.controller.update_team(member_names, self.event_id)
+            self.controller.update_events_categories(cat_titles, self.event_id)
+        else:
+            event_id = self.controller.create_event(new_event)
+            self.controller.create_team(member_names, event_id)
+            self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
+
+    def set_inputs(self, event):
+
+        self.name.set(event['name'])
+        day = event['begin'].strftime('%Y-%m-%d')
+        hour = event['begin'].strftime('%H')
+        self.begin_text.set(day)
+        self.hour_text.set(hour)
+        self.running_time_text.set(event['running_time'])
+        self.projection_type_choosen.set(event['projection_type'])
+        self.projection_room_choosen.set(event['projection_room'])
+
+
+        if event['room_reserved']:
+            self.room_reserved.set(1)
+        else:
+            self.room_reserved.set(0)
+
+        if event['management']:
+            self.management.set(1)
+        else:
+            self.management.set(0)
+
+        if event['equipment_reserved']:
+            self.equipment_reserved.set(1)
+        else:
+            self.equipment_reserved.set(0)
+
+        if event['guest_attendance']:
+            self.guest_attendance.set(1)
+        else:
+            self.guest_attendance.set(0)
+
+        self.set_displayed_members(event_id=event['id'])
+        self.display_categories(event_id=event['id'])
+        self.event_id = event['id']
+
+    def set_displayed_members(self, event_id=None):
+
+        self.members_tree.delete(*self.members_tree.get_children())
+        users = self.controller.get_events_per_user(event_id)
+
+        for i in range(len(users)):
+            self.members_tree.insert('', 'end', iid=str(i), text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
+            self.members_tree.change_state(str(i), users[i]['checked'])
+
+    def display_categories(self, event_id=None):
+
+        # The tree is cleaned
+        self.cats_tree.delete(*self.cats_tree.get_children())
+        # We get the categories realted to the event
+        categories = self.controller.get_events_categories(event_id)
+
+        for i, category in enumerate(categories):
+            s = '%d%s' % (category['price'], ' €')
+            self.cats_tree.insert('', 'end', iid=str(i), text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
+            self.cats_tree.change_state(str(i), category['checked'])
+
+    def set_edit_mode(self):
+        self.edit_mode = True
+
+    def set_new_mode(self):
+        self.edit_mode = False
 
 class Spinbox(ttk.Entry):
 

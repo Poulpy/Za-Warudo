@@ -40,7 +40,7 @@ class EventsPage(ttk.Frame):
         # date in the input are shown
         self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.set_displayed_events())
 
-        ttk.Button(self, text="Edit").grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
+        ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Ticketing").grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
@@ -117,6 +117,10 @@ class EventsPage(ttk.Frame):
                                           values=(event['begin'].strftime("%H:%M"),
                                                   (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
                                                   event['projection_type']), tags=(tag, 'select'))
+    def edit_event(self):
+        if self.event_selected != None:
+            log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))
+            self.controller.edit_event(name=self.events_tree.item(self.event_selected)['text'])
 
     def confirm_delete(self):
         '''

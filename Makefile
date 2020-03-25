@@ -7,3 +7,4 @@ docs:
 
 clean:
 	rm -r za_warudo/*.pyc za_warudo/__pycache__
+	rm log/*

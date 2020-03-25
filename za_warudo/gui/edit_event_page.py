@@ -31,8 +31,9 @@ class EditEventPage(ttk.Frame):
         save_button = ttk.Button(buttons_frame, text="Save", command=self.save)
 
         # Event form
+        self.name = StringVar()
         name_label = ttk.Label(self, text="Name")
-        self.name_entry = ttk.Entry(self)
+        self.name_entry = ttk.Entry(self, textvariable=self.name)
 
         # Variables to get the values after input
         self.begin_text = StringVar()
@@ -75,12 +76,12 @@ class EditEventPage(ttk.Frame):
         # Inputs for the event's status to go 'finished'
         self.room_reserved = IntVar()
         self.management = IntVar()
-        self.equipement_reserved = IntVar()
+        self.equipment_reserved = IntVar()
         self.guest_attendance = IntVar()
 
         check_frame = ttk.Frame(self)
         room_chbutton = ttk.Checkbutton(check_frame, text="Room reserved", variable=self.room_reserved)
-        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipement_reserved)
+        equipment_chbutton = ttk.Checkbutton(check_frame, text="Equipment reserved", variable=self.equipment_reserved)
         management_chbutton = ttk.Checkbutton(check_frame, text="Management reserved", variable=self.management)
         guest_attendance_chbutton = ttk.Checkbutton(check_frame, text="Guest attendance confirmed", variable=self.guest_attendance)
 
@@ -330,7 +331,7 @@ class EditEventPage(ttk.Frame):
 
         if self.room_reserved.get() == 1: new_event['room_reserved'] = True
         if self.management.get() == 1: new_event['management'] = True
-        if self.equipement_reserved.get() == 1: new_event['equipement_reserved'] = True
+        if self.equipment_reserved.get() == 1: new_event['equipment_reserved'] = True
         if self.guest_attendance.get() == 1: new_event['guest_attendance'] = True
 
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
@@ -341,6 +342,23 @@ class EditEventPage(ttk.Frame):
         self.controller.create_events_categories(cat_titles, event_id)
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
+
+    def set_inputs(self, event):
+
+        self.name.set(event['name'])
+        day = event['begin'].strftime('%Y-%m-%d')
+        hour = event['begin'].strftime('%H')
+        self.begin_text.set(day)
+        self.hour_text.set(hour)
+        self.running_time_text.set(event['running_time'])
+        self.projection_type_choosen.set(event['projection_type'])
+        self.projection_room_choosen.set(event['projection_room'])
+
+
+        if event['room_reserved']: self.room_reserved.set(1)
+        if event['management']: self.management.set(1)
+        if event['equipment_reserved']: self.equipment_reserved.set(1)
+        if event['guest_attendance']: self.guest_attendance.set(1)
 
 class Spinbox(ttk.Entry):
 

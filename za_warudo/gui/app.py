@@ -233,4 +233,12 @@ class App(Tk):
     def delete_event(self, event_name):
         return Event.delete().where(Event.name == event_name).execute()
 
+    def edit_event(self, name):
+        event_to_edit = Event.select().where(Event.name == name).dicts().get()
+        print(event_to_edit)
+        event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
+        self.frames['EditEventPage'].set_inputs(event=event_to_edit)
+        self.show_frame('EditEventPage')
+
+
 

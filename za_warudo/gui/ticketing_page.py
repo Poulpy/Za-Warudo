@@ -78,17 +78,17 @@ class TicketingPage(ttk.Frame):
 
     def set_inputs(self):
         # day-month-year begin_hour - end_hour
-        date = self.event['begin'].strftime("%d-%m-%Y %H")
+        date = self.event.begin.strftime("%d-%m-%Y %H")
         date += 'h - '
-        date += (self.event['begin'] + timedelta(minutes=self.event['running_time'])).strftime("%H")
+        date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime("%H")
         date += 'h'
-        seats_left = self.projection_room['total_seats'] - self.event['booked_seats'] - self.event['sold_seats']
+        seats_left = self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats
 
-        self.textvar['name'].set(self.event['name'])
-        self.textvar['projection_type'].set(self.event['projection_type'])
+        self.textvar['name'].set(self.event.name)
+        self.textvar['projection_type'].set(self.event.projection_type)
         self.textvar['date'].set(date)
         self.textvar['seats_left'].set(seats_left)
-        self.textvar['sold_seats'].set(self.event['sold_seats'])
-        self.textvar['booked_seats'].set(self.event['booked_seats'])
-        self.textvar['revenue'].set(self.event['revenue'])
+        self.textvar['sold_seats'].set(self.event.sold_seats)
+        self.textvar['booked_seats'].set(self.event.booked_seats)
+        self.textvar['revenue'].set(self.event.revenue)
 

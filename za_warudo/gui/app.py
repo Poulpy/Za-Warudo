@@ -282,11 +282,10 @@ class App(Tk):
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
     def go_to_ticket_page(self, event_name):
-        event = Event.select().where(Event.name == event_name).dicts().get()
-        projection_room = ProjectionRoom.select().where(ProjectionRoom.id == event['projection_room']).dicts().get()
+        event = Event.get(Event.name == event_name)
 
         self.frames['TicketingPage'].set_event(event)
-        self.frames['TicketingPage'].set_projection_room(projection_room)
+        self.frames['TicketingPage'].set_projection_room(event.projection_room)
         self.frames['TicketingPage'].set_inputs()
 
         self.show_frame('TicketingPage')

@@ -133,6 +133,7 @@ class EventsPage(ttk.Frame):
                 self.controller.update_events_page()
 
     def link_to_ticketing_page(self):
-        self.controller.show_frame('TicketingPage')
+        if self.event_selected != None:
+            self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
 
 

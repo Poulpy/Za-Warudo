@@ -281,6 +281,16 @@ class App(Tk):
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
+    def go_to_ticket_page(self, event_name):
+        event = Event.select().where(Event.name == event_name).dicts().get()
+        projection_room = ProjectionRoom.select().where(ProjectionRoom.id == event['projection_room']).dicts().get()
+
+        self.frames['TicketingPage'].set_event(event)
+        self.frames['TicketingPage'].set_projection_room(projection_room)
+        self.frames['TicketingPage'].set_inputs()
+
+        self.show_frame('TicketingPage')
+
     def app_will_quit(self):
         log.info('Application will terminate')
         db.close()

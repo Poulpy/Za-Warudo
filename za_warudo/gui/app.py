@@ -1,3 +1,4 @@
+from functools import partial
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
@@ -91,7 +92,7 @@ class App(Tk):
         if is_connected:
             pmenu.add_command(label="Timetable")
             pmenu.add_command(label="New vacation")
-            pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
+            pmenu.add_command(label="Log out", command=partial(self.show_frame, "ConnectionPage"))
             pmenu.add_separator()
 
         pmenu.add_command(label="Exit", command=self.destroy)

@@ -7,7 +7,8 @@ import re
 import ttkwidgets as tkw
 from tkcalendar import Calendar, DateEntry
 
-from gui.entry_date import EntryDate
+from gui.widgets import EntryDate
+from gui.widgets import Spinbox
 
 class EditEventPage(ttk.Frame):
     '''
@@ -423,10 +424,4 @@ class EditEventPage(ttk.Frame):
 
     def set_new_mode(self):
         self.edit_mode = False
-
-class Spinbox(ttk.Entry):
-
-    def __init__(self, master=None, **kw):
-
-        ttk.Entry.__init__(self, master, 'ttk::spinbox', **kw)
 

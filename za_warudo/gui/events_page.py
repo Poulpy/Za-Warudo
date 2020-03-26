@@ -7,7 +7,7 @@ import logging as log
 
 from tkcalendar import Calendar, DateEntry
 
-from gui.entry_date import EntryDate
+from gui.widgets import EntryDate
 
 # TODO put in module frames
 class EventsPage(ttk.Frame):

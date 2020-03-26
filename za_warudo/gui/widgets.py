@@ -3,7 +3,6 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle
 from tkcalendar import Calendar, DateEntry
 
-# TODO put in module widgets
 class EntryDate(ttk.Entry):
     '''
     Entry for selecting a date
@@ -34,6 +33,13 @@ class EntryDate(ttk.Entry):
                        date_pattern="y-mm-dd")
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="OK", command=combine_funcs(lambda: self.textvariable.set(cal.selection_get()), lambda: top.destroy())).pack()
+
+class Spinbox(ttk.Entry):
+
+    def __init__(self, master=None, **kw):
+
+        ttk.Entry.__init__(self, master, 'ttk::spinbox', **kw)
+
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):

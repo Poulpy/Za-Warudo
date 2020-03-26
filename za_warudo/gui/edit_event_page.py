@@ -6,7 +6,6 @@ import logging as log
 import re
 
 import ttkwidgets as tkw
-from tkcalendar import Calendar, DateEntry
 
 from gui.widgets import EntryDate
 from gui.widgets import Spinbox

@@ -235,8 +235,11 @@ class App(Tk):
         event['responsible'] = self.current_user.id
         return Event.update(**event).where(Event.id == event_id).execute()
 
-    def update(self, event: dict, event_id: int) -> int:
+    def update(self, event_id: int, event: dict) -> int:
         return Event.update(**event).where(Event.id == event_id).execute()
+
+    def get_event_by_id(self, event_id: int) -> int:
+        return Event.get(Event.id == event_id)
 
     def update_team(self, member_names, event_id):
         log.info('Updating team for the event %d' % (event_id))

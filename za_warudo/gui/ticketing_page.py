@@ -1,3 +1,4 @@
+from functools import partial
 from datetime import datetime
 from datetime import timedelta
 from tkinter import *
@@ -28,8 +29,8 @@ class TicketingPage(ttk.Frame):
         self.tickets_frame = ttk.Frame(self)
 
         back_button = ttk.Button(self, text='Back', command=self.back)
-        sell_button = ttk.Button(self, text='Sell', command=self.sell)
-        book_button = ttk.Button(self, text='Book', command=self.book)
+        sell_button = ttk.Button(self, text='Sell', command=partial(self.pass_order, 'sell'))
+        book_button = ttk.Button(self, text='Book', command=partial(self.pass_order, 'book'))
 
         # Those labels can be changed
         event_name_label = ttk.Label(self, textvariable=self.textvar['name'])
@@ -93,12 +94,34 @@ class TicketingPage(ttk.Frame):
     def back(self):
         self.controller.show_frame('EventsPage')
 
+    '''
     def sell(self):
-        log.info(self.get_seats())
-        log.info(self.total_price())
+        values_to_update = dict()
+        values_to_update['revenue'] = event.revenue + self.total_price()
+        values_to_update['sold_seats'] = self.sold_seats + self.get_seats()
+        log.info(values_to_update)
+        self.controller.update(event.id, values_to_update)
 
     def book(self):
-        pass
+        values_to_update = dict()
+        values_to_update['revenue'] = event.revenue + self.total_price()
+        values_to_update['booked_seats'] = self.booked_seats + self.get_seats()
+        log.info(values_to_update)
+        self.controller.update(event.id, values_to_update)
+    '''
+    def pass_order(self, order_type):
+        values_to_update = dict()
+        if order_type == 'sell':
+            values_to_update['sold_seats'] = self.event.sold_seats + self.get_seats()
+        elif order_type == 'book':
+            values_to_update['booked_seats'] = self.event.booked_seats + self.get_seats()
+        else:
+            return
+        values_to_update['revenue'] = self.event.revenue + self.total_price()
+        log.info(values_to_update)
+        self.controller.update(self.event.id, values_to_update)
+        self.event = self.controller.get_event_by_id(self.event.id)
+        self.display_events_seats_information()
 
     def set_event(self, event):
         self.event = event
@@ -106,14 +129,13 @@ class TicketingPage(ttk.Frame):
     def set_projection_room(self, projection_room):
         self.projection_room = projection_room
 
-    def set_inputs(self):
+    def display_events_seats_information(self):
         # day-month-year begin_hour - end_hour
         date = self.event.begin.strftime("%d-%m-%Y %H")
         date += 'h - '
         date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime("%H")
         date += 'h'
         seats_left = self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats
-
         self.textvar['name'].set(self.event.name)
         self.textvar['projection_type'].set(self.event.projection_type)
         self.textvar['date'].set(date)
@@ -121,6 +143,9 @@ class TicketingPage(ttk.Frame):
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
         self.textvar['revenue'].set(self.event.revenue)
+
+    def set_inputs(self):
+        self.display_events_seats_information()
 
         for widget in self.tickets_frame.winfo_children():
             widget.destroy()

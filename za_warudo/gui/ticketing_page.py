@@ -61,12 +61,41 @@ class TicketingPage(ttk.Frame):
         labels['revenue'].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
         revenue_label.grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
 
+        sell_button.grid(row=6, column=0, padx=pad, pady=pad, sticky=NSEW)
+        book_button.grid(row=6, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+
+    def get_seats(self) -> int:
+        '''
+        Return the number of seats requested
+        '''
+        seats = 0
+
+        for s in self.seats:
+            if s['var'].get() != '':
+                seats += int(s['var'].get())
+
+        return seats
+
+    def total_price(self) -> int:
+        '''
+        Return the total price, given a price and the number
+        of seats
+        '''
+        total = 0
+
+        for s in self.seats:
+            if s['var'].get() != '':
+                total += s['price'] * int(s['var'].get())
+
+        return total
 
     def back(self):
         self.controller.show_frame('EventsPage')
 
     def sell(self):
-        pass
+        log.info(self.get_seats())
+        log.info(self.total_price())
 
     def book(self):
         pass
@@ -97,8 +126,7 @@ class TicketingPage(ttk.Frame):
             widget.destroy()
 
         categories = self.controller.get_categories_for_event(self.event)
-        print('AAAAA')
-        print(categories)
+        log.debug(categories)
         self.seats = [None for i in categories]
         for i, c in enumerate(categories):
             self.seats[i] = {'price':c.price, 'var':StringVar()}

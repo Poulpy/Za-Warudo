@@ -235,6 +235,9 @@ class App(Tk):
         event['responsible'] = self.current_user.id
         return Event.update(**event).where(Event.id == event_id).execute()
 
+    def update(self, event: dict, event_id: int) -> int:
+        return Event.update(**event).where(Event.id == event_id).execute()
+
     def update_team(self, member_names, event_id):
         log.info('Updating team for the event %d' % (event_id))
         Team.delete().where(Team.event == event_id)
@@ -297,6 +300,7 @@ class App(Tk):
 
     def app_will_quit(self):
         log.info('Application will terminate')
+        log.info('Closing the database')
         db.close()
         self.destroy()
 

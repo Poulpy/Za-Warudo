@@ -10,6 +10,7 @@ from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
+from gui.ticketing_page import TicketingPage
 from models.projection_room import ProjectionRoom
 from models.user import User
 from models.team import Team
@@ -56,7 +57,7 @@ class App(Tk):
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame

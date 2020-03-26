@@ -43,7 +43,7 @@ class EventsPage(ttk.Frame):
         ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
-        ttk.Button(self, text="Ticketing").grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
+        ttk.Button(self, text="Ticketing", command=self.link_to_ticketing_page).grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
 
         # The events are shown in a table. The columns shows:
@@ -131,5 +131,8 @@ class EventsPage(ttk.Frame):
             if rst == 'yes':
                 print(self.controller.delete_event(event_name=self.events_tree.item(self.event_selected)['text']))
                 self.controller.update_events_page()
+
+    def link_to_ticketing_page(self):
+        self.controller.show_frame('TicketingPage')
 
 

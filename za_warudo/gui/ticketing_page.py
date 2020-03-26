@@ -30,11 +30,12 @@ class TicketingPage(ttk.Frame):
 
         self.tickets_frame = ttk.Frame(self)
 
+        # Buttons
         back_button = ttk.Button(self, text='Back', command=self.back)
         sell_button = ttk.Button(self, text='Sell', command=partial(self.pass_order, 'sell'))
         book_button = ttk.Button(self, text='Book', command=partial(self.pass_order, 'book'))
 
-        # Those labels can be changed
+        # Labels
         event_name_label = ttk.Label(self, textvariable=self.textvar['name'], font=("TkDefaultFont", "15"))
         event_type_label = ttk.Label(self, textvariable=self.textvar['projection_type'])
         location_label = ttk.Label(self, textvariable=self.textvar['location'])
@@ -96,10 +97,16 @@ class TicketingPage(ttk.Frame):
         return total
 
     def back(self):
+        '''
+        Go back to the events page and update the events displayed
+        '''
         self.controller.show_frame('EventsPage')
         self.controller.update_events_page()
 
     def pass_order(self, order_type):
+        '''
+        Sell or book seats for the event
+        '''
         values_to_update = dict()
         if order_type == 'sell':
             values_to_update['sold_seats'] = self.event.sold_seats + self.get_seats()

@@ -93,22 +93,8 @@ class TicketingPage(ttk.Frame):
 
     def back(self):
         self.controller.show_frame('EventsPage')
+        self.controller.update_events_page()
 
-    '''
-    def sell(self):
-        values_to_update = dict()
-        values_to_update['revenue'] = event.revenue + self.total_price()
-        values_to_update['sold_seats'] = self.sold_seats + self.get_seats()
-        log.info(values_to_update)
-        self.controller.update(event.id, values_to_update)
-
-    def book(self):
-        values_to_update = dict()
-        values_to_update['revenue'] = event.revenue + self.total_price()
-        values_to_update['booked_seats'] = self.booked_seats + self.get_seats()
-        log.info(values_to_update)
-        self.controller.update(event.id, values_to_update)
-    '''
     def pass_order(self, order_type):
         values_to_update = dict()
         if order_type == 'sell':
@@ -136,13 +122,14 @@ class TicketingPage(ttk.Frame):
         date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime("%H")
         date += 'h'
         seats_left = self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats
+        revenue = str(self.event.revenue) + ' €'
         self.textvar['name'].set(self.event.name)
         self.textvar['projection_type'].set(self.event.projection_type)
         self.textvar['date'].set(date)
         self.textvar['seats_left'].set(seats_left)
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
-        self.textvar['revenue'].set(self.event.revenue)
+        self.textvar['revenue'].set(revenue)
 
     def set_inputs(self):
         self.display_events_seats_information()

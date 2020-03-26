@@ -5,6 +5,8 @@ from tkinter import *
 from tkinter import ttk
 import logging as log
 
+from gui.widgets import Spinbox
+
 class TicketingPage(ttk.Frame):
     '''
     Page to book or sell tickets
@@ -22,7 +24,7 @@ class TicketingPage(ttk.Frame):
         labels = dict()
         self.textvar = dict()
 
-        for var in ('name', 'projection_type', 'date', 'seats_left', 'sold_seats', 'booked_seats', 'revenue'):
+        for var in ('name', 'projection_type', 'location', 'date', 'seats_left', 'sold_seats', 'booked_seats', 'revenue'):
             self.textvar[var] = StringVar()
             labels[var] = ttk.Label(self, text=var.capitalize().replace('_', ' '))
 
@@ -33,8 +35,9 @@ class TicketingPage(ttk.Frame):
         book_button = ttk.Button(self, text='Book', command=partial(self.pass_order, 'book'))
 
         # Those labels can be changed
-        event_name_label = ttk.Label(self, textvariable=self.textvar['name'])
+        event_name_label = ttk.Label(self, textvariable=self.textvar['name'], font=("TkDefaultFont", "15"))
         event_type_label = ttk.Label(self, textvariable=self.textvar['projection_type'])
+        location_label = ttk.Label(self, textvariable=self.textvar['location'])
         event_date_label = ttk.Label(self, textvariable=self.textvar['date'])
         seats_left_label = ttk.Label(self, textvariable=self.textvar['seats_left'])
         seats_sold_label = ttk.Label(self, textvariable=self.textvar['sold_seats'])
@@ -45,6 +48,7 @@ class TicketingPage(ttk.Frame):
         # GRID
         event_name_label.grid(row=0, column=0, padx=pad, pady=pad)
         event_type_label.grid(row=0, column=1, padx=pad, pady=pad)
+        location_label.grid(row=0, column=2, padx=pad, pady=pad)
         back_button.grid(row=0, column=4, padx=pad, pady=pad)
 
         event_date_label.grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
@@ -103,7 +107,13 @@ class TicketingPage(ttk.Frame):
             values_to_update['booked_seats'] = self.event.booked_seats + self.get_seats()
         else:
             return
+
         values_to_update['revenue'] = self.event.revenue + self.total_price()
+
+        if values_to_update['revenue'] == 0:
+            log.info('No revenue : no seats sold or booked ?')
+            return
+
         log.info(values_to_update)
         self.controller.update(self.event.id, values_to_update)
         self.event = self.controller.get_event_by_id(self.event.id)
@@ -121,10 +131,12 @@ class TicketingPage(ttk.Frame):
         date += 'h - '
         date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime("%H")
         date += 'h'
-        seats_left = self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats
+        seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+        seats_left += ' / ' + str(self.projection_room.total_seats)
         revenue = str(self.event.revenue) + ' €'
         self.textvar['name'].set(self.event.name)
         self.textvar['projection_type'].set(self.event.projection_type)
+        self.textvar['location'].set(self.projection_room.location)
         self.textvar['date'].set(date)
         self.textvar['seats_left'].set(seats_left)
         self.textvar['sold_seats'].set(self.event.sold_seats)
@@ -132,6 +144,7 @@ class TicketingPage(ttk.Frame):
         self.textvar['revenue'].set(revenue)
 
     def set_inputs(self):
+        pad = 5
         self.display_events_seats_information()
 
         for widget in self.tickets_frame.winfo_children():
@@ -144,7 +157,8 @@ class TicketingPage(ttk.Frame):
             self.seats[i] = {'price':c.price, 'var':StringVar()}
             price = str(c.price) + ' €'
 
-            ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, sticky=W)
-            ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, sticky=W)
-            ttk.Entry(self.tickets_frame, textvariable=self.seats[i]['var']).grid(row=i, column=2, sticky=E)
+            ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, padx=pad, pady=pad, sticky=W)
+            ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, padx=pad, pady=pad, sticky=W)
+            Spinbox(self.tickets_frame, textvariable=self.seats[i]['var'], from_=0, to=90).grid(row=i, column=2, padx=pad, pady=pad, sticky=E)
+            self.seats[i]['var'].set(0)
 

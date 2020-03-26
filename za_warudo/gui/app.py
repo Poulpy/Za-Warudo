@@ -1,3 +1,4 @@
+from functools import partial
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
@@ -10,6 +11,7 @@ from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
+from gui.ticketing_page import TicketingPage
 from models.projection_room import ProjectionRoom
 from models.user import User
 from models.team import Team
@@ -56,7 +58,7 @@ class App(Tk):
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -90,7 +92,7 @@ class App(Tk):
         if is_connected:
             pmenu.add_command(label="Timetable")
             pmenu.add_command(label="New vacation")
-            pmenu.add_command(label="Log out", command=lambda: self.show_frame("ConnectionPage"))
+            pmenu.add_command(label="Log out", command=partial(self.show_frame, "ConnectionPage"))
             pmenu.add_separator()
 
         pmenu.add_command(label="Exit", command=self.destroy)
@@ -233,6 +235,12 @@ class App(Tk):
         event['responsible'] = self.current_user.id
         return Event.update(**event).where(Event.id == event_id).execute()
 
+    def update(self, event_id: int, event: dict) -> int:
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def get_event_by_id(self, event_id: int) -> int:
+        return Event.get(Event.id == event_id)
+
     def update_team(self, member_names, event_id):
         log.info('Updating team for the event %d' % (event_id))
         Team.delete().where(Team.event == event_id)
@@ -280,8 +288,22 @@ class App(Tk):
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
+    def go_to_ticket_page(self, event_name):
+        event = Event.get(Event.name == event_name)
+
+        self.frames['TicketingPage'].set_event(event)
+        self.frames['TicketingPage'].set_projection_room(event.projection_room)
+        self.frames['TicketingPage'].set_inputs()
+
+        self.show_frame('TicketingPage')
+
+    def get_categories_for_event(self, event):
+        print(event.events_categories.dicts())
+        return list(set([ec.category for ec in event.events_categories]))
+
     def app_will_quit(self):
         log.info('Application will terminate')
+        log.info('Closing the database')
         db.close()
         self.destroy()
 

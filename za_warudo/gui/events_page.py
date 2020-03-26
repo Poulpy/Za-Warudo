@@ -1,3 +1,4 @@
+from functools import partial
 from datetime import datetime
 from datetime import timedelta
 from tkinter import *
@@ -7,7 +8,7 @@ import logging as log
 
 from tkcalendar import Calendar, DateEntry
 
-from gui.entry_date import EntryDate
+from gui.widgets import EntryDate
 
 # TODO put in module frames
 class EventsPage(ttk.Frame):
@@ -30,7 +31,7 @@ class EventsPage(ttk.Frame):
 
         # Creation of of an event : clicking on that button
         # will redirect the user on the edit event frame
-        new_event_button = ttk.Button(self, text="New event", command=lambda: controller.new_event())
+        new_event_button = ttk.Button(self, text="New event", command=partial(self.controller.new_event))
 
         self.date_text = StringVar()
         self.date_entry = EntryDate(self, textvariable=self.date_text)
@@ -43,7 +44,7 @@ class EventsPage(ttk.Frame):
         ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
-        ttk.Button(self, text="Ticketing").grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
+        ttk.Button(self, text="Ticketing", command=self.link_to_ticketing_page).grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
 
         # The events are shown in a table. The columns shows:
@@ -131,5 +132,9 @@ class EventsPage(ttk.Frame):
             if rst == 'yes':
                 print(self.controller.delete_event(event_name=self.events_tree.item(self.event_selected)['text']))
                 self.controller.update_events_page()
+
+    def link_to_ticketing_page(self):
+        if self.event_selected != None:
+            self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
 
 

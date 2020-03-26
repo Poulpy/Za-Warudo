@@ -1,3 +1,4 @@
+from functools import partial
 from tkinter import *
 from tkinter import ttk
 from ttkthemes import ThemedStyle
@@ -32,7 +33,11 @@ class EntryDate(ttk.Entry):
                        locale="fr_FR",
                        date_pattern="y-mm-dd")
         cal.pack(fill="both", expand=True)
-        ttk.Button(top, text="OK", command=combine_funcs(lambda: self.textvariable.set(cal.selection_get()), lambda: top.destroy())).pack()
+        ttk.Button(top, text="OK", command=combine_funcs(partial(self.get_calendar_input, top, cal))).pack()
+
+    def get_calendar_input(self, top, cal):
+        self.textvariable.set(cal.selection_get())
+        top.destroy()
 
 class Spinbox(ttk.Entry):
 

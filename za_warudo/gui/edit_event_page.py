@@ -1,3 +1,4 @@
+from functools import partial
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
@@ -29,7 +30,7 @@ class EditEventPage(ttk.Frame):
         error_label = ttk.Label(self, textvariable=self.error_text, font=("TkDefaultFont", "7"))
         error_label.configure(style="Red.TLabel")
         buttons_frame = ttk.Frame(self)
-        back_button = ttk.Button(buttons_frame, text='Back', command=lambda: self.controller.show_frame("EventsPage"))
+        back_button = ttk.Button(buttons_frame, text='Back', command=partial(self.controller.show_frame, "EventsPage"))
 
         # And of course, the button to save it all
         save_button = ttk.Button(buttons_frame, text="Save", command=self.save)
@@ -133,7 +134,7 @@ class EditEventPage(ttk.Frame):
         presentation_check = ttk.Checkbutton(presentation_frame,
                                              text="Author presentation",
                                              variable=self.presentation,
-                                             command=lambda: self.handle_presentation_frame)
+                                             command=partial(self.handle_presentation_frame))
         presentation_check.bind('<1>', self.handle_presentation_frame)
         author_label = ttk.Label(presentation_frame, text="Author")
         self.author_entry = ttk.Entry(presentation_frame, textvariable=self.author, state='disabled')
@@ -149,7 +150,7 @@ class EditEventPage(ttk.Frame):
         debate_check = ttk.Checkbutton(debate_frame,
                                        text="Debate",
                                        variable=self.debate,
-                                       command=lambda: self.handle_debate_frame)
+                                       command=partial(self.handle_debate_frame))
         debate_check.bind('<1>', self.handle_debate_frame)
         speaker_label = ttk.Label(debate_frame, text="Speaker")
         self.speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker, state='disabled')

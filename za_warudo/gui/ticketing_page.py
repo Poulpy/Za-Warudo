@@ -25,7 +25,7 @@ class TicketingPage(ttk.Frame):
             self.textvar[var] = StringVar()
             labels[var] = ttk.Label(self, text=var.capitalize().replace('_', ' '))
 
-        tickets_frame = ttk.Frame(self)
+        self.tickets_frame = ttk.Frame(self)
 
         back_button = ttk.Button(self, text='Back', command=self.back)
         sell_button = ttk.Button(self, text='Sell', command=self.sell)
@@ -40,13 +40,14 @@ class TicketingPage(ttk.Frame):
         seats_booked_label = ttk.Label(self, textvariable=self.textvar['booked_seats'])
         revenue_label = ttk.Label(self, textvariable=self.textvar['revenue'])
 
+
         # GRID
         event_name_label.grid(row=0, column=0, padx=pad, pady=pad)
         event_type_label.grid(row=0, column=1, padx=pad, pady=pad)
         back_button.grid(row=0, column=4, padx=pad, pady=pad)
 
-        # labels['date'].grid(row=1, column=0, padx=pad, pady=pad, sticky=W)
         event_date_label.grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
+        self.tickets_frame.grid(row=1, column=2, rowspan=5, padx=pad, pady=pad, sticky=NSEW)
 
         labels['seats_left'].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
         seats_left_label.grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
@@ -91,4 +92,19 @@ class TicketingPage(ttk.Frame):
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
         self.textvar['revenue'].set(self.event.revenue)
+
+        for widget in self.tickets_frame.winfo_children():
+            widget.destroy()
+
+        categories = self.controller.get_categories_for_event(self.event)
+        print('AAAAA')
+        print(categories)
+        self.seats = [None for i in categories]
+        for i, c in enumerate(categories):
+            self.seats[i] = {'price':c.price, 'var':StringVar()}
+            price = str(c.price) + ' €'
+
+            ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, sticky=W)
+            ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, sticky=W)
+            ttk.Entry(self.tickets_frame, textvariable=self.seats[i]['var']).grid(row=i, column=2, sticky=E)
 

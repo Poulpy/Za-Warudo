@@ -290,6 +290,10 @@ class App(Tk):
 
         self.show_frame('TicketingPage')
 
+    def get_categories_for_event(self, event):
+        print(event.events_categories.dicts())
+        return list(set([ec.category for ec in event.events_categories]))
+
     def app_will_quit(self):
         log.info('Application will terminate')
         db.close()

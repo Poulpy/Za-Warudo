@@ -62,7 +62,7 @@ class ShowEventPage(ttk.Frame):
         pricelist_scrollbar.pack()
 
         # Grid
-        back_button.grid(row=0, column=5, padx=pad, pady=pad)
+        back_button.grid(row=0, column=6, padx=pad, pady=pad)
 
         label['name'].grid(row=1, column=0, padx=pad, pady=pad, sticky=W)
         value['name'].grid(row=1, column=1, padx=pad, pady=pad, sticky=E)

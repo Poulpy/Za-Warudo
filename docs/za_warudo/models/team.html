@@ -37,8 +37,8 @@ class Team(Model):
     event : that&#39;s a member of a team
     &#39;&#39;&#39;
 
-    member = ForeignKeyField(User)
-    event = ForeignKeyField(Event)
+    member = ForeignKeyField(User, backref=&#39;teams&#39;)
+    event = ForeignKeyField(Event, backref=&#39;teams&#39;)
 
     def __str__(self):
         return &#34;[User] name: &#34; + self.name + &#34;, login: &#34; + self.login
@@ -74,8 +74,8 @@ event : that's a member of a team</p></section>
     event : that&#39;s a member of a team
     &#39;&#39;&#39;
 
-    member = ForeignKeyField(User)
-    event = ForeignKeyField(Event)
+    member = ForeignKeyField(User, backref=&#39;teams&#39;)
+    event = ForeignKeyField(Event, backref=&#39;teams&#39;)
 
     def __str__(self):
         return &#34;[User] name: &#34; + self.name + &#34;, login: &#34; + self.login

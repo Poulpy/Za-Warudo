@@ -196,7 +196,7 @@ class EditEventPage(ttk.Frame):
         self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
 
-    def check_missing_or_incorrect_input(self):
+    def check_missing_or_incorrect_input(self) -> str:
         '''
         Name, day, hour, running time, must not be empty
         p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
@@ -278,7 +278,7 @@ class EditEventPage(ttk.Frame):
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
 
-    def set_event(self, event):
+    def set_event(self, event: Event):
         self.event = event
 
     def set_projection_room(self, projection_room):
@@ -320,7 +320,7 @@ class EditEventPage(ttk.Frame):
         self.display_categories(event_id=self.event.id)
         self.event_id = self.event.id
 
-    def display_members(self, event_id=None):
+    def display_members(self, event_id: int=None):
 
         self.members_tree.delete(*self.members_tree.get_children())
         users = self.controller.get_events_per_user(event_id)
@@ -329,7 +329,7 @@ class EditEventPage(ttk.Frame):
             self.members_tree.insert('', 'end', iid=str(i), text=users[i]['user'], tags=('even' if i % 2 else 'odd',), values=(users[i]['events'],))
             self.members_tree.change_state(str(i), users[i]['checked'])
 
-    def display_categories(self, event_id=None):
+    def display_categories(self, event_id: int=None):
 
         # The tree is cleaned
         self.cats_tree.delete(*self.cats_tree.get_children())

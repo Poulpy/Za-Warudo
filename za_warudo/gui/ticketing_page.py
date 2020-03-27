@@ -110,7 +110,7 @@ class TicketingPage(ttk.Frame):
         self.controller.show_frame('EventsPage')
         self.controller.update_events_page()
 
-    def pass_order(self, order_type):
+    def pass_order(self, order_type: str):
         '''
         Sell or book seats for the event
         '''

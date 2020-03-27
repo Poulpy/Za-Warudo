@@ -11,47 +11,60 @@ class ConnectionPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
+        pad = 10
+
         up = ttk.Frame(self, padding=(5, 5, 5, 5))
         down = ttk.Frame(self)
 
+        self.notification_text = StringVar()
+
         connection_label = ttk.Label(up, text="Connection", font=("TkDefaultFont", "15"))
-        connection_label.grid(row=0, column=1, sticky=S)
 
         # It's the input for the user's login
         self.login_entry = ttk.Entry(up)
-        self.login_entry.grid(row=1, column=1, padx=5, pady=5, sticky=NSEW)
         self.login_entry.focus()
 
         # It's the input for the user's password
         # The password is hidden with *
         self.password_entry = ttk.Entry(up, show="•")
-        self.password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=NSEW)
-        self.password_entry.bind("<Return>", self.controller.check_credentials)
+        self.password_entry.bind("<Return>", self.login)
 
-        login_button = ttk.Button(up, text="Login", command=self.controller.check_credentials)
-        login_button.grid(row=3, column=1, padx=5, pady=5, sticky=N)
+        login_button = ttk.Button(up, text="Login", command=self.login)
 
         # Label that shows if the authentification has failed
-        # TODO rename that var to fail_auth_label
-        self.success_label_text = StringVar()
-        self.success_label = ttk.Label(down, textvariable=self.success_label_text, justify=CENTER)
-        self.success_label.grid(row=0, column=1, padx=5, pady=5, sticky=EW)
+        notification_label = ttk.Label(down, textvariable=self.notification_text, justify=CENTER)
+        notification_label.configure(style='Red.TLabel')
 
-        # We place the components in the grid
         up.grid_rowconfigure(0, weight=1)
         up.grid_rowconfigure(4, weight=1)
         up.grid_columnconfigure(0, weight=1)
         up.grid_columnconfigure(4, weight=1)
 
+        connection_label.grid(row=0, column=1, sticky=N+S)
+        notification_label.grid(row=0, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        self.login_entry.grid(row=1, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        self.password_entry.grid(row=2, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        login_button.grid(row=3, column=1, padx=pad, pady=pad, sticky=N+S)
+
         up.place(rely=.4, relx=.5, anchor=CENTER)
         down.place(rely=.6, relx=.5, anchor=CENTER)
 
-    def display_notification(self, message: str, color: str):
+    def display_notification(self, message: str):
         '''
         Display something bellow the login button
         the color argument is a string denoting a style, ie, Red.TLabel, TEntry
         '''
-        self.success_label_text.set(message)
-        self.success_label.configure(style=color)
+        self.notification_text.set(message)
         log.info(message)
+
+
+    def login(self, event=None):
+        # We get the user input : login and password
+        login = self.login_entry.get()
+        password = self.password_entry.get()
+        notif = self.controller.check_credentials(login, password)
+        self.display_notification(notif)
 

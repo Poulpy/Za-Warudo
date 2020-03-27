@@ -194,30 +194,26 @@ class App(Tk):
         else:
             self.set_menu(True)
 
-    def check_credentials(self, event=None):
+    def check_credentials(self, login: str, password: str) -> str:
         '''
         Event raised when the user click on the login button
         on the connection page
         '''
-
-        # We get the user input : login and password
-        login = self.frames["ConnectionPage"].login_entry.get()
-        password = self.frames["ConnectionPage"].password_entry.get()
 
         # We search in the database the user with the corresponding login
         u = User.select().where(User.login == login).first()
 
         # We check if the login is right and then the password
         if u == None:
-            self.frames["ConnectionPage"].display_notification("Authentification failed : no user found", "Red.TLabel")
+            return 'Authentification failed : no user found'
         else:
             if password == u.password:
-                self.frames["ConnectionPage"].display_notification("", "TLabel")
                 self.current_user = u
                 log.info("Authentification successfull")
                 self.show_frame("EventsPage")
+                return ''
             else:
-                self.frames["ConnectionPage"].display_notification("Authentification failed : password incorrect", "Red.TLabel")
+                return 'Authentification failed : password incorrect'
 
 
     def create_event(self, event):

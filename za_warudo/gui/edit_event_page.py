@@ -290,41 +290,47 @@ class EditEventPage(ttk.Frame):
         self.controller.update_events_page()
         self.controller.show_frame("EventsPage")
 
-    def set_inputs(self, event):
+    def set_event(self, event):
+        self.event = event
 
-        self.name.set(event['name'])
-        day = event['begin'].strftime('%Y-%m-%d')
-        hour = event['begin'].strftime('%H')
+    def set_projection_room(self, projection_room):
+        self.projection_room = projection_room
+
+    def set_inputs(self):
+
+        self.name.set(event.name)
+        day = event.begin.strftime('%Y-%m-%d')
+        hour = event.begin.strftime('%H')
         self.begin_text.set(day)
         self.hour_text.set(hour)
-        self.running_time_text.set(event['running_time'])
-        self.projection_type_choosen.set(event['projection_type'])
-        self.projection_room_choosen.set(event['projection_room'])
+        self.running_time_text.set(event.running_time)
+        self.projection_type_choosen.set(event.projection_type)
+        self.projection_room_choosen.set(projection_room.location)
 
 
-        if event['room_reserved']:
+        if event.room_reserved:
             self.room_reserved.set(1)
         else:
             self.room_reserved.set(0)
 
-        if event['management']:
+        if event.management:
             self.management.set(1)
         else:
             self.management.set(0)
 
-        if event['equipment_reserved']:
+        if event.equipment_reserved:
             self.equipment_reserved.set(1)
         else:
             self.equipment_reserved.set(0)
 
-        if event['guest_attendance']:
+        if event.guest_attendance:
             self.guest_attendance.set(1)
         else:
             self.guest_attendance.set(0)
 
-        self.display_members(event_id=event['id'])
-        self.display_categories(event_id=event['id'])
-        self.event_id = event['id']
+        self.display_members(event_id=event.id)
+        self.display_categories(event_id=event.id)
+        self.event_id = event.id
 
     def display_members(self, event_id=None):
 

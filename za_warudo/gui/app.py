@@ -286,11 +286,14 @@ class App(Tk):
         return Event.delete().where(Event.name == event_name).execute()
 
     def edit_event(self, name):
-        event_to_edit = Event.select().where(Event.name == name).dicts().get()
+        #event_to_edit = Event.select().where(Event.name == name).dicts().get()
+        event_to_edit = Event.get(Event.name == name)
         print(event_to_edit)
-        event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
+        #event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
         self.frames['EditEventPage'].set_edit_mode()
-        self.frames['EditEventPage'].set_inputs(event=event_to_edit)
+        self.frames['EditEventPage'].set_event(event_to_edit)
+        self.frames['EditEventPage'].set_projection_room(ProjectionRoom.get(event_to_edit['projection_room']))
+        self.frames['EditEventPage'].set_inputs()
         self.show_frame('EditEventPage')
 
     def get_location(self, projection_room_id):

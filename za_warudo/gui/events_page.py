@@ -106,9 +106,9 @@ class EventsPage(ttk.Frame):
 
     def edit_event(self):
         if self.event_selected != None:
-            self.event_selected = None
             log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))
             self.controller.edit_event(name=self.events_tree.item(self.event_selected)['text'])
+            self.event_selected = None
 
     def confirm_delete(self):
         '''

@@ -239,22 +239,10 @@ class EditEventPage(ttk.Frame):
 
         new_event = dict()
 
-        if self.room_reserved.get() == 1:
-            new_event['room_reserved'] = True
-        else:
-            new_event['room_reserved'] = False
-        if self.management.get() == 1:
-            new_event['management'] = True
-        else:
-            new_event['management'] = False
-        if self.equipment_reserved.get() == 1:
-            new_event['equipment_reserved'] = True
-        else:
-            new_event['equipment_reserved'] = False
-        if self.guest_attendance.get() == 1:
-            new_event['guest_attendance'] = True
-        else:
-            new_event['guest_attendance'] = False
+        new_event['room_reserved'] = self.room_reserved.get() == 1
+        new_event['management'] = self.management.get() == 1
+        new_event['equipment_reserved'] = self.equipment_reserved.get() == 1
+        new_event['guest_attendance'] = self.guest_attendance.get() == 1
 
         member_names = [self.members_tree.item(member)['text'] for member in self.members_tree.get_checked()]
         cat_titles = [self.cats_tree.item(title)['text'] for title in self.cats_tree.get_checked()]
@@ -298,39 +286,39 @@ class EditEventPage(ttk.Frame):
 
     def set_inputs(self):
 
-        self.name.set(event.name)
-        day = event.begin.strftime('%Y-%m-%d')
-        hour = event.begin.strftime('%H')
+        self.name.set(self.event.name)
+        day = self.event.begin.strftime('%Y-%m-%d')
+        hour = self.event.begin.strftime('%H')
         self.begin_text.set(day)
         self.hour_text.set(hour)
-        self.running_time_text.set(event.running_time)
-        self.projection_type_choosen.set(event.projection_type)
-        self.projection_room_choosen.set(projection_room.location)
+        self.running_time_text.set(self.event.running_time)
+        self.projection_type_choosen.set(self.event.projection_type)
+        self.projection_room_choosen.set(self.projection_room.location)
 
 
-        if event.room_reserved:
+        if self.event.room_reserved:
             self.room_reserved.set(1)
         else:
             self.room_reserved.set(0)
 
-        if event.management:
+        if self.event.management:
             self.management.set(1)
         else:
             self.management.set(0)
 
-        if event.equipment_reserved:
+        if self.event.equipment_reserved:
             self.equipment_reserved.set(1)
         else:
             self.equipment_reserved.set(0)
 
-        if event.guest_attendance:
+        if self.event.guest_attendance:
             self.guest_attendance.set(1)
         else:
             self.guest_attendance.set(0)
 
-        self.display_members(event_id=event.id)
-        self.display_categories(event_id=event.id)
-        self.event_id = event.id
+        self.display_members(event_id=self.event.id)
+        self.display_categories(event_id=self.event.id)
+        self.event_id = self.event.id
 
     def display_members(self, event_id=None):
 

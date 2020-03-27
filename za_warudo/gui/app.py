@@ -145,7 +145,7 @@ class App(Tk):
         return Category.select()
 
 
-    def get_events_categories(self, event_id=None):
+    def get_events_categories(self, event_id: int=None):
         if event_id == None:
             return [{'title':c.title, 'price':c.price, 'checked':'unchecked'} for c in Category.select()]
         else:
@@ -166,7 +166,7 @@ class App(Tk):
 
         return ProjectionRoom.select()
 
-    def get_events_per_user(self, event_id=None):
+    def get_events_per_user(self, event_id: int=None):
         if event_id == None:
             return [{'user':user.name, 'events':Team.select().where(Team.member == user).count(), 'checked':'unchecked'} for user in User.select()]
         else:
@@ -195,7 +195,7 @@ class App(Tk):
 
         self.frames["EventsPage"].display_events()
 
-    def show_frame(self, page_name):
+    def show_frame(self, page_name: str):
         '''Show a frame for the given page name'''
 
         log.info('Go to frame %s' % (page_name))
@@ -231,7 +231,7 @@ class App(Tk):
                 return 'Authentification failed : password incorrect'
 
 
-    def create_event(self, event):
+    def create_event(self, event: Event) -> int:
         '''
         Create a event with a dict given in argument
         '''
@@ -242,7 +242,7 @@ class App(Tk):
 
         return event_created.id
 
-    def update_event(self, event, event_id):
+    def update_event(self, event: dict, event_id: int) -> int:
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
         event['responsible'] = self.current_user.id
@@ -254,19 +254,17 @@ class App(Tk):
     def get_event_by_id(self, event_id: int) -> int:
         return Event.get(Event.id == event_id)
 
-    def update_team(self, member_names, event_id):
+    def update_team(self, member_names: list, event_id: int):
         log.info('Updating team for the event %d' % (event_id))
-        print(Team.delete().where(Team.event == event_id).execute())
+        Team.delete().where(Team.event == event_id).execute()
         self.create_team(member_names, event_id)
 
-    def update_events_categories(self, cat_titles, event_id):
+    def update_events_categories(self, cat_titles: list, event_id: int):
         log.info('Updating events categories for event %d' % (event_id))
-        #print('Rows deleted : %d' % (EventsCategory.delete().where(EventsCategory.event == event_id).execute()))
-        #print(EventsCategory.delete().where(EventsCategory.event == event_id))
         EventsCategory.delete().where(EventsCategory.event == event_id).execute()
         self.create_events_categories(cat_titles, event_id)
 
-    def create_team(self, member_names, event_id):
+    def create_team(self, member_names: list, event_id: int):
         '''
         Associates a user with an event : (user, event)
         '''
@@ -274,39 +272,35 @@ class App(Tk):
         print(team)
         Team.insert_many(team).execute()
 
-    def create_events_categories(self, cat_titles, event_id):
+    def create_events_categories(self, cat_titles: list, event_id: int):
         '''
         Associates a category with an event
         '''
         cats = [{'category':Category.get(Category.title == title).id, 'event':event_id} for title in cat_titles]
-        print(cats)
         EventsCategory.insert_many(cats).execute()
 
-    def delete_event(self, event_name):
+    def delete_event(self, event_name: str) -> int:
         return Event.delete().where(Event.name == event_name).execute()
 
-    def edit_event(self, name):
-        #event_to_edit = Event.select().where(Event.name == name).dicts().get()
+    def edit_event(self, name: str):
         event_to_edit = Event.get(Event.name == name)
-        print(event_to_edit)
-        #event_to_edit['projection_room'] = ProjectionRoom.get(event_to_edit['projection_room']).location
         self.frames['EditEventPage'].set_edit_mode()
         self.frames['EditEventPage'].set_event(event_to_edit)
-        self.frames['EditEventPage'].set_projection_room(ProjectionRoom.get(event_to_edit['projection_room']))
+        self.frames['EditEventPage'].set_projection_room(ProjectionRoom.get(event_to_edit.projection_room))
         self.frames['EditEventPage'].set_inputs()
         self.show_frame('EditEventPage')
 
-    def get_location(self, projection_room_id):
+    def get_location(self, projection_room_id: int) -> str:
         return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
 
-    def get_total_seats_for_event(self, projection_room_id):
+    def get_total_seats_for_event(self, projection_room_id: int) -> int:
         return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
 
     def get_seats_left(self, event_id):
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
-    def go_to_show_event_page(self, event_name):
+    def go_to_show_event_page(self, event_name: str):
         event = Event.get(Event.name == event_name)
 
         self.frames['ShowEventPage'].set_event(event)
@@ -322,7 +316,7 @@ class App(Tk):
     def get_events_members(self, event):
         return User.select().join(Team).where((User.id == Team.member) & (Team.event == event))
 
-    def go_to_ticket_page(self, event_name):
+    def go_to_ticket_page(self, event_name: str):
         event = Event.get(Event.name == event_name)
 
         self.frames['TicketingPage'].set_event(event)
@@ -331,7 +325,7 @@ class App(Tk):
 
         self.show_frame('TicketingPage')
 
-    def get_categories_for_event(self, event):
+    def get_categories_for_event(self, event: Event) -> list:
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
 

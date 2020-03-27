@@ -37,7 +37,7 @@ class App(Tk):
         # theme along with 'arc'
         # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
-        style.set_theme("breeze")
+        style.set_theme("arc")
 
         self.geometry("1200x550")
         self.minsize(300, 300)
@@ -295,11 +295,16 @@ class App(Tk):
 
         self.frames['ShowEventPage'].set_event(event)
         self.frames['ShowEventPage'].set_projection_room(event.projection_room)
-        self.frames['ShowEventPage'].set_categories(self.get_categories_for_event(event))
-        self.frames['ShowEventPage'].set_responsible(User.get(User.id == event.responsible))
+        self.frames['ShowEventPage'].set_categories(event.events_categories)
+        self.frames['ShowEventPage'].set_responsible(event.responsible)
+        self.frames['ShowEventPage'].set_members(self.get_events_members(event))
+        self.frames['ShowEventPage'].set_members(event.teams)
         self.frames['ShowEventPage'].display_events_information()
 
         self.show_frame('ShowEventPage')
+
+    def get_events_members(self, event):
+        return User.select().join(Team).where((User.id == Team.member) & (Team.event == event))
 
     def go_to_ticket_page(self, event_name):
         event = Event.get(Event.name == event_name)
@@ -313,6 +318,7 @@ class App(Tk):
     def get_categories_for_event(self, event):
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
+
 
     def app_will_quit(self):
         log.info('Application will terminate')

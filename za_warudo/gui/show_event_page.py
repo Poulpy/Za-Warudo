@@ -16,6 +16,9 @@ class ShowEventPage(ttk.Frame):
         self.event = None
         self.projection_room = None
 
+        categories_frame = ttk.Frame(self)
+        members_frame = ttk.Frame(self)
+
         # Default padding for the widgets
         pad = 10
         mut_labels = ('name', 'projection_type', 'location',
@@ -35,18 +38,31 @@ class ShowEventPage(ttk.Frame):
         back_button = ttk.Button(self, text="Back", command=self.back)
         timetable_button = ttk.Button(self, text="Timetable", command=self.timetable)
 
+        # Treeviews
+        label['members'] = ttk.Label(self, text="Members")
+        members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
+        self.members_tree = ttk.Treeview(members_frame, selectmode='browse', yscrollcommand=members_scrollbar.set)
+        self.members_tree.heading("#0", text="Name")
+        self.members_tree.tag_configure('odd', background="#F0F0F0")
+        self.members_tree.tag_configure('even', background="#FAFAFA")
+        members_scrollbar.configure(command=self.members_tree.yview)
+        self.members_tree.pack(side=LEFT)
+        members_scrollbar.pack()
+
         # Grid
-        back_button.grid(row=0, column=4, padx=pad, pady=pad)
+        back_button.grid(row=0, column=5, padx=pad, pady=pad)
 
         label['name'].grid(row=1, column=0, padx=pad, pady=pad, sticky=W)
         value['name'].grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
         label['seats_left'].grid(row=1, column=2, padx=pad, pady=pad, sticky=W)
         value['seats_left'].grid(row=1, column=3, padx=pad, pady=pad, sticky=W)
+        label['members'].grid(row=1, column=4, padx=pad, pady=pad, sticky=W)
 
         label['projection_type'].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
         value['projection_type'].grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
         label['sold_seats'].grid(row=2, column=2, padx=pad, pady=pad, sticky=W)
         value['sold_seats'].grid(row=2, column=3, padx=pad, pady=pad, sticky=W)
+        members_frame.grid(row=2, column=4, rowspan=6, padx=pad, pady=pad, sticky=NSEW)
 
         label['location'].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
         value['location'].grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
@@ -75,6 +91,8 @@ class ShowEventPage(ttk.Frame):
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
         self.textvar['responsible'].set(self.responsible.name)
+        self.display_members()
+        print(self.members)
 
 
     def timetable(self):
@@ -82,6 +100,15 @@ class ShowEventPage(ttk.Frame):
 
     def back(self):
         self.controller.show_frame('EventsPage')
+
+    def display_members(self):
+        self.members_tree.delete(*self.members_tree.get_children())
+
+        print('Members')
+        print(len(self.members))
+        for i, team in enumerate(self.members):
+            log.info('iid : %d, member : %s' % (i, team.member.name))
+            self.members_tree.insert('', 'end', iid=str(i), text=team.member.name, tags=('even' if i % 2 else 'odd',))
 
     def display_event_information(self):
         pass
@@ -97,5 +124,8 @@ class ShowEventPage(ttk.Frame):
 
     def set_responsible(self, responsible):
         self.responsible = responsible
+
+    def set_members(self, members):
+        self.members = members
 
 

@@ -8,7 +8,6 @@ from playhouse.reflection import print_table_sql
 
 from models.user import User
 from models.category import Category
-from models.debate import Debate
 from models.event import Event
 from models.events_category import EventsCategory
 from models.projection_room import ProjectionRoom
@@ -23,7 +22,7 @@ SEED_FILES_DIR = "db/seed_files/"
 
 # All the models/tables of the database
 # TODO make it dynamic by putting the models in a package/module
-MODELS = (User, ProjectionRoom, Team, Debate, Event, Category,
+MODELS = (User, ProjectionRoom, Team, Event, Category,
           EventsCategory, Vacation)
 
 

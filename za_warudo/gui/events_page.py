@@ -42,7 +42,7 @@ class EventsPage(ttk.Frame):
         self.date_text.trace('w', lambda name, index, mode, date_text=self.date_text: self.display_events())
 
         ttk.Button(self, text="Edit", command=self.edit_event).grid(row=2, column=1, sticky=(W+E), pady=5, padx=5)
-        ttk.Button(self, text="Details").grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
+        ttk.Button(self, text="Details", command=self.link_to_show_page).grid(row=3, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Delete", command=self.confirm_delete).grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
         ttk.Button(self, text="Ticketing", command=self.link_to_ticketing_page).grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
@@ -136,5 +136,14 @@ class EventsPage(ttk.Frame):
     def link_to_ticketing_page(self):
         if self.event_selected != None:
             self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
+        else:
+            log.info('No item selected')
+
+    def link_to_show_page(self):
+        if self.event_selected != None:
+            self.controller.go_to_show_event_page(event_name=self.events_tree.item(self.event_selected)['text'])
+        else:
+            log.info('No item selected')
+
 
 

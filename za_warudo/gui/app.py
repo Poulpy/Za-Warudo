@@ -7,16 +7,17 @@ import logging as log
 from peewee import *
 from ttkthemes import ThemedStyle
 
-from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
+from gui.show_event_page import ShowEventPage
 from gui.ticketing_page import TicketingPage
-from models.projection_room import ProjectionRoom
-from models.user import User
-from models.team import Team
 from models.category import Category
+from models.event import Event
 from models.events_category import EventsCategory
+from models.projection_room import ProjectionRoom
+from models.team import Team
+from models.user import User
 
 db = SqliteDatabase("db/app.db")
 
@@ -34,8 +35,9 @@ class App(Tk):
         self.protocol('WM_DELETE_WINDOW', self.app_will_quit)
         # We use the 'breeze' theme because it's the most beautiful
         # theme along with 'arc'
+        # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
-        style.set_theme("breeze")
+        style.set_theme("arc")
 
         self.geometry("1200x550")
         self.minsize(300, 300)
@@ -58,7 +60,7 @@ class App(Tk):
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage, ShowEventPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -243,12 +245,14 @@ class App(Tk):
 
     def update_team(self, member_names, event_id):
         log.info('Updating team for the event %d' % (event_id))
-        Team.delete().where(Team.event == event_id)
+        print(Team.delete().where(Team.event == event_id).execute())
         self.create_team(member_names, event_id)
 
     def update_events_categories(self, cat_titles, event_id):
         log.info('Updating events categories for event %d' % (event_id))
-        EventsCategory.delete().where(EventsCategory.event == event_id)
+        #print('Rows deleted : %d' % (EventsCategory.delete().where(EventsCategory.event == event_id).execute()))
+        #print(EventsCategory.delete().where(EventsCategory.event == event_id))
+        EventsCategory.delete().where(EventsCategory.event == event_id).execute()
         self.create_events_categories(cat_titles, event_id)
 
     def create_team(self, member_names, event_id):
@@ -288,6 +292,22 @@ class App(Tk):
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
+    def go_to_show_event_page(self, event_name):
+        event = Event.get(Event.name == event_name)
+
+        self.frames['ShowEventPage'].set_event(event)
+        self.frames['ShowEventPage'].set_projection_room(event.projection_room)
+        self.frames['ShowEventPage'].set_categories(event.events_categories)
+        self.frames['ShowEventPage'].set_responsible(event.responsible)
+        self.frames['ShowEventPage'].set_members(self.get_events_members(event))
+        self.frames['ShowEventPage'].set_members(event.teams)
+        self.frames['ShowEventPage'].display_events_information()
+
+        self.show_frame('ShowEventPage')
+
+    def get_events_members(self, event):
+        return User.select().join(Team).where((User.id == Team.member) & (Team.event == event))
+
     def go_to_ticket_page(self, event_name):
         event = Event.get(Event.name == event_name)
 
@@ -300,6 +320,7 @@ class App(Tk):
     def get_categories_for_event(self, event):
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
+
 
     def app_will_quit(self):
         log.info('Application will terminate')

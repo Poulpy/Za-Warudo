@@ -2,7 +2,6 @@ import datetime
 
 from peewee import Model, SqliteDatabase, CharField, DateTimeField, IntegerField, ForeignKeyField, BooleanField, Check
 
-from models.debate import Debate
 from models.projection_room import ProjectionRoom
 from models.user import User
 
@@ -24,10 +23,11 @@ class Event(Model):
     equipment_reserved = BooleanField(default = False)
     management = BooleanField(default = False)
     guest_attendance = BooleanField(default = False)
+    debate = BooleanField(default = False)
+    presentation = BooleanField(default = False)
 
     responsible = ForeignKeyField(User, backref="events")
-    projection_room = ForeignKeyField(ProjectionRoom, backref="events", null = False)
-    debate = ForeignKeyField(Debate, backref="events", null = True)
+    projection_room = ForeignKeyField(ProjectionRoom, backref="events")
 
     class Meta:
         database = db

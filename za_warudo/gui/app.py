@@ -37,7 +37,7 @@ class App(Tk):
         # theme along with 'arc'
         # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
-        style.set_theme("arc")
+        style.set_theme("breeze")
 
         self.geometry("1200x550")
         self.minsize(300, 300)
@@ -55,6 +55,22 @@ class App(Tk):
         s = ttk.Style()
         s.configure("Red.TLabel", foreground="red")
         s.configure("Treeview", rowheight=30)
+
+        # The breeze theme is missing something: there is
+        # no highlight chen the user clicks on an item
+        # of the Treeview. These lines add little dots
+        # around the item to prevent that
+        # TODO see README
+        s.layout("Treeview.Item",
+        [('Treeitem.padding', {'sticky': 'nswe', 'children':
+            [('Treeitem.indicator', {'side': 'left', 'sticky': ''}),
+            ('Treeitem.image', {'side': 'left', 'sticky': ''}),
+            ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [
+                 ('Treeitem.text', {'side': 'left', 'sticky': ''}),
+            ]})
+            ],
+        })]
+        )
 
         # All frames of the application
         # TODO make it dynamic
@@ -112,7 +128,6 @@ class App(Tk):
         given in argument (format : "%Y-%m-%d")
         TODO pass the format in argument for flexibility
         '''
-
 
         log.info(date_str)
 

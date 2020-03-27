@@ -16,7 +16,7 @@ class ShowEventPage(ttk.Frame):
         self.event = None
         self.projection_room = None
 
-        categories_frame = ttk.Frame(self)
+        pricelist_frame = ttk.Frame(self)
         members_frame = ttk.Frame(self)
 
         # Default padding for the widgets
@@ -49,6 +49,18 @@ class ShowEventPage(ttk.Frame):
         self.members_tree.pack(side=LEFT)
         members_scrollbar.pack()
 
+        label['pricelist'] = ttk.Label(self, text="Price list")
+        pricelist_scrollbar = ttk.Scrollbar(pricelist_frame, orient=VERTICAL)
+        self.pricelist_tree = ttk.Treeview(pricelist_frame, columns=("#1"), yscrollcommand=members_scrollbar.set)
+        self.pricelist_tree.heading("#0", text="Title")
+        self.pricelist_tree.heading("#1", text="Price")
+        self.pricelist_tree.column("#1", width=50)
+        self.pricelist_tree.tag_configure('odd', background="#F0F0F0")
+        self.pricelist_tree.tag_configure('even', background="#FAFAFA")
+        pricelist_scrollbar.configure(command=self.pricelist_tree.yview)
+        self.pricelist_tree.pack(side=LEFT)
+        pricelist_scrollbar.pack()
+
         # Grid
         back_button.grid(row=0, column=5, padx=pad, pady=pad)
 
@@ -57,12 +69,14 @@ class ShowEventPage(ttk.Frame):
         label['seats_left'].grid(row=1, column=2, padx=pad, pady=pad, sticky=W)
         value['seats_left'].grid(row=1, column=3, padx=pad, pady=pad, sticky=W)
         label['members'].grid(row=1, column=4, padx=pad, pady=pad, sticky=W)
+        label['pricelist'].grid(row=1, column=5, padx=pad, pady=pad, sticky=W)
 
         label['projection_type'].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
         value['projection_type'].grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
         label['sold_seats'].grid(row=2, column=2, padx=pad, pady=pad, sticky=W)
         value['sold_seats'].grid(row=2, column=3, padx=pad, pady=pad, sticky=W)
         members_frame.grid(row=2, column=4, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
+        pricelist_frame.grid(row=2, column=5, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
 
         label['location'].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
         value['location'].grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
@@ -92,7 +106,8 @@ class ShowEventPage(ttk.Frame):
         self.textvar['booked_seats'].set(self.event.booked_seats)
         self.textvar['responsible'].set(self.responsible.name)
         self.display_members()
-        print(self.members)
+        self.display_pricelist()
+        #print(self.members)
 
 
     def timetable(self):
@@ -101,13 +116,22 @@ class ShowEventPage(ttk.Frame):
     def back(self):
         self.controller.show_frame('EventsPage')
 
+    def display_pricelist(self):
+        self.pricelist_tree.delete(*self.pricelist_tree.get_children())
+
+        print(self.categories)
+        for i, price in enumerate(self.categories):
+            value = str(price.category.price) + ' €'
+            self.pricelist_tree.insert('', 'end', text=price.category.title, values=(value,), tags=('even' if i % 2 else 'odd',))
+
+
     def display_members(self):
         self.members_tree.delete(*self.members_tree.get_children())
 
-        print('Members')
-        print(len(self.members))
+        #print('Members')
+        #print(len(self.members))
         for i, team in enumerate(self.members):
-            log.info('iid : %d, member : %s' % (i, team.member.name))
+            #log.info('iid : %d, member : %s' % (i, team.member.name))
             self.members_tree.insert('', 'end', iid=str(i), text=team.member.name, tags=('even' if i % 2 else 'odd',))
 
     def display_event_information(self):

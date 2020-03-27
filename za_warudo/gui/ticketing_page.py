@@ -19,7 +19,7 @@ class TicketingPage(ttk.Frame):
         self.projection_room = None
 
         # Default padding for the widgets
-        pad = 5
+        pad = 10
         all_labels = ('name', 'projection_type', 'location',
                       'date', 'seats_left', 'sold_seats',
                       'booked_seats', 'revenue', 'notification')
@@ -53,28 +53,29 @@ class TicketingPage(ttk.Frame):
         # GRID
         event_name_label.grid(row=0, column=0, padx=pad, pady=pad)
         event_type_label.grid(row=0, column=1, padx=pad, pady=pad)
-        location_label.grid(row=0, column=2, padx=pad, pady=pad)
         back_button.grid(row=0, column=4, padx=pad, pady=pad)
 
         event_date_label.grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
         self.tickets_frame.grid(row=1, column=2, rowspan=5, padx=pad, pady=pad, sticky=NSEW)
 
-        labels['seats_left'].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
-        seats_left_label.grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
+        location_label.grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
 
-        labels['sold_seats'].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
-        seats_sold_label.grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
+        labels['seats_left'].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
+        seats_left_label.grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
 
-        labels['booked_seats'].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
-        seats_booked_label.grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
+        labels['sold_seats'].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
+        seats_sold_label.grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
 
-        labels['revenue'].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
-        revenue_label.grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
+        labels['booked_seats'].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
+        seats_booked_label.grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
 
-        sell_button.grid(row=6, column=0, padx=pad, pady=pad, sticky=NSEW)
-        book_button.grid(row=6, column=1, padx=pad, pady=pad, sticky=NSEW)
+        labels['revenue'].grid(row=6, column=0, padx=pad, pady=pad, sticky=W)
+        revenue_label.grid(row=6, column=1, padx=pad, pady=pad, sticky=E)
 
-        notification_label.grid(row=0, column=0, columnspan=3, padx=pad, pady=pad, sticky=NSEW)
+        sell_button.grid(row=7, column=0, padx=pad, pady=pad, sticky=NSEW)
+        book_button.grid(row=7, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        notification_label.grid(row=8, column=0, columnspan=3, padx=pad, pady=pad, sticky=NSEW)
 
 
     def get_seats(self) -> int:
@@ -169,7 +170,7 @@ class TicketingPage(ttk.Frame):
         self.textvar['revenue'].set(revenue)
 
     def set_inputs(self):
-        pad = 5
+        pad = 10
         self.display_events_seats_information()
 
         for widget in self.tickets_frame.winfo_children():

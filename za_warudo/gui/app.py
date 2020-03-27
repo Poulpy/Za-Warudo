@@ -7,16 +7,17 @@ import logging as log
 from peewee import *
 from ttkthemes import ThemedStyle
 
-from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
+from gui.show_event_page import ShowEventPage
 from gui.ticketing_page import TicketingPage
-from models.projection_room import ProjectionRoom
-from models.user import User
-from models.team import Team
 from models.category import Category
+from models.event import Event
 from models.events_category import EventsCategory
+from models.projection_room import ProjectionRoom
+from models.team import Team
+from models.user import User
 
 db = SqliteDatabase("db/app.db")
 
@@ -34,6 +35,7 @@ class App(Tk):
         self.protocol('WM_DELETE_WINDOW', self.app_will_quit)
         # We use the 'breeze' theme because it's the most beautiful
         # theme along with 'arc'
+        # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
         style.set_theme("breeze")
 
@@ -58,7 +60,7 @@ class App(Tk):
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage, ShowEventPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -287,6 +289,17 @@ class App(Tk):
     def get_seats_left(self, event_id):
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
+
+    def go_to_show_event_page(self, event_name):
+        event = Event.get(Event.name == event_name)
+
+        self.frames['ShowEventPage'].set_event(event)
+        self.frames['ShowEventPage'].set_projection_room(event.projection_room)
+        self.frames['ShowEventPage'].set_categories(self.get_categories_for_event(event))
+        self.frames['ShowEventPage'].set_responsible(User.get(User.id == event.responsible))
+        self.frames['ShowEventPage'].display_events_information()
+
+        self.show_frame('ShowEventPage')
 
     def go_to_ticket_page(self, event_name):
         event = Event.get(Event.name == event_name)

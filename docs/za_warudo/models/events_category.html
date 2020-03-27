@@ -37,8 +37,8 @@ class EventsCategory(Model):
     An event can have multiple fees, and a fee can belong to many events
     &#39;&#39;&#39;
 
-    event = ForeignKeyField(Event)
-    category = ForeignKeyField(Category)
+    event = ForeignKeyField(Event, backref=&#39;events_categories&#39;)
+    category = ForeignKeyField(Category, backref=&#39;events_categories&#39;)
 
     class Meta:
         database = db
@@ -69,8 +69,8 @@ class EventsCategory(Model):
     An event can have multiple fees, and a fee can belong to many events
     &#39;&#39;&#39;
 
-    event = ForeignKeyField(Event)
-    category = ForeignKeyField(Category)
+    event = ForeignKeyField(Event, backref=&#39;events_categories&#39;)
+    category = ForeignKeyField(Category, backref=&#39;events_categories&#39;)
 
     class Meta:
         database = db

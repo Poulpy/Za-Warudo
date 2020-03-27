@@ -34,7 +34,6 @@ from playhouse.reflection import print_table_sql
 
 from models.user import User
 from models.category import Category
-from models.debate import Debate
 from models.event import Event
 from models.events_category import EventsCategory
 from models.projection_room import ProjectionRoom
@@ -49,11 +48,12 @@ SEED_FILES_DIR = &#34;db/seed_files/&#34;
 
 # All the models/tables of the database
 # TODO make it dynamic by putting the models in a package/module
-MODELS = (User, ProjectionRoom, Team, Debate, Event, Category,
+MODELS = (User, ProjectionRoom, Team, Event, Category,
           EventsCategory, Vacation)
 
 
 def get_class(kls):
+    &#39;&#39;&#39;
     module, klass = kls.split(&#39;.&#39;)
     return getattr(__import__(module), klass)
     &#39;&#39;&#39;
@@ -63,7 +63,6 @@ def get_class(kls):
     for comp in parts[1:]:
         m = getattr(m, comp)
     return m
-    &#39;&#39;&#39;
 
 def seed():
     &#39;&#39;&#39;
@@ -102,7 +101,7 @@ def seed():
                     seeds.append({fields[i]:data[i] for i in range(len(data))})
 
             log.info(&#34;Seeding %s...&#34; % (klass))
-            Table = get_class(klass)
+            Table = get_class(&#39;models.&#39; + klass)
             Table.insert_many(seeds).execute()
             log.info(&#34;Seeding done for %s&#34; % (klass))
 
@@ -224,12 +223,14 @@ their types</p></section>
 <span>def <span class="ident">get_class</span></span>(<span>kls)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>module, klass = kls.split('.')
+return getattr(<strong>import</strong>(module), klass)</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_class(kls):
+    &#39;&#39;&#39;
     module, klass = kls.split(&#39;.&#39;)
     return getattr(__import__(module), klass)
     &#39;&#39;&#39;
@@ -238,8 +239,7 @@ their types</p></section>
     m = __import__( module )
     for comp in parts[1:]:
         m = getattr(m, comp)
-    return m
-    &#39;&#39;&#39;</code></pre>
+    return m</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.seed.seed"><code class="name flex">
@@ -291,7 +291,7 @@ Other rows : datas</p></section>
                     seeds.append({fields[i]:data[i] for i in range(len(data))})
 
             log.info(&#34;Seeding %s...&#34; % (klass))
-            Table = get_class(klass)
+            Table = get_class(&#39;models.&#39; + klass)
             Table.insert_many(seeds).execute()
             log.info(&#34;Seeding done for %s&#34; % (klass))
 

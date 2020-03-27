@@ -20,6 +20,164 @@
 <h1 class="title">Module <code>za_warudo.gui.show_event_page</code></h1>
 </header>
 <section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from functools import partial
+from datetime import datetime
+from datetime import timedelta
+from tkinter import *
+from tkinter import ttk
+import logging as log
+
+class ShowEventPage(ttk.Frame):
+    &#39;&#39;&#39;
+    Page showing details about and event
+    &#39;&#39;&#39;
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.event = None
+        self.projection_room = None
+
+        pricelist_frame = ttk.Frame(self)
+        members_frame = ttk.Frame(self)
+
+        # Default padding for the widgets
+        pad = 10
+        mut_labels = (&#39;name&#39;, &#39;projection_type&#39;, &#39;location&#39;,
+                      &#39;date&#39;, &#39;seats_left&#39;, &#39;sold_seats&#39;,
+                      &#39;booked_seats&#39;, &#39;responsible&#39;)
+
+        label = dict()
+        self.textvar = dict()
+        value = dict()
+
+        for var in mut_labels:
+            label[var] = ttk.Label(self, text=var.capitalize().replace(&#39;_&#39;, &#39; &#39;))
+            self.textvar[var] = StringVar()
+            value[var] = ttk.Label(self, textvariable=self.textvar[var])
+
+        # Buttons
+        back_button = ttk.Button(self, text=&#34;Back&#34;, command=self.back)
+        timetable_button = ttk.Button(self, text=&#34;Timetable&#34;, command=self.timetable)
+
+        # Treeviews
+        label[&#39;members&#39;] = ttk.Label(self, text=&#34;Members&#34;)
+        members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
+        self.members_tree = ttk.Treeview(members_frame, selectmode=&#39;browse&#39;, yscrollcommand=members_scrollbar.set)
+        self.members_tree.heading(&#34;#0&#34;, text=&#34;Name&#34;)
+        self.members_tree.tag_configure(&#39;odd&#39;, background=&#34;#F0F0F0&#34;)
+        self.members_tree.tag_configure(&#39;even&#39;, background=&#34;#FAFAFA&#34;)
+        members_scrollbar.configure(command=self.members_tree.yview)
+        self.members_tree.pack(side=LEFT)
+        members_scrollbar.pack()
+
+        label[&#39;pricelist&#39;] = ttk.Label(self, text=&#34;Price list&#34;)
+        pricelist_scrollbar = ttk.Scrollbar(pricelist_frame, orient=VERTICAL)
+        self.pricelist_tree = ttk.Treeview(pricelist_frame, columns=(&#34;#1&#34;), yscrollcommand=members_scrollbar.set)
+        self.pricelist_tree.heading(&#34;#0&#34;, text=&#34;Title&#34;)
+        self.pricelist_tree.heading(&#34;#1&#34;, text=&#34;Price&#34;)
+        self.pricelist_tree.column(&#34;#1&#34;, width=50)
+        self.pricelist_tree.tag_configure(&#39;odd&#39;, background=&#34;#F0F0F0&#34;)
+        self.pricelist_tree.tag_configure(&#39;even&#39;, background=&#34;#FAFAFA&#34;)
+        pricelist_scrollbar.configure(command=self.pricelist_tree.yview)
+        self.pricelist_tree.pack(side=LEFT)
+        pricelist_scrollbar.pack()
+
+        # Grid
+        back_button.grid(row=0, column=6, padx=pad, pady=pad)
+
+        label[&#39;name&#39;].grid(row=1, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;name&#39;].grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;seats_left&#39;].grid(row=1, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;seats_left&#39;].grid(row=1, column=3, padx=pad, pady=pad, sticky=W)
+        label[&#39;members&#39;].grid(row=1, column=4, padx=pad, pady=pad, sticky=W)
+        label[&#39;pricelist&#39;].grid(row=1, column=5, padx=pad, pady=pad, sticky=W)
+
+        label[&#39;projection_type&#39;].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;projection_type&#39;].grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;sold_seats&#39;].grid(row=2, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;sold_seats&#39;].grid(row=2, column=3, padx=pad, pady=pad, sticky=W)
+        members_frame.grid(row=2, column=4, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
+        pricelist_frame.grid(row=2, column=5, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
+
+        label[&#39;location&#39;].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;location&#39;].grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;booked_seats&#39;].grid(row=3, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;booked_seats&#39;].grid(row=3, column=3, padx=pad, pady=pad, sticky=W)
+
+        label[&#39;date&#39;].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;date&#39;].grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;responsible&#39;].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;responsible&#39;].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
+
+    def display_events_information(self):
+        # day-month-year begin_hour - end_hour
+        date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+        date += &#39;h - &#39;
+        date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+        date += &#39;h&#39;
+        seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+        seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+        revenue = str(self.event.revenue) + &#39; €&#39;
+        self.textvar[&#39;name&#39;].set(self.event.name)
+        self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+        self.textvar[&#39;location&#39;].set(self.projection_room.location)
+        self.textvar[&#39;date&#39;].set(date)
+        self.textvar[&#39;seats_left&#39;].set(seats_left)
+        self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+        self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+        self.textvar[&#39;responsible&#39;].set(self.responsible.name)
+        self.display_members()
+        self.display_pricelist()
+        #print(self.members)
+
+
+    def timetable(self):
+        pass
+
+    def back(self):
+        self.controller.show_frame(&#39;EventsPage&#39;)
+
+    def display_pricelist(self):
+        self.pricelist_tree.delete(*self.pricelist_tree.get_children())
+
+        print(self.categories)
+        for i, price in enumerate(self.categories):
+            value = str(price.category.price) + &#39; €&#39;
+            self.pricelist_tree.insert(&#39;&#39;, &#39;end&#39;, text=price.category.title, values=(value,), tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))
+
+
+    def display_members(self):
+        self.members_tree.delete(*self.members_tree.get_children())
+
+        #print(&#39;Members&#39;)
+        #print(len(self.members))
+        for i, team in enumerate(self.members):
+            #log.info(&#39;iid : %d, member : %s&#39; % (i, team.member.name))
+            self.members_tree.insert(&#39;&#39;, &#39;end&#39;, iid=str(i), text=team.member.name, tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))
+
+    def display_event_information(self):
+        pass
+
+    def set_event(self, event):
+        self.event = event
+
+    def set_projection_room(self, projection_room):
+        self.projection_room = projection_room
+
+    def set_categories(self, categories):
+        self.categories = categories
+
+    def set_responsible(self, responsible):
+        self.responsible = responsible
+
+    def set_members(self, members):
+        self.members = members</code></pre>
+</details>
 </section>
 <section>
 </section>
@@ -28,6 +186,359 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage"><code class="flex name class">
+<span>class <span class="ident">ShowEventPage</span></span>
+<span>(</span><span>parent, controller)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Page showing details about and event</p>
+<p>Construct a Ttk Frame with parent master.</p>
+<p>STANDARD OPTIONS</p>
+<pre><code>class, cursor, style, takefocus
+</code></pre>
+<p>WIDGET-SPECIFIC OPTIONS</p>
+<pre><code>borderwidth, relief, padding, width, height
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ShowEventPage(ttk.Frame):
+    &#39;&#39;&#39;
+    Page showing details about and event
+    &#39;&#39;&#39;
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.event = None
+        self.projection_room = None
+
+        pricelist_frame = ttk.Frame(self)
+        members_frame = ttk.Frame(self)
+
+        # Default padding for the widgets
+        pad = 10
+        mut_labels = (&#39;name&#39;, &#39;projection_type&#39;, &#39;location&#39;,
+                      &#39;date&#39;, &#39;seats_left&#39;, &#39;sold_seats&#39;,
+                      &#39;booked_seats&#39;, &#39;responsible&#39;)
+
+        label = dict()
+        self.textvar = dict()
+        value = dict()
+
+        for var in mut_labels:
+            label[var] = ttk.Label(self, text=var.capitalize().replace(&#39;_&#39;, &#39; &#39;))
+            self.textvar[var] = StringVar()
+            value[var] = ttk.Label(self, textvariable=self.textvar[var])
+
+        # Buttons
+        back_button = ttk.Button(self, text=&#34;Back&#34;, command=self.back)
+        timetable_button = ttk.Button(self, text=&#34;Timetable&#34;, command=self.timetable)
+
+        # Treeviews
+        label[&#39;members&#39;] = ttk.Label(self, text=&#34;Members&#34;)
+        members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
+        self.members_tree = ttk.Treeview(members_frame, selectmode=&#39;browse&#39;, yscrollcommand=members_scrollbar.set)
+        self.members_tree.heading(&#34;#0&#34;, text=&#34;Name&#34;)
+        self.members_tree.tag_configure(&#39;odd&#39;, background=&#34;#F0F0F0&#34;)
+        self.members_tree.tag_configure(&#39;even&#39;, background=&#34;#FAFAFA&#34;)
+        members_scrollbar.configure(command=self.members_tree.yview)
+        self.members_tree.pack(side=LEFT)
+        members_scrollbar.pack()
+
+        label[&#39;pricelist&#39;] = ttk.Label(self, text=&#34;Price list&#34;)
+        pricelist_scrollbar = ttk.Scrollbar(pricelist_frame, orient=VERTICAL)
+        self.pricelist_tree = ttk.Treeview(pricelist_frame, columns=(&#34;#1&#34;), yscrollcommand=members_scrollbar.set)
+        self.pricelist_tree.heading(&#34;#0&#34;, text=&#34;Title&#34;)
+        self.pricelist_tree.heading(&#34;#1&#34;, text=&#34;Price&#34;)
+        self.pricelist_tree.column(&#34;#1&#34;, width=50)
+        self.pricelist_tree.tag_configure(&#39;odd&#39;, background=&#34;#F0F0F0&#34;)
+        self.pricelist_tree.tag_configure(&#39;even&#39;, background=&#34;#FAFAFA&#34;)
+        pricelist_scrollbar.configure(command=self.pricelist_tree.yview)
+        self.pricelist_tree.pack(side=LEFT)
+        pricelist_scrollbar.pack()
+
+        # Grid
+        back_button.grid(row=0, column=6, padx=pad, pady=pad)
+
+        label[&#39;name&#39;].grid(row=1, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;name&#39;].grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;seats_left&#39;].grid(row=1, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;seats_left&#39;].grid(row=1, column=3, padx=pad, pady=pad, sticky=W)
+        label[&#39;members&#39;].grid(row=1, column=4, padx=pad, pady=pad, sticky=W)
+        label[&#39;pricelist&#39;].grid(row=1, column=5, padx=pad, pady=pad, sticky=W)
+
+        label[&#39;projection_type&#39;].grid(row=2, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;projection_type&#39;].grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;sold_seats&#39;].grid(row=2, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;sold_seats&#39;].grid(row=2, column=3, padx=pad, pady=pad, sticky=W)
+        members_frame.grid(row=2, column=4, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
+        pricelist_frame.grid(row=2, column=5, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
+
+        label[&#39;location&#39;].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;location&#39;].grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;booked_seats&#39;].grid(row=3, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;booked_seats&#39;].grid(row=3, column=3, padx=pad, pady=pad, sticky=W)
+
+        label[&#39;date&#39;].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
+        value[&#39;date&#39;].grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
+        label[&#39;responsible&#39;].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
+        value[&#39;responsible&#39;].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
+
+    def display_events_information(self):
+        # day-month-year begin_hour - end_hour
+        date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+        date += &#39;h - &#39;
+        date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+        date += &#39;h&#39;
+        seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+        seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+        revenue = str(self.event.revenue) + &#39; €&#39;
+        self.textvar[&#39;name&#39;].set(self.event.name)
+        self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+        self.textvar[&#39;location&#39;].set(self.projection_room.location)
+        self.textvar[&#39;date&#39;].set(date)
+        self.textvar[&#39;seats_left&#39;].set(seats_left)
+        self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+        self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+        self.textvar[&#39;responsible&#39;].set(self.responsible.name)
+        self.display_members()
+        self.display_pricelist()
+        #print(self.members)
+
+
+    def timetable(self):
+        pass
+
+    def back(self):
+        self.controller.show_frame(&#39;EventsPage&#39;)
+
+    def display_pricelist(self):
+        self.pricelist_tree.delete(*self.pricelist_tree.get_children())
+
+        print(self.categories)
+        for i, price in enumerate(self.categories):
+            value = str(price.category.price) + &#39; €&#39;
+            self.pricelist_tree.insert(&#39;&#39;, &#39;end&#39;, text=price.category.title, values=(value,), tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))
+
+
+    def display_members(self):
+        self.members_tree.delete(*self.members_tree.get_children())
+
+        #print(&#39;Members&#39;)
+        #print(len(self.members))
+        for i, team in enumerate(self.members):
+            #log.info(&#39;iid : %d, member : %s&#39; % (i, team.member.name))
+            self.members_tree.insert(&#39;&#39;, &#39;end&#39;, iid=str(i), text=team.member.name, tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))
+
+    def display_event_information(self):
+        pass
+
+    def set_event(self, event):
+        self.event = event
+
+    def set_projection_room(self, projection_room):
+        self.projection_room = projection_room
+
+    def set_categories(self, categories):
+        self.categories = categories
+
+    def set_responsible(self, responsible):
+        self.responsible = responsible
+
+    def set_members(self, members):
+        self.members = members</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>tkinter.ttk.Frame</li>
+<li>tkinter.ttk.Widget</li>
+<li>tkinter.Widget</li>
+<li>tkinter.BaseWidget</li>
+<li>tkinter.Misc</li>
+<li>tkinter.Pack</li>
+<li>tkinter.Place</li>
+<li>tkinter.Grid</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.back"><code class="name flex">
+<span>def <span class="ident">back</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def back(self):
+    self.controller.show_frame(&#39;EventsPage&#39;)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.display_event_information"><code class="name flex">
+<span>def <span class="ident">display_event_information</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_event_information(self):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.display_events_information"><code class="name flex">
+<span>def <span class="ident">display_events_information</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_events_information(self):
+    # day-month-year begin_hour - end_hour
+    date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+    date += &#39;h - &#39;
+    date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+    date += &#39;h&#39;
+    seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+    seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+    revenue = str(self.event.revenue) + &#39; €&#39;
+    self.textvar[&#39;name&#39;].set(self.event.name)
+    self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+    self.textvar[&#39;location&#39;].set(self.projection_room.location)
+    self.textvar[&#39;date&#39;].set(date)
+    self.textvar[&#39;seats_left&#39;].set(seats_left)
+    self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+    self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+    self.textvar[&#39;responsible&#39;].set(self.responsible.name)
+    self.display_members()
+    self.display_pricelist()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.display_members"><code class="name flex">
+<span>def <span class="ident">display_members</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_members(self):
+    self.members_tree.delete(*self.members_tree.get_children())
+
+    #print(&#39;Members&#39;)
+    #print(len(self.members))
+    for i, team in enumerate(self.members):
+        #log.info(&#39;iid : %d, member : %s&#39; % (i, team.member.name))
+        self.members_tree.insert(&#39;&#39;, &#39;end&#39;, iid=str(i), text=team.member.name, tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.display_pricelist"><code class="name flex">
+<span>def <span class="ident">display_pricelist</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_pricelist(self):
+    self.pricelist_tree.delete(*self.pricelist_tree.get_children())
+
+    print(self.categories)
+    for i, price in enumerate(self.categories):
+        value = str(price.category.price) + &#39; €&#39;
+        self.pricelist_tree.insert(&#39;&#39;, &#39;end&#39;, text=price.category.title, values=(value,), tags=(&#39;even&#39; if i % 2 else &#39;odd&#39;,))</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.set_categories"><code class="name flex">
+<span>def <span class="ident">set_categories</span></span>(<span>self, categories)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_categories(self, categories):
+    self.categories = categories</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.set_event"><code class="name flex">
+<span>def <span class="ident">set_event</span></span>(<span>self, event)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_event(self, event):
+    self.event = event</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.set_members"><code class="name flex">
+<span>def <span class="ident">set_members</span></span>(<span>self, members)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_members(self, members):
+    self.members = members</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.set_projection_room"><code class="name flex">
+<span>def <span class="ident">set_projection_room</span></span>(<span>self, projection_room)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_projection_room(self, projection_room):
+    self.projection_room = projection_room</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.set_responsible"><code class="name flex">
+<span>def <span class="ident">set_responsible</span></span>(<span>self, responsible)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_responsible(self, responsible):
+    self.responsible = responsible</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.show_event_page.ShowEventPage.timetable"><code class="name flex">
+<span>def <span class="ident">timetable</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def timetable(self):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -39,6 +550,26 @@
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="za_warudo.gui" href="index.html">za_warudo.gui</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="za_warudo.gui.show_event_page.ShowEventPage" href="#za_warudo.gui.show_event_page.ShowEventPage">ShowEventPage</a></code></h4>
+<ul class="">
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.back" href="#za_warudo.gui.show_event_page.ShowEventPage.back">back</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.display_event_information" href="#za_warudo.gui.show_event_page.ShowEventPage.display_event_information">display_event_information</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.display_events_information" href="#za_warudo.gui.show_event_page.ShowEventPage.display_events_information">display_events_information</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.display_members" href="#za_warudo.gui.show_event_page.ShowEventPage.display_members">display_members</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.display_pricelist" href="#za_warudo.gui.show_event_page.ShowEventPage.display_pricelist">display_pricelist</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.set_categories" href="#za_warudo.gui.show_event_page.ShowEventPage.set_categories">set_categories</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.set_event" href="#za_warudo.gui.show_event_page.ShowEventPage.set_event">set_event</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.set_members" href="#za_warudo.gui.show_event_page.ShowEventPage.set_members">set_members</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.set_projection_room" href="#za_warudo.gui.show_event_page.ShowEventPage.set_projection_room">set_projection_room</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.set_responsible" href="#za_warudo.gui.show_event_page.ShowEventPage.set_responsible">set_responsible</a></code></li>
+<li><code><a title="za_warudo.gui.show_event_page.ShowEventPage.timetable" href="#za_warudo.gui.show_event_page.ShowEventPage.timetable">timetable</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

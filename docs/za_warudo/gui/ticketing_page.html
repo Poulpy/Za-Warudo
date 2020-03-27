@@ -20,6 +20,200 @@
 <h1 class="title">Module <code>za_warudo.gui.ticketing_page</code></h1>
 </header>
 <section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from functools import partial
+from datetime import datetime
+from datetime import timedelta
+from tkinter import *
+from tkinter import ttk
+import logging as log
+
+from gui.widgets import Spinbox
+
+class TicketingPage(ttk.Frame):
+    &#39;&#39;&#39;
+    Page to book or sell tickets
+    &#39;&#39;&#39;
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.event = None
+        self.projection_room = None
+
+        # Default padding for the widgets
+        pad = 10
+        all_labels = (&#39;name&#39;, &#39;projection_type&#39;, &#39;location&#39;,
+                      &#39;date&#39;, &#39;seats_left&#39;, &#39;sold_seats&#39;,
+                      &#39;booked_seats&#39;, &#39;revenue&#39;, &#39;notification&#39;)
+
+        labels = dict()
+        self.textvar = dict()
+
+        for var in all_labels:
+            self.textvar[var] = StringVar()
+            labels[var] = ttk.Label(self, text=var.capitalize().replace(&#39;_&#39;, &#39; &#39;))
+
+        self.tickets_frame = ttk.Frame(self)
+
+        # Buttons
+        back_button = ttk.Button(self, text=&#39;Back&#39;, command=self.back)
+        sell_button = ttk.Button(self, text=&#39;Sell&#39;, command=partial(self.pass_order, &#39;sell&#39;))
+        book_button = ttk.Button(self, text=&#39;Book&#39;, command=partial(self.pass_order, &#39;book&#39;))
+
+        # Labels
+        event_name_label = ttk.Label(self, textvariable=self.textvar[&#39;name&#39;], font=(&#34;TkDefaultFont&#34;, &#34;15&#34;))
+        event_type_label = ttk.Label(self, textvariable=self.textvar[&#39;projection_type&#39;])
+        location_label = ttk.Label(self, textvariable=self.textvar[&#39;location&#39;])
+        event_date_label = ttk.Label(self, textvariable=self.textvar[&#39;date&#39;])
+        seats_left_label = ttk.Label(self, textvariable=self.textvar[&#39;seats_left&#39;])
+        seats_sold_label = ttk.Label(self, textvariable=self.textvar[&#39;sold_seats&#39;])
+        seats_booked_label = ttk.Label(self, textvariable=self.textvar[&#39;booked_seats&#39;])
+        revenue_label = ttk.Label(self, textvariable=self.textvar[&#39;revenue&#39;])
+        notification_label = ttk.Label(self, textvariable=self.textvar[&#39;notification&#39;])
+
+
+        # GRID
+        event_name_label.grid(row=0, column=0, padx=pad, pady=pad)
+        event_type_label.grid(row=0, column=1, padx=pad, pady=pad)
+        back_button.grid(row=0, column=4, padx=pad, pady=pad)
+
+        event_date_label.grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
+        self.tickets_frame.grid(row=1, column=2, rowspan=5, padx=pad, pady=pad, sticky=NSEW)
+
+        location_label.grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;seats_left&#39;].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
+        seats_left_label.grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;sold_seats&#39;].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
+        seats_sold_label.grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;booked_seats&#39;].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
+        seats_booked_label.grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;revenue&#39;].grid(row=6, column=0, padx=pad, pady=pad, sticky=W)
+        revenue_label.grid(row=6, column=1, padx=pad, pady=pad, sticky=E)
+
+        sell_button.grid(row=7, column=0, padx=pad, pady=pad, sticky=NSEW)
+        book_button.grid(row=7, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        notification_label.grid(row=8, column=0, columnspan=3, padx=pad, pady=pad, sticky=NSEW)
+
+
+    def get_seats(self) -&gt; int:
+        &#39;&#39;&#39;
+        Return the number of seats requested
+        &#39;&#39;&#39;
+        seats = 0
+
+        for s in self.seats:
+            if s[&#39;var&#39;].get() != &#39;&#39;:
+                seats += int(s[&#39;var&#39;].get())
+
+        return seats
+
+    def total_price(self) -&gt; int:
+        &#39;&#39;&#39;
+        Return the total price, given a price and the number
+        of seats
+        &#39;&#39;&#39;
+        total = 0
+
+        for s in self.seats:
+            if s[&#39;var&#39;].get() != &#39;&#39;:
+                total += s[&#39;price&#39;] * int(s[&#39;var&#39;].get())
+
+        return total
+
+    def back(self):
+        &#39;&#39;&#39;
+        Go back to the events page and update the events displayed
+        &#39;&#39;&#39;
+        self.controller.show_frame(&#39;EventsPage&#39;)
+        self.controller.update_events_page()
+
+    def pass_order(self, order_type: str):
+        &#39;&#39;&#39;
+        Sell or book seats for the event
+        &#39;&#39;&#39;
+        seats_purchased = self.event.sold_seats + self.event.booked_seats
+        seats_requested = self.get_seats()
+        total_price = self.total_price()
+        values_to_update = dict()
+
+        if seats_requested &lt;= 0:
+            self.textvar[&#39;notification&#39;].set(&#39;Select at least 1 seat to sell/book&#39;)
+            return
+        if self.projection_room.total_seats == seats_purchased:
+            self.textvar[&#39;notification&#39;].set(&#39;No more seats available&#39;)
+            return
+        if seats_requested &gt; self.projection_room.total_seats - seats_purchased:
+            self.textvar[&#39;notification&#39;].set(&#39;Not enough seats left&#39;)
+            return
+
+        if order_type == &#39;sell&#39;:
+            values_to_update[&#39;sold_seats&#39;] = self.event.sold_seats + seats_requested
+        elif order_type == &#39;book&#39;:
+            values_to_update[&#39;booked_seats&#39;] = self.event.booked_seats + seats_requested
+        else:
+            return
+
+        values_to_update[&#39;revenue&#39;] = self.event.revenue + self.total_price()
+
+        log.info(values_to_update)
+        self.textvar[&#39;notification&#39;].set(str(seats_requested) + &#39; seats taken&#39;)
+
+        self.controller.update(self.event.id, values_to_update)
+        self.event = self.controller.get_event_by_id(self.event.id)
+        self.display_events_seats_information()
+
+    def set_event(self, event):
+        self.event = event
+
+    def set_projection_room(self, projection_room):
+        self.projection_room = projection_room
+
+    def display_events_seats_information(self):
+        # day-month-year begin_hour - end_hour
+        date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+        date += &#39;h - &#39;
+        date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+        date += &#39;h&#39;
+        seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+        seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+        revenue = str(self.event.revenue) + &#39; €&#39;
+        self.textvar[&#39;name&#39;].set(self.event.name)
+        self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+        self.textvar[&#39;location&#39;].set(self.projection_room.location)
+        self.textvar[&#39;date&#39;].set(date)
+        self.textvar[&#39;seats_left&#39;].set(seats_left)
+        self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+        self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+        self.textvar[&#39;revenue&#39;].set(revenue)
+
+    def set_inputs(self):
+        pad = 10
+        self.display_events_seats_information()
+
+        for widget in self.tickets_frame.winfo_children():
+            widget.destroy()
+
+        categories = self.controller.get_categories_for_event(self.event)
+        log.debug(categories)
+        self.seats = [None for i in categories]
+        for i, c in enumerate(categories):
+            self.seats[i] = {&#39;price&#39;:c.price, &#39;var&#39;:StringVar()}
+            price = str(c.price) + &#39; €&#39;
+
+            ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, padx=pad, pady=pad, sticky=W)
+            ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, padx=pad, pady=pad, sticky=W)
+            Spinbox(self.tickets_frame, textvariable=self.seats[i][&#39;var&#39;], from_=0, to=90).grid(row=i, column=2, padx=pad, pady=pad, sticky=E)
+            self.seats[i][&#39;var&#39;].set(0)</code></pre>
+</details>
 </section>
 <section>
 </section>
@@ -28,6 +222,413 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage"><code class="flex name class">
+<span>class <span class="ident">TicketingPage</span></span>
+<span>(</span><span>parent, controller)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Page to book or sell tickets</p>
+<p>Construct a Ttk Frame with parent master.</p>
+<p>STANDARD OPTIONS</p>
+<pre><code>class, cursor, style, takefocus
+</code></pre>
+<p>WIDGET-SPECIFIC OPTIONS</p>
+<pre><code>borderwidth, relief, padding, width, height
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TicketingPage(ttk.Frame):
+    &#39;&#39;&#39;
+    Page to book or sell tickets
+    &#39;&#39;&#39;
+
+    def __init__(self, parent, controller):
+        ttk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.event = None
+        self.projection_room = None
+
+        # Default padding for the widgets
+        pad = 10
+        all_labels = (&#39;name&#39;, &#39;projection_type&#39;, &#39;location&#39;,
+                      &#39;date&#39;, &#39;seats_left&#39;, &#39;sold_seats&#39;,
+                      &#39;booked_seats&#39;, &#39;revenue&#39;, &#39;notification&#39;)
+
+        labels = dict()
+        self.textvar = dict()
+
+        for var in all_labels:
+            self.textvar[var] = StringVar()
+            labels[var] = ttk.Label(self, text=var.capitalize().replace(&#39;_&#39;, &#39; &#39;))
+
+        self.tickets_frame = ttk.Frame(self)
+
+        # Buttons
+        back_button = ttk.Button(self, text=&#39;Back&#39;, command=self.back)
+        sell_button = ttk.Button(self, text=&#39;Sell&#39;, command=partial(self.pass_order, &#39;sell&#39;))
+        book_button = ttk.Button(self, text=&#39;Book&#39;, command=partial(self.pass_order, &#39;book&#39;))
+
+        # Labels
+        event_name_label = ttk.Label(self, textvariable=self.textvar[&#39;name&#39;], font=(&#34;TkDefaultFont&#34;, &#34;15&#34;))
+        event_type_label = ttk.Label(self, textvariable=self.textvar[&#39;projection_type&#39;])
+        location_label = ttk.Label(self, textvariable=self.textvar[&#39;location&#39;])
+        event_date_label = ttk.Label(self, textvariable=self.textvar[&#39;date&#39;])
+        seats_left_label = ttk.Label(self, textvariable=self.textvar[&#39;seats_left&#39;])
+        seats_sold_label = ttk.Label(self, textvariable=self.textvar[&#39;sold_seats&#39;])
+        seats_booked_label = ttk.Label(self, textvariable=self.textvar[&#39;booked_seats&#39;])
+        revenue_label = ttk.Label(self, textvariable=self.textvar[&#39;revenue&#39;])
+        notification_label = ttk.Label(self, textvariable=self.textvar[&#39;notification&#39;])
+
+
+        # GRID
+        event_name_label.grid(row=0, column=0, padx=pad, pady=pad)
+        event_type_label.grid(row=0, column=1, padx=pad, pady=pad)
+        back_button.grid(row=0, column=4, padx=pad, pady=pad)
+
+        event_date_label.grid(row=1, column=1, padx=pad, pady=pad, sticky=E)
+        self.tickets_frame.grid(row=1, column=2, rowspan=5, padx=pad, pady=pad, sticky=NSEW)
+
+        location_label.grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;seats_left&#39;].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
+        seats_left_label.grid(row=3, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;sold_seats&#39;].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
+        seats_sold_label.grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;booked_seats&#39;].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
+        seats_booked_label.grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
+
+        labels[&#39;revenue&#39;].grid(row=6, column=0, padx=pad, pady=pad, sticky=W)
+        revenue_label.grid(row=6, column=1, padx=pad, pady=pad, sticky=E)
+
+        sell_button.grid(row=7, column=0, padx=pad, pady=pad, sticky=NSEW)
+        book_button.grid(row=7, column=1, padx=pad, pady=pad, sticky=NSEW)
+
+        notification_label.grid(row=8, column=0, columnspan=3, padx=pad, pady=pad, sticky=NSEW)
+
+
+    def get_seats(self) -&gt; int:
+        &#39;&#39;&#39;
+        Return the number of seats requested
+        &#39;&#39;&#39;
+        seats = 0
+
+        for s in self.seats:
+            if s[&#39;var&#39;].get() != &#39;&#39;:
+                seats += int(s[&#39;var&#39;].get())
+
+        return seats
+
+    def total_price(self) -&gt; int:
+        &#39;&#39;&#39;
+        Return the total price, given a price and the number
+        of seats
+        &#39;&#39;&#39;
+        total = 0
+
+        for s in self.seats:
+            if s[&#39;var&#39;].get() != &#39;&#39;:
+                total += s[&#39;price&#39;] * int(s[&#39;var&#39;].get())
+
+        return total
+
+    def back(self):
+        &#39;&#39;&#39;
+        Go back to the events page and update the events displayed
+        &#39;&#39;&#39;
+        self.controller.show_frame(&#39;EventsPage&#39;)
+        self.controller.update_events_page()
+
+    def pass_order(self, order_type: str):
+        &#39;&#39;&#39;
+        Sell or book seats for the event
+        &#39;&#39;&#39;
+        seats_purchased = self.event.sold_seats + self.event.booked_seats
+        seats_requested = self.get_seats()
+        total_price = self.total_price()
+        values_to_update = dict()
+
+        if seats_requested &lt;= 0:
+            self.textvar[&#39;notification&#39;].set(&#39;Select at least 1 seat to sell/book&#39;)
+            return
+        if self.projection_room.total_seats == seats_purchased:
+            self.textvar[&#39;notification&#39;].set(&#39;No more seats available&#39;)
+            return
+        if seats_requested &gt; self.projection_room.total_seats - seats_purchased:
+            self.textvar[&#39;notification&#39;].set(&#39;Not enough seats left&#39;)
+            return
+
+        if order_type == &#39;sell&#39;:
+            values_to_update[&#39;sold_seats&#39;] = self.event.sold_seats + seats_requested
+        elif order_type == &#39;book&#39;:
+            values_to_update[&#39;booked_seats&#39;] = self.event.booked_seats + seats_requested
+        else:
+            return
+
+        values_to_update[&#39;revenue&#39;] = self.event.revenue + self.total_price()
+
+        log.info(values_to_update)
+        self.textvar[&#39;notification&#39;].set(str(seats_requested) + &#39; seats taken&#39;)
+
+        self.controller.update(self.event.id, values_to_update)
+        self.event = self.controller.get_event_by_id(self.event.id)
+        self.display_events_seats_information()
+
+    def set_event(self, event):
+        self.event = event
+
+    def set_projection_room(self, projection_room):
+        self.projection_room = projection_room
+
+    def display_events_seats_information(self):
+        # day-month-year begin_hour - end_hour
+        date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+        date += &#39;h - &#39;
+        date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+        date += &#39;h&#39;
+        seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+        seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+        revenue = str(self.event.revenue) + &#39; €&#39;
+        self.textvar[&#39;name&#39;].set(self.event.name)
+        self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+        self.textvar[&#39;location&#39;].set(self.projection_room.location)
+        self.textvar[&#39;date&#39;].set(date)
+        self.textvar[&#39;seats_left&#39;].set(seats_left)
+        self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+        self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+        self.textvar[&#39;revenue&#39;].set(revenue)
+
+    def set_inputs(self):
+        pad = 10
+        self.display_events_seats_information()
+
+        for widget in self.tickets_frame.winfo_children():
+            widget.destroy()
+
+        categories = self.controller.get_categories_for_event(self.event)
+        log.debug(categories)
+        self.seats = [None for i in categories]
+        for i, c in enumerate(categories):
+            self.seats[i] = {&#39;price&#39;:c.price, &#39;var&#39;:StringVar()}
+            price = str(c.price) + &#39; €&#39;
+
+            ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, padx=pad, pady=pad, sticky=W)
+            ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, padx=pad, pady=pad, sticky=W)
+            Spinbox(self.tickets_frame, textvariable=self.seats[i][&#39;var&#39;], from_=0, to=90).grid(row=i, column=2, padx=pad, pady=pad, sticky=E)
+            self.seats[i][&#39;var&#39;].set(0)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>tkinter.ttk.Frame</li>
+<li>tkinter.ttk.Widget</li>
+<li>tkinter.Widget</li>
+<li>tkinter.BaseWidget</li>
+<li>tkinter.Misc</li>
+<li>tkinter.Pack</li>
+<li>tkinter.Place</li>
+<li>tkinter.Grid</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.back"><code class="name flex">
+<span>def <span class="ident">back</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Go back to the events page and update the events displayed</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def back(self):
+    &#39;&#39;&#39;
+    Go back to the events page and update the events displayed
+    &#39;&#39;&#39;
+    self.controller.show_frame(&#39;EventsPage&#39;)
+    self.controller.update_events_page()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.display_events_seats_information"><code class="name flex">
+<span>def <span class="ident">display_events_seats_information</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_events_seats_information(self):
+    # day-month-year begin_hour - end_hour
+    date = self.event.begin.strftime(&#34;%d-%m-%Y %H&#34;)
+    date += &#39;h - &#39;
+    date += (self.event.begin + timedelta(minutes=self.event.running_time)).strftime(&#34;%H&#34;)
+    date += &#39;h&#39;
+    seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
+    seats_left += &#39; / &#39; + str(self.projection_room.total_seats)
+    revenue = str(self.event.revenue) + &#39; €&#39;
+    self.textvar[&#39;name&#39;].set(self.event.name)
+    self.textvar[&#39;projection_type&#39;].set(self.event.projection_type)
+    self.textvar[&#39;location&#39;].set(self.projection_room.location)
+    self.textvar[&#39;date&#39;].set(date)
+    self.textvar[&#39;seats_left&#39;].set(seats_left)
+    self.textvar[&#39;sold_seats&#39;].set(self.event.sold_seats)
+    self.textvar[&#39;booked_seats&#39;].set(self.event.booked_seats)
+    self.textvar[&#39;revenue&#39;].set(revenue)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.get_seats"><code class="name flex">
+<span>def <span class="ident">get_seats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the number of seats requested</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_seats(self) -&gt; int:
+    &#39;&#39;&#39;
+    Return the number of seats requested
+    &#39;&#39;&#39;
+    seats = 0
+
+    for s in self.seats:
+        if s[&#39;var&#39;].get() != &#39;&#39;:
+            seats += int(s[&#39;var&#39;].get())
+
+    return seats</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.pass_order"><code class="name flex">
+<span>def <span class="ident">pass_order</span></span>(<span>self, order_type)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Sell or book seats for the event</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pass_order(self, order_type: str):
+    &#39;&#39;&#39;
+    Sell or book seats for the event
+    &#39;&#39;&#39;
+    seats_purchased = self.event.sold_seats + self.event.booked_seats
+    seats_requested = self.get_seats()
+    total_price = self.total_price()
+    values_to_update = dict()
+
+    if seats_requested &lt;= 0:
+        self.textvar[&#39;notification&#39;].set(&#39;Select at least 1 seat to sell/book&#39;)
+        return
+    if self.projection_room.total_seats == seats_purchased:
+        self.textvar[&#39;notification&#39;].set(&#39;No more seats available&#39;)
+        return
+    if seats_requested &gt; self.projection_room.total_seats - seats_purchased:
+        self.textvar[&#39;notification&#39;].set(&#39;Not enough seats left&#39;)
+        return
+
+    if order_type == &#39;sell&#39;:
+        values_to_update[&#39;sold_seats&#39;] = self.event.sold_seats + seats_requested
+    elif order_type == &#39;book&#39;:
+        values_to_update[&#39;booked_seats&#39;] = self.event.booked_seats + seats_requested
+    else:
+        return
+
+    values_to_update[&#39;revenue&#39;] = self.event.revenue + self.total_price()
+
+    log.info(values_to_update)
+    self.textvar[&#39;notification&#39;].set(str(seats_requested) + &#39; seats taken&#39;)
+
+    self.controller.update(self.event.id, values_to_update)
+    self.event = self.controller.get_event_by_id(self.event.id)
+    self.display_events_seats_information()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.set_event"><code class="name flex">
+<span>def <span class="ident">set_event</span></span>(<span>self, event)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_event(self, event):
+    self.event = event</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.set_inputs"><code class="name flex">
+<span>def <span class="ident">set_inputs</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_inputs(self):
+    pad = 10
+    self.display_events_seats_information()
+
+    for widget in self.tickets_frame.winfo_children():
+        widget.destroy()
+
+    categories = self.controller.get_categories_for_event(self.event)
+    log.debug(categories)
+    self.seats = [None for i in categories]
+    for i, c in enumerate(categories):
+        self.seats[i] = {&#39;price&#39;:c.price, &#39;var&#39;:StringVar()}
+        price = str(c.price) + &#39; €&#39;
+
+        ttk.Label(self.tickets_frame, text=c.title).grid(row=i, column=0, padx=pad, pady=pad, sticky=W)
+        ttk.Label(self.tickets_frame, text=price).grid(row=i, column=1, padx=pad, pady=pad, sticky=W)
+        Spinbox(self.tickets_frame, textvariable=self.seats[i][&#39;var&#39;], from_=0, to=90).grid(row=i, column=2, padx=pad, pady=pad, sticky=E)
+        self.seats[i][&#39;var&#39;].set(0)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.set_projection_room"><code class="name flex">
+<span>def <span class="ident">set_projection_room</span></span>(<span>self, projection_room)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_projection_room(self, projection_room):
+    self.projection_room = projection_room</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.ticketing_page.TicketingPage.total_price"><code class="name flex">
+<span>def <span class="ident">total_price</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the total price, given a price and the number
+of seats</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def total_price(self) -&gt; int:
+    &#39;&#39;&#39;
+    Return the total price, given a price and the number
+    of seats
+    &#39;&#39;&#39;
+    total = 0
+
+    for s in self.seats:
+        if s[&#39;var&#39;].get() != &#39;&#39;:
+            total += s[&#39;price&#39;] * int(s[&#39;var&#39;].get())
+
+    return total</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -39,6 +640,23 @@
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="za_warudo.gui" href="index.html">za_warudo.gui</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="za_warudo.gui.ticketing_page.TicketingPage" href="#za_warudo.gui.ticketing_page.TicketingPage">TicketingPage</a></code></h4>
+<ul class="">
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.back" href="#za_warudo.gui.ticketing_page.TicketingPage.back">back</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.display_events_seats_information" href="#za_warudo.gui.ticketing_page.TicketingPage.display_events_seats_information">display_events_seats_information</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.get_seats" href="#za_warudo.gui.ticketing_page.TicketingPage.get_seats">get_seats</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.pass_order" href="#za_warudo.gui.ticketing_page.TicketingPage.pass_order">pass_order</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.set_event" href="#za_warudo.gui.ticketing_page.TicketingPage.set_event">set_event</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.set_inputs" href="#za_warudo.gui.ticketing_page.TicketingPage.set_inputs">set_inputs</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.set_projection_room" href="#za_warudo.gui.ticketing_page.TicketingPage.set_projection_room">set_projection_room</a></code></li>
+<li><code><a title="za_warudo.gui.ticketing_page.TicketingPage.total_price" href="#za_warudo.gui.ticketing_page.TicketingPage.total_price">total_price</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

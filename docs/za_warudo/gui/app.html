@@ -24,7 +24,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from datetime import datetime
+<pre><code class="python">from functools import partial
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 import logging as log
@@ -32,11 +33,16 @@ import logging as log
 from peewee import *
 from ttkthemes import ThemedStyle
 
-from models.event import Event
 from gui.connection_page import ConnectionPage
 from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
+from gui.show_event_page import ShowEventPage
+from gui.ticketing_page import TicketingPage
+from models.category import Category
+from models.event import Event
+from models.events_category import EventsCategory
 from models.projection_room import ProjectionRoom
+from models.team import Team
 from models.user import User
 
 db = SqliteDatabase(&#34;db/app.db&#34;)
@@ -51,12 +57,15 @@ class App(Tk):
         Tk.__init__(self, *args, **kwargs)
 
         container = ttk.Frame(self)
+        db.connect()
+        self.protocol(&#39;WM_DELETE_WINDOW&#39;, self.app_will_quit)
         # We use the &#39;breeze&#39; theme because it&#39;s the most beautiful
         # theme along with &#39;arc&#39;
+        # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
         style.set_theme(&#34;breeze&#34;)
 
-        self.geometry(&#34;700x600&#34;)
+        self.geometry(&#34;1200x550&#34;)
         self.minsize(300, 300)
         self.title(&#34;Za Warudo&#34;)
 
@@ -71,12 +80,29 @@ class App(Tk):
         # Styles
         s = ttk.Style()
         s.configure(&#34;Red.TLabel&#34;, foreground=&#34;red&#34;)
+        s.configure(&#34;Treeview&#34;, rowheight=30)
+
+        # The breeze theme is missing something: there is
+        # no highlight chen the user clicks on an item
+        # of the Treeview. These lines add little dots
+        # around the item to prevent that
+        # TODO see README
+        s.layout(&#34;Treeview.Item&#34;,
+        [(&#39;Treeitem.padding&#39;, {&#39;sticky&#39;: &#39;nswe&#39;, &#39;children&#39;:
+            [(&#39;Treeitem.indicator&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            (&#39;Treeitem.image&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            (&#39;Treeitem.focus&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;, &#39;children&#39;: [
+                 (&#39;Treeitem.text&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            ]})
+            ],
+        })]
+        )
 
         # All frames of the application
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage, ShowEventPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -85,9 +111,15 @@ class App(Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky=&#34;nsew&#34;, padx=15, pady=15)
+            # frame.grid_propagate(0)
 
         self.show_frame(&#34;ConnectionPage&#34;)
         self.set_menu(is_connected=False)
+
+    def new_event(self):
+        log.info(&#39;New event&#39;)
+        self.frames[&#39;EditEventPage&#39;].set_new_mode()
+        self.show_frame(&#39;EditEventPage&#39;)
 
 
     def set_menu(self, is_connected: bool):
@@ -104,7 +136,7 @@ class App(Tk):
         if is_connected:
             pmenu.add_command(label=&#34;Timetable&#34;)
             pmenu.add_command(label=&#34;New vacation&#34;)
-            pmenu.add_command(label=&#34;Log out&#34;, command=lambda: self.show_frame(&#34;ConnectionPage&#34;))
+            pmenu.add_command(label=&#34;Log out&#34;, command=partial(self.show_frame, &#34;ConnectionPage&#34;))
             pmenu.add_separator()
 
         pmenu.add_command(label=&#34;Exit&#34;, command=self.destroy)
@@ -123,51 +155,76 @@ class App(Tk):
         TODO pass the format in argument for flexibility
         &#39;&#39;&#39;
 
-        db.connect()
-
         log.info(date_str)
 
         date = datetime.strptime(date_str, &#34;%Y-%m-%d&#34;).date()
-        events = Event.select().where((Event.begin.year == date.year)
+        return Event.select().where((Event.begin.year == date.year)
                                     &amp; (Event.begin.month == date.month)
-                                    &amp; (Event.begin.day == date.day))
+                                    &amp; (Event.begin.day == date.day)).order_by(Event.begin)
 
-        db.close()
 
-        return events
+
+    def get_categories(self):
+        &#39;&#39;&#39;
+        Return all categories
+        &#39;&#39;&#39;
+        return Category.select()
+
+
+    def get_events_categories(self, event_id: int=None):
+        if event_id == None:
+            return [{&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:&#39;unchecked&#39;} for c in Category.select()]
+        else:
+            ec = []
+            for c in Category.select():
+                checked = &#39;unchecked&#39;
+                if EventsCategory.select().where((EventsCategory.category == c.id) &amp; (EventsCategory.event == event_id)):
+                    checked = &#39;checked&#39;
+                ec.append({&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:checked})
+
+            return ec
+
 
     def get_projection_rooms(self):
         &#39;&#39;&#39;
         Return all projection rooms
         &#39;&#39;&#39;
 
-        db.connect()
-        proj_rooms = ProjectionRoom.select()
-        db.close()
+        return ProjectionRoom.select()
 
-        return proj_rooms
+    def get_events_per_user(self, event_id: int=None):
+        if event_id == None:
+            return [{&#39;user&#39;:user.name, &#39;events&#39;:Team.select().where(Team.member == user).count(), &#39;checked&#39;:&#39;unchecked&#39;} for user in User.select()]
+        else:
+            epu = []
+            for u in User.select():
+                checked = &#39;unchecked&#39;
+                if Team.select().where((Team.member == u) &amp; (Team.event == event_id)):
+                    checked = &#39;checked&#39;
+                epu.append({&#39;user&#39;:u.name, &#39;events&#39;:Team.select().where(Team.member == u).count(), &#39;checked&#39;:checked})
+
+            return epu
+
 
     def get_users(self):
         &#39;&#39;&#39;
         Return all users
         &#39;&#39;&#39;
 
-        db.connect()
-        users = User.select()
-        db.close()
+        return User.select()
 
-        return users
 
     def update_events_page(self):
         &#39;&#39;&#39;
         Update the events displayed in the events page
         &#39;&#39;&#39;
 
-        self.frames[&#34;EventsPage&#34;].set_displayed_events()
+        self.frames[&#34;EventsPage&#34;].display_events()
 
-    def show_frame(self, page_name):
+    def show_frame(self, page_name: str):
         &#39;&#39;&#39;Show a frame for the given page name&#39;&#39;&#39;
 
+        log.info(&#39;Go to frame %s&#39; % (page_name))
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -178,42 +235,132 @@ class App(Tk):
         else:
             self.set_menu(True)
 
-    def check_credentials(self, event=None):
+    def check_credentials(self, login: str, password: str) -&gt; str:
         &#39;&#39;&#39;
         Event raised when the user click on the login button
         on the connection page
         &#39;&#39;&#39;
-        db.connect()
-
-        # We get the user input : login and password
-        login = self.frames[&#34;ConnectionPage&#34;].login_entry.get()
-        password = self.frames[&#34;ConnectionPage&#34;].password_entry.get()
 
         # We search in the database the user with the corresponding login
         u = User.select().where(User.login == login).first()
 
         # We check if the login is right and then the password
         if u == None:
-            self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : no user found&#34;, &#34;Red.TLabel&#34;)
+            return &#39;Authentification failed : no user found&#39;
         else:
             if password == u.password:
-                self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;&#34;, &#34;TLabel&#34;)
                 self.current_user = u
                 log.info(&#34;Authentification successfull&#34;)
                 self.show_frame(&#34;EventsPage&#34;)
+                return &#39;&#39;
             else:
-                self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : password incorrect&#34;, &#34;Red.TLabel&#34;)
+                return &#39;Authentification failed : password incorrect&#39;
 
-        db.close()
 
-    def create_event(self, event):
+    def create_event(self, event: Event) -&gt; int:
         &#39;&#39;&#39;
         Create a event with a dict given in argument
         &#39;&#39;&#39;
         event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
         event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
         event[&#39;responsible&#39;] = self.current_user.id
-        Event.create(**event)</code></pre>
+        event_created = Event.create(**event)
+
+        return event_created.id
+
+    def update_event(self, event: dict, event_id: int) -&gt; int:
+        event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
+        event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
+        event[&#39;responsible&#39;] = self.current_user.id
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def update(self, event_id: int, event: dict) -&gt; int:
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def get_event_by_id(self, event_id: int) -&gt; int:
+        return Event.get(Event.id == event_id)
+
+    def update_team(self, member_names: list, event_id: int):
+        log.info(&#39;Updating team for the event %d&#39; % (event_id))
+        Team.delete().where(Team.event == event_id).execute()
+        self.create_team(member_names, event_id)
+
+    def update_events_categories(self, cat_titles: list, event_id: int):
+        log.info(&#39;Updating events categories for event %d&#39; % (event_id))
+        EventsCategory.delete().where(EventsCategory.event == event_id).execute()
+        self.create_events_categories(cat_titles, event_id)
+
+    def create_team(self, member_names: list, event_id: int):
+        &#39;&#39;&#39;
+        Associates a user with an event : (user, event)
+        &#39;&#39;&#39;
+        team = [{&#39;member&#39;:User.get(User.name == name).id, &#39;event&#39;:event_id} for name in member_names]
+        print(team)
+        Team.insert_many(team).execute()
+
+    def create_events_categories(self, cat_titles: list, event_id: int):
+        &#39;&#39;&#39;
+        Associates a category with an event
+        &#39;&#39;&#39;
+        cats = [{&#39;category&#39;:Category.get(Category.title == title).id, &#39;event&#39;:event_id} for title in cat_titles]
+        EventsCategory.insert_many(cats).execute()
+
+    def delete_event(self, event_name: str) -&gt; int:
+        return Event.delete().where(Event.name == event_name).execute()
+
+    def edit_event(self, name: str):
+        event_to_edit = Event.get(Event.name == name)
+        self.frames[&#39;EditEventPage&#39;].set_edit_mode()
+        self.frames[&#39;EditEventPage&#39;].set_event(event_to_edit)
+        self.frames[&#39;EditEventPage&#39;].set_projection_room(ProjectionRoom.get(event_to_edit.projection_room))
+        self.frames[&#39;EditEventPage&#39;].set_inputs()
+        self.show_frame(&#39;EditEventPage&#39;)
+
+    def get_location(self, projection_room_id: int) -&gt; str:
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
+
+    def get_total_seats_for_event(self, projection_room_id: int) -&gt; int:
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
+
+    def get_seats_left(self, event_id):
+        event = Event.get(Event.id == event_id)
+        return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
+
+    def go_to_show_event_page(self, event_name: str):
+        event = Event.get(Event.name == event_name)
+
+        self.frames[&#39;ShowEventPage&#39;].set_event(event)
+        self.frames[&#39;ShowEventPage&#39;].set_projection_room(event.projection_room)
+        self.frames[&#39;ShowEventPage&#39;].set_categories(event.events_categories)
+        self.frames[&#39;ShowEventPage&#39;].set_responsible(event.responsible)
+        self.frames[&#39;ShowEventPage&#39;].set_members(self.get_events_members(event))
+        self.frames[&#39;ShowEventPage&#39;].set_members(event.teams)
+        self.frames[&#39;ShowEventPage&#39;].display_events_information()
+
+        self.show_frame(&#39;ShowEventPage&#39;)
+
+    def get_events_members(self, event):
+        return User.select().join(Team).where((User.id == Team.member) &amp; (Team.event == event))
+
+    def go_to_ticket_page(self, event_name: str):
+        event = Event.get(Event.name == event_name)
+
+        self.frames[&#39;TicketingPage&#39;].set_event(event)
+        self.frames[&#39;TicketingPage&#39;].set_projection_room(event.projection_room)
+        self.frames[&#39;TicketingPage&#39;].set_inputs()
+
+        self.show_frame(&#39;TicketingPage&#39;)
+
+    def get_categories_for_event(self, event) -&gt; list:
+        print(event.events_categories.dicts())
+        return list(set([ec.category for ec in event.events_categories]))
+
+
+    def app_will_quit(self):
+        log.info(&#39;Application will terminate&#39;)
+        log.info(&#39;Closing the database&#39;)
+        db.close()
+        self.destroy()</code></pre>
 </details>
 </section>
 <section>
@@ -251,12 +398,15 @@ is the name of the widget class.</p></section>
         Tk.__init__(self, *args, **kwargs)
 
         container = ttk.Frame(self)
+        db.connect()
+        self.protocol(&#39;WM_DELETE_WINDOW&#39;, self.app_will_quit)
         # We use the &#39;breeze&#39; theme because it&#39;s the most beautiful
         # theme along with &#39;arc&#39;
+        # TODO us OS native ui; macOS : aqua
         style = ThemedStyle(self)
         style.set_theme(&#34;breeze&#34;)
 
-        self.geometry(&#34;700x600&#34;)
+        self.geometry(&#34;1200x550&#34;)
         self.minsize(300, 300)
         self.title(&#34;Za Warudo&#34;)
 
@@ -271,12 +421,29 @@ is the name of the widget class.</p></section>
         # Styles
         s = ttk.Style()
         s.configure(&#34;Red.TLabel&#34;, foreground=&#34;red&#34;)
+        s.configure(&#34;Treeview&#34;, rowheight=30)
+
+        # The breeze theme is missing something: there is
+        # no highlight chen the user clicks on an item
+        # of the Treeview. These lines add little dots
+        # around the item to prevent that
+        # TODO see README
+        s.layout(&#34;Treeview.Item&#34;,
+        [(&#39;Treeitem.padding&#39;, {&#39;sticky&#39;: &#39;nswe&#39;, &#39;children&#39;:
+            [(&#39;Treeitem.indicator&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            (&#39;Treeitem.image&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            (&#39;Treeitem.focus&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;, &#39;children&#39;: [
+                 (&#39;Treeitem.text&#39;, {&#39;side&#39;: &#39;left&#39;, &#39;sticky&#39;: &#39;&#39;}),
+            ]})
+            ],
+        })]
+        )
 
         # All frames of the application
         # TODO make it dynamic
         self.frames = {}
 
-        for P in (ConnectionPage, EventsPage, EditEventPage):
+        for P in (ConnectionPage, EventsPage, EditEventPage, TicketingPage, ShowEventPage):
             page_name = P.__name__
             frame = P(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -285,9 +452,15 @@ is the name of the widget class.</p></section>
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky=&#34;nsew&#34;, padx=15, pady=15)
+            # frame.grid_propagate(0)
 
         self.show_frame(&#34;ConnectionPage&#34;)
         self.set_menu(is_connected=False)
+
+    def new_event(self):
+        log.info(&#39;New event&#39;)
+        self.frames[&#39;EditEventPage&#39;].set_new_mode()
+        self.show_frame(&#39;EditEventPage&#39;)
 
 
     def set_menu(self, is_connected: bool):
@@ -304,7 +477,7 @@ is the name of the widget class.</p></section>
         if is_connected:
             pmenu.add_command(label=&#34;Timetable&#34;)
             pmenu.add_command(label=&#34;New vacation&#34;)
-            pmenu.add_command(label=&#34;Log out&#34;, command=lambda: self.show_frame(&#34;ConnectionPage&#34;))
+            pmenu.add_command(label=&#34;Log out&#34;, command=partial(self.show_frame, &#34;ConnectionPage&#34;))
             pmenu.add_separator()
 
         pmenu.add_command(label=&#34;Exit&#34;, command=self.destroy)
@@ -323,51 +496,76 @@ is the name of the widget class.</p></section>
         TODO pass the format in argument for flexibility
         &#39;&#39;&#39;
 
-        db.connect()
-
         log.info(date_str)
 
         date = datetime.strptime(date_str, &#34;%Y-%m-%d&#34;).date()
-        events = Event.select().where((Event.begin.year == date.year)
+        return Event.select().where((Event.begin.year == date.year)
                                     &amp; (Event.begin.month == date.month)
-                                    &amp; (Event.begin.day == date.day))
+                                    &amp; (Event.begin.day == date.day)).order_by(Event.begin)
 
-        db.close()
 
-        return events
+
+    def get_categories(self):
+        &#39;&#39;&#39;
+        Return all categories
+        &#39;&#39;&#39;
+        return Category.select()
+
+
+    def get_events_categories(self, event_id: int=None):
+        if event_id == None:
+            return [{&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:&#39;unchecked&#39;} for c in Category.select()]
+        else:
+            ec = []
+            for c in Category.select():
+                checked = &#39;unchecked&#39;
+                if EventsCategory.select().where((EventsCategory.category == c.id) &amp; (EventsCategory.event == event_id)):
+                    checked = &#39;checked&#39;
+                ec.append({&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:checked})
+
+            return ec
+
 
     def get_projection_rooms(self):
         &#39;&#39;&#39;
         Return all projection rooms
         &#39;&#39;&#39;
 
-        db.connect()
-        proj_rooms = ProjectionRoom.select()
-        db.close()
+        return ProjectionRoom.select()
 
-        return proj_rooms
+    def get_events_per_user(self, event_id: int=None):
+        if event_id == None:
+            return [{&#39;user&#39;:user.name, &#39;events&#39;:Team.select().where(Team.member == user).count(), &#39;checked&#39;:&#39;unchecked&#39;} for user in User.select()]
+        else:
+            epu = []
+            for u in User.select():
+                checked = &#39;unchecked&#39;
+                if Team.select().where((Team.member == u) &amp; (Team.event == event_id)):
+                    checked = &#39;checked&#39;
+                epu.append({&#39;user&#39;:u.name, &#39;events&#39;:Team.select().where(Team.member == u).count(), &#39;checked&#39;:checked})
+
+            return epu
+
 
     def get_users(self):
         &#39;&#39;&#39;
         Return all users
         &#39;&#39;&#39;
 
-        db.connect()
-        users = User.select()
-        db.close()
+        return User.select()
 
-        return users
 
     def update_events_page(self):
         &#39;&#39;&#39;
         Update the events displayed in the events page
         &#39;&#39;&#39;
 
-        self.frames[&#34;EventsPage&#34;].set_displayed_events()
+        self.frames[&#34;EventsPage&#34;].display_events()
 
-    def show_frame(self, page_name):
+    def show_frame(self, page_name: str):
         &#39;&#39;&#39;Show a frame for the given page name&#39;&#39;&#39;
 
+        log.info(&#39;Go to frame %s&#39; % (page_name))
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -378,42 +576,132 @@ is the name of the widget class.</p></section>
         else:
             self.set_menu(True)
 
-    def check_credentials(self, event=None):
+    def check_credentials(self, login: str, password: str) -&gt; str:
         &#39;&#39;&#39;
         Event raised when the user click on the login button
         on the connection page
         &#39;&#39;&#39;
-        db.connect()
-
-        # We get the user input : login and password
-        login = self.frames[&#34;ConnectionPage&#34;].login_entry.get()
-        password = self.frames[&#34;ConnectionPage&#34;].password_entry.get()
 
         # We search in the database the user with the corresponding login
         u = User.select().where(User.login == login).first()
 
         # We check if the login is right and then the password
         if u == None:
-            self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : no user found&#34;, &#34;Red.TLabel&#34;)
+            return &#39;Authentification failed : no user found&#39;
         else:
             if password == u.password:
-                self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;&#34;, &#34;TLabel&#34;)
                 self.current_user = u
                 log.info(&#34;Authentification successfull&#34;)
                 self.show_frame(&#34;EventsPage&#34;)
+                return &#39;&#39;
             else:
-                self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : password incorrect&#34;, &#34;Red.TLabel&#34;)
+                return &#39;Authentification failed : password incorrect&#39;
 
-        db.close()
 
-    def create_event(self, event):
+    def create_event(self, event: Event) -&gt; int:
         &#39;&#39;&#39;
         Create a event with a dict given in argument
         &#39;&#39;&#39;
         event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
         event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
         event[&#39;responsible&#39;] = self.current_user.id
-        Event.create(**event)</code></pre>
+        event_created = Event.create(**event)
+
+        return event_created.id
+
+    def update_event(self, event: dict, event_id: int) -&gt; int:
+        event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
+        event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
+        event[&#39;responsible&#39;] = self.current_user.id
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def update(self, event_id: int, event: dict) -&gt; int:
+        return Event.update(**event).where(Event.id == event_id).execute()
+
+    def get_event_by_id(self, event_id: int) -&gt; int:
+        return Event.get(Event.id == event_id)
+
+    def update_team(self, member_names: list, event_id: int):
+        log.info(&#39;Updating team for the event %d&#39; % (event_id))
+        Team.delete().where(Team.event == event_id).execute()
+        self.create_team(member_names, event_id)
+
+    def update_events_categories(self, cat_titles: list, event_id: int):
+        log.info(&#39;Updating events categories for event %d&#39; % (event_id))
+        EventsCategory.delete().where(EventsCategory.event == event_id).execute()
+        self.create_events_categories(cat_titles, event_id)
+
+    def create_team(self, member_names: list, event_id: int):
+        &#39;&#39;&#39;
+        Associates a user with an event : (user, event)
+        &#39;&#39;&#39;
+        team = [{&#39;member&#39;:User.get(User.name == name).id, &#39;event&#39;:event_id} for name in member_names]
+        print(team)
+        Team.insert_many(team).execute()
+
+    def create_events_categories(self, cat_titles: list, event_id: int):
+        &#39;&#39;&#39;
+        Associates a category with an event
+        &#39;&#39;&#39;
+        cats = [{&#39;category&#39;:Category.get(Category.title == title).id, &#39;event&#39;:event_id} for title in cat_titles]
+        EventsCategory.insert_many(cats).execute()
+
+    def delete_event(self, event_name: str) -&gt; int:
+        return Event.delete().where(Event.name == event_name).execute()
+
+    def edit_event(self, name: str):
+        event_to_edit = Event.get(Event.name == name)
+        self.frames[&#39;EditEventPage&#39;].set_edit_mode()
+        self.frames[&#39;EditEventPage&#39;].set_event(event_to_edit)
+        self.frames[&#39;EditEventPage&#39;].set_projection_room(ProjectionRoom.get(event_to_edit.projection_room))
+        self.frames[&#39;EditEventPage&#39;].set_inputs()
+        self.show_frame(&#39;EditEventPage&#39;)
+
+    def get_location(self, projection_room_id: int) -&gt; str:
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
+
+    def get_total_seats_for_event(self, projection_room_id: int) -&gt; int:
+        return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
+
+    def get_seats_left(self, event_id):
+        event = Event.get(Event.id == event_id)
+        return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
+
+    def go_to_show_event_page(self, event_name: str):
+        event = Event.get(Event.name == event_name)
+
+        self.frames[&#39;ShowEventPage&#39;].set_event(event)
+        self.frames[&#39;ShowEventPage&#39;].set_projection_room(event.projection_room)
+        self.frames[&#39;ShowEventPage&#39;].set_categories(event.events_categories)
+        self.frames[&#39;ShowEventPage&#39;].set_responsible(event.responsible)
+        self.frames[&#39;ShowEventPage&#39;].set_members(self.get_events_members(event))
+        self.frames[&#39;ShowEventPage&#39;].set_members(event.teams)
+        self.frames[&#39;ShowEventPage&#39;].display_events_information()
+
+        self.show_frame(&#39;ShowEventPage&#39;)
+
+    def get_events_members(self, event):
+        return User.select().join(Team).where((User.id == Team.member) &amp; (Team.event == event))
+
+    def go_to_ticket_page(self, event_name: str):
+        event = Event.get(Event.name == event_name)
+
+        self.frames[&#39;TicketingPage&#39;].set_event(event)
+        self.frames[&#39;TicketingPage&#39;].set_projection_room(event.projection_room)
+        self.frames[&#39;TicketingPage&#39;].set_inputs()
+
+        self.show_frame(&#39;TicketingPage&#39;)
+
+    def get_categories_for_event(self, event) -&gt; list:
+        print(event.events_categories.dicts())
+        return list(set([ec.category for ec in event.events_categories]))
+
+
+    def app_will_quit(self):
+        log.info(&#39;Application will terminate&#39;)
+        log.info(&#39;Closing the database&#39;)
+        db.close()
+        self.destroy()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -423,8 +711,24 @@ is the name of the widget class.</p></section>
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="za_warudo.gui.app.App.app_will_quit"><code class="name flex">
+<span>def <span class="ident">app_will_quit</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def app_will_quit(self):
+    log.info(&#39;Application will terminate&#39;)
+    log.info(&#39;Closing the database&#39;)
+    db.close()
+    self.destroy()</code></pre>
+</details>
+</dd>
 <dt id="za_warudo.gui.app.App.check_credentials"><code class="name flex">
-<span>def <span class="ident">check_credentials</span></span>(<span>self, event=None)</span>
+<span>def <span class="ident">check_credentials</span></span>(<span>self, login, password)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Event raised when the user click on the login button
@@ -433,33 +737,26 @@ on the connection page</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def check_credentials(self, event=None):
+<pre><code class="python">def check_credentials(self, login: str, password: str) -&gt; str:
     &#39;&#39;&#39;
     Event raised when the user click on the login button
     on the connection page
     &#39;&#39;&#39;
-    db.connect()
-
-    # We get the user input : login and password
-    login = self.frames[&#34;ConnectionPage&#34;].login_entry.get()
-    password = self.frames[&#34;ConnectionPage&#34;].password_entry.get()
 
     # We search in the database the user with the corresponding login
     u = User.select().where(User.login == login).first()
 
     # We check if the login is right and then the password
     if u == None:
-        self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : no user found&#34;, &#34;Red.TLabel&#34;)
+        return &#39;Authentification failed : no user found&#39;
     else:
         if password == u.password:
-            self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;&#34;, &#34;TLabel&#34;)
             self.current_user = u
             log.info(&#34;Authentification successfull&#34;)
             self.show_frame(&#34;EventsPage&#34;)
+            return &#39;&#39;
         else:
-            self.frames[&#34;ConnectionPage&#34;].display_notification(&#34;Authentification failed : password incorrect&#34;, &#34;Red.TLabel&#34;)
-
-    db.close()</code></pre>
+            return &#39;Authentification failed : password incorrect&#39;</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.create_event"><code class="name flex">
@@ -471,14 +768,125 @@ on the connection page</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_event(self, event):
+<pre><code class="python">def create_event(self, event: Event) -&gt; int:
     &#39;&#39;&#39;
     Create a event with a dict given in argument
     &#39;&#39;&#39;
     event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
     event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
     event[&#39;responsible&#39;] = self.current_user.id
-    Event.create(**event)</code></pre>
+    event_created = Event.create(**event)
+
+    return event_created.id</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.create_events_categories"><code class="name flex">
+<span>def <span class="ident">create_events_categories</span></span>(<span>self, cat_titles, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Associates a category with an event</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_events_categories(self, cat_titles: list, event_id: int):
+    &#39;&#39;&#39;
+    Associates a category with an event
+    &#39;&#39;&#39;
+    cats = [{&#39;category&#39;:Category.get(Category.title == title).id, &#39;event&#39;:event_id} for title in cat_titles]
+    EventsCategory.insert_many(cats).execute()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.create_team"><code class="name flex">
+<span>def <span class="ident">create_team</span></span>(<span>self, member_names, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Associates a user with an event : (user, event)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_team(self, member_names: list, event_id: int):
+    &#39;&#39;&#39;
+    Associates a user with an event : (user, event)
+    &#39;&#39;&#39;
+    team = [{&#39;member&#39;:User.get(User.name == name).id, &#39;event&#39;:event_id} for name in member_names]
+    print(team)
+    Team.insert_many(team).execute()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.delete_event"><code class="name flex">
+<span>def <span class="ident">delete_event</span></span>(<span>self, event_name)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def delete_event(self, event_name: str) -&gt; int:
+    return Event.delete().where(Event.name == event_name).execute()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.edit_event"><code class="name flex">
+<span>def <span class="ident">edit_event</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def edit_event(self, name: str):
+    event_to_edit = Event.get(Event.name == name)
+    self.frames[&#39;EditEventPage&#39;].set_edit_mode()
+    self.frames[&#39;EditEventPage&#39;].set_event(event_to_edit)
+    self.frames[&#39;EditEventPage&#39;].set_projection_room(ProjectionRoom.get(event_to_edit.projection_room))
+    self.frames[&#39;EditEventPage&#39;].set_inputs()
+    self.show_frame(&#39;EditEventPage&#39;)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_categories"><code class="name flex">
+<span>def <span class="ident">get_categories</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return all categories</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_categories(self):
+    &#39;&#39;&#39;
+    Return all categories
+    &#39;&#39;&#39;
+    return Category.select()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_categories_for_event"><code class="name flex">
+<span>def <span class="ident">get_categories_for_event</span></span>(<span>self, event)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_categories_for_event(self, event) -&gt; list:
+    print(event.events_categories.dicts())
+    return list(set([ec.category for ec in event.events_categories]))</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_event_by_id"><code class="name flex">
+<span>def <span class="ident">get_event_by_id</span></span>(<span>self, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_event_by_id(self, event_id: int) -&gt; int:
+    return Event.get(Event.id == event_id)</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.get_events"><code class="name flex">
@@ -499,18 +907,84 @@ TODO pass the format in argument for flexibility</p></section>
     TODO pass the format in argument for flexibility
     &#39;&#39;&#39;
 
-    db.connect()
-
     log.info(date_str)
 
     date = datetime.strptime(date_str, &#34;%Y-%m-%d&#34;).date()
-    events = Event.select().where((Event.begin.year == date.year)
+    return Event.select().where((Event.begin.year == date.year)
                                 &amp; (Event.begin.month == date.month)
-                                &amp; (Event.begin.day == date.day))
+                                &amp; (Event.begin.day == date.day)).order_by(Event.begin)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_events_categories"><code class="name flex">
+<span>def <span class="ident">get_events_categories</span></span>(<span>self, event_id=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_events_categories(self, event_id: int=None):
+    if event_id == None:
+        return [{&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:&#39;unchecked&#39;} for c in Category.select()]
+    else:
+        ec = []
+        for c in Category.select():
+            checked = &#39;unchecked&#39;
+            if EventsCategory.select().where((EventsCategory.category == c.id) &amp; (EventsCategory.event == event_id)):
+                checked = &#39;checked&#39;
+            ec.append({&#39;title&#39;:c.title, &#39;price&#39;:c.price, &#39;checked&#39;:checked})
 
-    db.close()
+        return ec</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_events_members"><code class="name flex">
+<span>def <span class="ident">get_events_members</span></span>(<span>self, event)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_events_members(self, event):
+    return User.select().join(Team).where((User.id == Team.member) &amp; (Team.event == event))</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_events_per_user"><code class="name flex">
+<span>def <span class="ident">get_events_per_user</span></span>(<span>self, event_id=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_events_per_user(self, event_id: int=None):
+    if event_id == None:
+        return [{&#39;user&#39;:user.name, &#39;events&#39;:Team.select().where(Team.member == user).count(), &#39;checked&#39;:&#39;unchecked&#39;} for user in User.select()]
+    else:
+        epu = []
+        for u in User.select():
+            checked = &#39;unchecked&#39;
+            if Team.select().where((Team.member == u) &amp; (Team.event == event_id)):
+                checked = &#39;checked&#39;
+            epu.append({&#39;user&#39;:u.name, &#39;events&#39;:Team.select().where(Team.member == u).count(), &#39;checked&#39;:checked})
 
-    return events</code></pre>
+        return epu</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_location"><code class="name flex">
+<span>def <span class="ident">get_location</span></span>(<span>self, projection_room_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_location(self, projection_room_id: int) -&gt; str:
+    return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.get_projection_rooms"><code class="name flex">
@@ -527,11 +1001,34 @@ TODO pass the format in argument for flexibility</p></section>
     Return all projection rooms
     &#39;&#39;&#39;
 
-    db.connect()
-    proj_rooms = ProjectionRoom.select()
-    db.close()
-
-    return proj_rooms</code></pre>
+    return ProjectionRoom.select()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_seats_left"><code class="name flex">
+<span>def <span class="ident">get_seats_left</span></span>(<span>self, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_seats_left(self, event_id):
+    event = Event.get(Event.id == event_id)
+    return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.get_total_seats_for_event"><code class="name flex">
+<span>def <span class="ident">get_total_seats_for_event</span></span>(<span>self, projection_room_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_total_seats_for_event(self, projection_room_id: int) -&gt; int:
+    return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.get_users"><code class="name flex">
@@ -548,11 +1045,64 @@ TODO pass the format in argument for flexibility</p></section>
     Return all users
     &#39;&#39;&#39;
 
-    db.connect()
-    users = User.select()
-    db.close()
+    return User.select()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.go_to_show_event_page"><code class="name flex">
+<span>def <span class="ident">go_to_show_event_page</span></span>(<span>self, event_name)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def go_to_show_event_page(self, event_name: str):
+    event = Event.get(Event.name == event_name)
 
-    return users</code></pre>
+    self.frames[&#39;ShowEventPage&#39;].set_event(event)
+    self.frames[&#39;ShowEventPage&#39;].set_projection_room(event.projection_room)
+    self.frames[&#39;ShowEventPage&#39;].set_categories(event.events_categories)
+    self.frames[&#39;ShowEventPage&#39;].set_responsible(event.responsible)
+    self.frames[&#39;ShowEventPage&#39;].set_members(self.get_events_members(event))
+    self.frames[&#39;ShowEventPage&#39;].set_members(event.teams)
+    self.frames[&#39;ShowEventPage&#39;].display_events_information()
+
+    self.show_frame(&#39;ShowEventPage&#39;)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.go_to_ticket_page"><code class="name flex">
+<span>def <span class="ident">go_to_ticket_page</span></span>(<span>self, event_name)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def go_to_ticket_page(self, event_name: str):
+    event = Event.get(Event.name == event_name)
+
+    self.frames[&#39;TicketingPage&#39;].set_event(event)
+    self.frames[&#39;TicketingPage&#39;].set_projection_room(event.projection_room)
+    self.frames[&#39;TicketingPage&#39;].set_inputs()
+
+    self.show_frame(&#39;TicketingPage&#39;)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.new_event"><code class="name flex">
+<span>def <span class="ident">new_event</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def new_event(self):
+    log.info(&#39;New event&#39;)
+    self.frames[&#39;EditEventPage&#39;].set_new_mode()
+    self.show_frame(&#39;EditEventPage&#39;)</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.set_menu"><code class="name flex">
@@ -578,7 +1128,7 @@ TODO pass the format in argument for flexibility</p></section>
     if is_connected:
         pmenu.add_command(label=&#34;Timetable&#34;)
         pmenu.add_command(label=&#34;New vacation&#34;)
-        pmenu.add_command(label=&#34;Log out&#34;, command=lambda: self.show_frame(&#34;ConnectionPage&#34;))
+        pmenu.add_command(label=&#34;Log out&#34;, command=partial(self.show_frame, &#34;ConnectionPage&#34;))
         pmenu.add_separator()
 
     pmenu.add_command(label=&#34;Exit&#34;, command=self.destroy)
@@ -600,9 +1150,10 @@ TODO pass the format in argument for flexibility</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def show_frame(self, page_name):
+<pre><code class="python">def show_frame(self, page_name: str):
     &#39;&#39;&#39;Show a frame for the given page name&#39;&#39;&#39;
 
+    log.info(&#39;Go to frame %s&#39; % (page_name))
     frame = self.frames[page_name]
     frame.tkraise()
 
@@ -612,6 +1163,50 @@ TODO pass the format in argument for flexibility</p></section>
         self.set_menu(False)
     else:
         self.set_menu(True)</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.update"><code class="name flex">
+<span>def <span class="ident">update</span></span>(<span>self, event_id, event)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enter event loop until all pending events have been processed by Tcl.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update(self, event_id: int, event: dict) -&gt; int:
+    return Event.update(**event).where(Event.id == event_id).execute()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.update_event"><code class="name flex">
+<span>def <span class="ident">update_event</span></span>(<span>self, event, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_event(self, event: dict, event_id: int) -&gt; int:
+    event[&#39;projection_room&#39;] = ProjectionRoom.get(ProjectionRoom.location == event[&#39;projection_room&#39;]).id
+    event[&#39;begin&#39;] = datetime.strptime(event[&#39;begin&#39;], &#34;%Y-%m-%d %H:%M&#34;)
+    event[&#39;responsible&#39;] = self.current_user.id
+    return Event.update(**event).where(Event.id == event_id).execute()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.update_events_categories"><code class="name flex">
+<span>def <span class="ident">update_events_categories</span></span>(<span>self, cat_titles, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_events_categories(self, cat_titles: list, event_id: int):
+    log.info(&#39;Updating events categories for event %d&#39; % (event_id))
+    EventsCategory.delete().where(EventsCategory.event == event_id).execute()
+    self.create_events_categories(cat_titles, event_id)</code></pre>
 </details>
 </dd>
 <dt id="za_warudo.gui.app.App.update_events_page"><code class="name flex">
@@ -628,7 +1223,22 @@ TODO pass the format in argument for flexibility</p></section>
     Update the events displayed in the events page
     &#39;&#39;&#39;
 
-    self.frames[&#34;EventsPage&#34;].set_displayed_events()</code></pre>
+    self.frames[&#34;EventsPage&#34;].display_events()</code></pre>
+</details>
+</dd>
+<dt id="za_warudo.gui.app.App.update_team"><code class="name flex">
+<span>def <span class="ident">update_team</span></span>(<span>self, member_names, event_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_team(self, member_names: list, event_id: int):
+    log.info(&#39;Updating team for the event %d&#39; % (event_id))
+    Team.delete().where(Team.event == event_id).execute()
+    self.create_team(member_names, event_id)</code></pre>
 </details>
 </dd>
 </dl>
@@ -652,14 +1262,35 @@ TODO pass the format in argument for flexibility</p></section>
 <li>
 <h4><code><a title="za_warudo.gui.app.App" href="#za_warudo.gui.app.App">App</a></code></h4>
 <ul class="">
+<li><code><a title="za_warudo.gui.app.App.app_will_quit" href="#za_warudo.gui.app.App.app_will_quit">app_will_quit</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.check_credentials" href="#za_warudo.gui.app.App.check_credentials">check_credentials</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.create_event" href="#za_warudo.gui.app.App.create_event">create_event</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.create_events_categories" href="#za_warudo.gui.app.App.create_events_categories">create_events_categories</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.create_team" href="#za_warudo.gui.app.App.create_team">create_team</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.delete_event" href="#za_warudo.gui.app.App.delete_event">delete_event</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.edit_event" href="#za_warudo.gui.app.App.edit_event">edit_event</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_categories" href="#za_warudo.gui.app.App.get_categories">get_categories</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_categories_for_event" href="#za_warudo.gui.app.App.get_categories_for_event">get_categories_for_event</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_event_by_id" href="#za_warudo.gui.app.App.get_event_by_id">get_event_by_id</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.get_events" href="#za_warudo.gui.app.App.get_events">get_events</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_events_categories" href="#za_warudo.gui.app.App.get_events_categories">get_events_categories</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_events_members" href="#za_warudo.gui.app.App.get_events_members">get_events_members</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_events_per_user" href="#za_warudo.gui.app.App.get_events_per_user">get_events_per_user</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_location" href="#za_warudo.gui.app.App.get_location">get_location</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.get_projection_rooms" href="#za_warudo.gui.app.App.get_projection_rooms">get_projection_rooms</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_seats_left" href="#za_warudo.gui.app.App.get_seats_left">get_seats_left</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.get_total_seats_for_event" href="#za_warudo.gui.app.App.get_total_seats_for_event">get_total_seats_for_event</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.get_users" href="#za_warudo.gui.app.App.get_users">get_users</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.go_to_show_event_page" href="#za_warudo.gui.app.App.go_to_show_event_page">go_to_show_event_page</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.go_to_ticket_page" href="#za_warudo.gui.app.App.go_to_ticket_page">go_to_ticket_page</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.new_event" href="#za_warudo.gui.app.App.new_event">new_event</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.set_menu" href="#za_warudo.gui.app.App.set_menu">set_menu</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.show_frame" href="#za_warudo.gui.app.App.show_frame">show_frame</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.update" href="#za_warudo.gui.app.App.update">update</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.update_event" href="#za_warudo.gui.app.App.update_event">update_event</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.update_events_categories" href="#za_warudo.gui.app.App.update_events_categories">update_events_categories</a></code></li>
 <li><code><a title="za_warudo.gui.app.App.update_events_page" href="#za_warudo.gui.app.App.update_events_page">update_events_page</a></code></li>
+<li><code><a title="za_warudo.gui.app.App.update_team" href="#za_warudo.gui.app.App.update_team">update_team</a></code></li>
 </ul>
 </li>
 </ul>

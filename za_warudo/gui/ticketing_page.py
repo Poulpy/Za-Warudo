@@ -138,6 +138,8 @@ class TicketingPage(ttk.Frame):
         values_to_update['revenue'] = self.event.revenue + self.total_price()
 
         log.info(values_to_update)
+        self.textvar['notification'].set(str(seats_requested) + ' seats taken')
+
         self.controller.update(self.event.id, values_to_update)
         self.event = self.controller.get_event_by_id(self.event.id)
         self.display_events_seats_information()

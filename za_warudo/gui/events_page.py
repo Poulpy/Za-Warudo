@@ -106,6 +106,7 @@ class EventsPage(ttk.Frame):
 
     def edit_event(self):
         if self.event_selected != None:
+            self.event_selected = None
             log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))
             self.controller.edit_event(name=self.events_tree.item(self.event_selected)['text'])
 
@@ -124,12 +125,14 @@ class EventsPage(ttk.Frame):
     def link_to_ticketing_page(self):
         if self.event_selected != None:
             self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
+            self.event_selected = None
         else:
             log.info('No item selected')
 
     def link_to_show_page(self):
         if self.event_selected != None:
             self.controller.go_to_show_event_page(event_name=self.events_tree.item(self.event_selected)['text'])
+            self.event_selected = None
         else:
             log.info('No item selected')
 

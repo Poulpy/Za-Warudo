@@ -132,13 +132,7 @@ class EditEventPage(ttk.Frame):
         presentation_frame = ttk.Frame(self)
         presentation_check = ttk.Checkbutton(presentation_frame,
                                              text="Author presentation",
-                                             variable=self.presentation,
-                                             command=partial(self.handle_presentation_frame))
-        presentation_check.bind('<1>', self.handle_presentation_frame)
-        author_label = ttk.Label(presentation_frame, text="Author")
-        self.author_entry = ttk.Entry(presentation_frame, textvariable=self.author, state='disabled')
-        context_label = ttk.Label(presentation_frame, text="Context")
-        self.context_entry = ttk.Entry(presentation_frame, textvariable=self.context, state='disabled')
+                                             variable=self.presentation)
 
         # DEBATE
         self.debate = IntVar()
@@ -148,26 +142,7 @@ class EditEventPage(ttk.Frame):
         debate_frame = ttk.Frame(self)
         debate_check = ttk.Checkbutton(debate_frame,
                                        text="Debate",
-                                       variable=self.debate,
-                                       command=partial(self.handle_debate_frame))
-        debate_check.bind('<1>', self.handle_debate_frame)
-        speaker_label = ttk.Label(debate_frame, text="Speaker")
-        self.speaker_entry = ttk.Entry(debate_frame, textvariable=self.speaker, state='disabled')
-        contact_label = ttk.Label(debate_frame, text="Contact details")
-        self.contact_entry = ttk.Entry(debate_frame, textvariable=self.contact_details, state='disabled')
-
-        '''
-        periodicity_label = ttk.Label(self, text="Periodicity")
-        self.periodicity_choosen = StringVar()
-        periodicities = ttk.Combobox(self,
-                                     textvariable=self.periodicity_choosen,
-                                     state='readonly',
-                                     command=lambda: self.handle_periodicity_frame)
-        periodicities['values'] = ["None", "One week", "Two weeks", "One month"]
-        periodicities.current(0)
-        week_end_check = ttk.Checkbutton(self, text="Weekend included", variable=self.week_ends)
-        '''
-
+                                       variable=self.debate)
 
         # Placing the components
         # ROW 0
@@ -198,19 +173,10 @@ class EditEventPage(ttk.Frame):
         # ROW 0 RIGHT SIDE
         presentation_frame.grid(row=1, column=4, sticky=NSEW, columnspan=2, rowspan=2, pady=5, padx=5)
         presentation_check.grid(row=0, column=0, sticky=W)
-        author_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
-        self.author_entry.grid(row=1, column=1, sticky=E)
-        context_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
-        self.context_entry.grid(row=2, column=1, sticky=E)
-
 
         # ROW 3 RIGHT SIDE
         debate_frame.grid(row=3, column=4, sticky=NSEW, rowspan=2, columnspan=2, pady=5, padx=5)
         debate_check.grid(row=0, column=0, sticky=W)
-        speaker_label.grid(row=1, column=0, sticky=W, padx=(20, 0))
-        self.speaker_entry.grid(row=1, column=1, sticky=E)
-        contact_label.grid(row=2, column=0, sticky=W, padx=(20, 0))
-        self.contact_entry.grid(row=2, column=1, sticky=E)
 
         # ROW 5 RIGHT SIDE
         check_frame.grid(row=5, column=4, rowspan=2, columnspan=2, sticky=N+W, pady=5, padx=5)
@@ -229,27 +195,6 @@ class EditEventPage(ttk.Frame):
         cats_frame.grid(row=5, column=2, columnspan=2, pady=5, padx=5, sticky=NSEW)
         self.cats_tree.pack(side=LEFT, expand=True)
         cats_scrollbar.pack()
-
-
-    # 1 : unchecked
-    # 0 : checked
-    def handle_presentation_frame(self, event=None):
-        print("Value of checkbox : " + str(self.presentation.get()))
-        if self.presentation.get() == 1:
-            self.author_entry['state'] = 'disabled'
-            self.context_entry['state'] = 'disabled'
-        else:
-            self.author_entry['state'] = 'normal'
-            self.context_entry['state'] = 'normal'
-
-    def handle_debate_frame(self, event=None):
-        print("Value of checkbox : " + str(self.debate.get()))
-        if self.debate.get() == 1:
-            self.speaker_entry['state'] = 'disabled'
-            self.contact_entry['state'] = 'disabled'
-        else:
-            self.speaker_entry['state'] = 'normal'
-            self.contact_entry['state'] = 'normal'
 
     def check_missing_or_incorrect_input(self):
         '''
@@ -273,17 +218,6 @@ class EditEventPage(ttk.Frame):
             error_msg.append('Members (at least one)')
         if len(self.cats_tree.get_checked()) == 0:
             error_msg.append('Categories (at least one)')
-
-        if self.debate.get() == 1:
-            if self.speaker.get() == '':
-                error_msg.append('Speaker')
-            if self.contact_details.get() == '':
-                error_msg.append('Contact details')
-        if self.presentation.get() == 1:
-            if self.author.get() == '':
-                error_msg.append('Author')
-            if self.context.get() == '':
-                error_msg.append('Context')
 
         if len(error_msg) == 0:
             return None
@@ -342,14 +276,8 @@ class EditEventPage(ttk.Frame):
         new_event['projection_type'] = self.projection_type_choosen.get()
         new_event['projection_room'] = self.projection_room_choosen.get()
 
-        '''
-        if self.debate.get() == 1:
-            new_event['speaker'] = self.speaker.get()
-            new_event['contact_details'] = self.contact_details.get()
-        if self.presentation.get() == 1:
-            new_event['author'] = self.author.get()
-            new_event['context'] = self.context.get()
-        '''
+        new_event['debate'] = self.debate.get() == 1
+        new_event['presentation'] = self.presentation.get() == 1
 
         if self.edit_mode:
             self.controller.update_event(new_event, self.event_id)

@@ -62,7 +62,7 @@ class ShowEventPage(ttk.Frame):
         value['projection_type'].grid(row=2, column=1, padx=pad, pady=pad, sticky=E)
         label['sold_seats'].grid(row=2, column=2, padx=pad, pady=pad, sticky=W)
         value['sold_seats'].grid(row=2, column=3, padx=pad, pady=pad, sticky=W)
-        members_frame.grid(row=2, column=4, rowspan=6, padx=pad, pady=pad, sticky=NSEW)
+        members_frame.grid(row=2, column=4, rowspan=9, padx=pad, pady=pad, sticky=NSEW)
 
         label['location'].grid(row=3, column=0, padx=pad, pady=pad, sticky=W)
         value['location'].grid(row=3, column=1, padx=pad, pady=pad, sticky=E)

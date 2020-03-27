@@ -245,12 +245,14 @@ class App(Tk):
 
     def update_team(self, member_names, event_id):
         log.info('Updating team for the event %d' % (event_id))
-        Team.delete().where(Team.event == event_id)
+        print(Team.delete().where(Team.event == event_id).execute())
         self.create_team(member_names, event_id)
 
     def update_events_categories(self, cat_titles, event_id):
         log.info('Updating events categories for event %d' % (event_id))
-        EventsCategory.delete().where(EventsCategory.event == event_id)
+        #print('Rows deleted : %d' % (EventsCategory.delete().where(EventsCategory.event == event_id).execute()))
+        #print(EventsCategory.select().where(EventsCategory.event == event_id))
+        EventsCategory.select().where(EventsCategory.event == event_id)
         self.create_events_categories(cat_titles, event_id)
 
     def create_team(self, member_names, event_id):

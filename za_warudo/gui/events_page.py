@@ -92,17 +92,17 @@ class EventsPage(ttk.Frame):
         events = self.controller.get_events(self.date_text.get())
         self.events_tree.delete(*self.events_tree.get_children())
 
-        for i, event in enumerate(events.dicts()):
+        for i, event in enumerate(events):
             if i % 2 == 0:
                 tag = 'odd'
             else:
                 tag = 'even'
-            values = (event['begin'].strftime("%H:%M"),
-                      (event['begin'] + timedelta(minutes=event['running_time'])).strftime("%H:%M"),
-                      event['projection_type'],
-                      self.controller.get_location(event['projection_room']),
-                      self.controller.get_seats_left(event['id']))
-            self.events_tree.insert("", 'end', text=event['name'], values=values, tags=(tag))
+            values = (event.begin.strftime("%H:%M"),
+                      (event.begin + timedelta(minutes=event.running_time)).strftime("%H:%M"),
+                      event.projection_type,
+                      self.controller.get_location(event.projection_room),
+                      self.controller.get_seats_left(event.id))
+            self.events_tree.insert("", 'end', text=event.name, values=values, tags=(tag))
 
     def edit_event(self):
         if self.event_selected != None:

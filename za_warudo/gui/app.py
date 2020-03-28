@@ -12,6 +12,7 @@ from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
 from gui.show_event_page import ShowEventPage
 from gui.ticketing_page import TicketingPage
+from gui.timetable_page import TimetablePage
 from models.category import Category
 from models.event import Event
 from models.events_category import EventsCategory
@@ -108,7 +109,7 @@ class App(Tk):
         help_menu = Menu(menubar, tearoff=0)
 
         if is_connected:
-            pmenu.add_command(label="Timetable")
+            pmenu.add_command(label="Timetable", command=partial(self.pop_timetable, self.current_user.name))
             pmenu.add_command(label="New vacation")
             pmenu.add_command(label="Log out", command=partial(self.show_frame, "ConnectionPage"))
             pmenu.add_separator()
@@ -237,7 +238,7 @@ class App(Tk):
         '''
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
-        event['responsible'] = self.current_user.id
+        event['manager'] = self.current_user.id
         event_created = Event.create(**event)
 
         return event_created.id
@@ -245,7 +246,7 @@ class App(Tk):
     def update_event(self, event: dict, event_id: int) -> int:
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
-        event['responsible'] = self.current_user.id
+        event['manager'] = self.current_user.id
         return Event.update(**event).where(Event.id == event_id).execute()
 
     def update(self, event_id: int, event: dict) -> int:
@@ -306,7 +307,7 @@ class App(Tk):
         self.frames['ShowEventPage'].set_event(event)
         self.frames['ShowEventPage'].set_projection_room(event.projection_room)
         self.frames['ShowEventPage'].set_categories(event.events_categories)
-        self.frames['ShowEventPage'].set_responsible(event.responsible)
+        self.frames['ShowEventPage'].set_manager(event.manager)
         self.frames['ShowEventPage'].set_members(self.get_events_members(event))
         self.frames['ShowEventPage'].set_members(event.teams)
         self.frames['ShowEventPage'].display_events_information()
@@ -328,6 +329,40 @@ class App(Tk):
     def get_categories_for_event(self, event) -> list:
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
+
+    def has_permission_to_delete(self, event_name: str) -> bool:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return self.current_user == event.manager
+
+    def get_events_status(self, event_name: str) -> str:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return event.status
+
+    def has_permission_to_edit(self, event_name: str) -> bool:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return (Team.select().where((Team.member == self.current_user) & (Team.event == event)).count() == 1
+               or self.current_user == event.manager)
+
+    def pop_timetable(self, user_name: str):
+        top = Toplevel(self)
+        top.geometry('400x300')
+        top.title('Timetable : ' + user_name)
+
+        user = User.get(User.name == user_name)
+        events = self.get_events_for_member(user)
+        timetable = TimetablePage(top, events)
+        timetable.pack(fill=BOTH, expand=True)
+
+
+    def get_events_for_member(self, user: User) -> list:
+        teams = Team.select().where(Team.member == user)
+        return [Event.get(Event.id == team.event) for team in teams]
 
 
     def app_will_quit(self):

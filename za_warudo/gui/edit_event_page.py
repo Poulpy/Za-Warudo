@@ -94,12 +94,12 @@ class EditEventPage(ttk.Frame):
         members_frame = ttk.Frame(self)
         members_label = ttk.Label(self, text="Add members")
         members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
-        # List of users; the responsible has to choose among them
+        # List of users; the manager has to choose among them
         # members that'll participate in the event's organisation
         self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
         members_scrollbar.configure(command=self.members_tree.yview)
 
-        self.members_tree.column("Events")#, width=50)
+        self.members_tree.column("Events", anchor='center')#, width=50)
         self.members_tree.heading("#0", text="Name")
         self.members_tree.heading("Events", text="Events")
 
@@ -224,6 +224,10 @@ class EditEventPage(ttk.Frame):
         else:
             return ' '.join(['Missing or incorrect fields :', ', '.join(error_msg)])
 
+    def is_event_finished(self) -> bool:
+        return (self.room_reserved.get() == 1 and self.management.get() == 1
+                and self.equipment_reserved.get() == 1 and self.guest_attendance.get() == 1)
+
     def save(self, event=None):
         '''
         Get all the datas from the form to create an
@@ -268,6 +272,8 @@ class EditEventPage(ttk.Frame):
         new_event['presentation'] = self.presentation.get() == 1
 
         if self.edit_mode:
+            if self.event.status == 'in progress' and self.is_event_finished():
+                new_event['status'] = 'finished'
             self.controller.update_event(new_event, self.event_id)
             self.controller.update_team(member_names, self.event_id)
             self.controller.update_events_categories(cat_titles, self.event_id)

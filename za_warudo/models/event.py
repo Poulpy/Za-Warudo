@@ -26,7 +26,7 @@ class Event(Model):
     debate = BooleanField(default = False)
     presentation = BooleanField(default = False)
 
-    responsible = ForeignKeyField(User, backref="events")
+    manager = ForeignKeyField(User, backref="events")
     projection_room = ForeignKeyField(ProjectionRoom, backref="events")
 
     class Meta:

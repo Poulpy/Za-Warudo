@@ -23,7 +23,8 @@ class ShowEventPage(ttk.Frame):
         pad = 10
         mut_labels = ('name', 'projection_type', 'location',
                       'date', 'seats_left', 'sold_seats',
-                      'booked_seats', 'responsible')
+                      'booked_seats', 'manager', 'status', 'debate',
+                      'presentation')
 
         label = dict()
         self.textvar = dict()
@@ -85,8 +86,16 @@ class ShowEventPage(ttk.Frame):
 
         label['date'].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
         value['date'].grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
-        label['responsible'].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
-        value['responsible'].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
+        label['manager'].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
+        value['manager'].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
+
+        label['debate'].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
+        value['debate'].grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
+        label['status'].grid(row=5, column=2, padx=pad, pady=pad, sticky=W)
+        value['status'].grid(row=5, column=3, padx=pad, pady=pad, sticky=W)
+
+        label['presentation'].grid(row=6, column=0, padx=pad, pady=pad, sticky=W)
+        value['presentation'].grid(row=6, column=1, padx=pad, pady=pad, sticky=E)
 
     def display_events_information(self):
         # day-month-year begin_hour - end_hour
@@ -97,6 +106,15 @@ class ShowEventPage(ttk.Frame):
         seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
         seats_left += ' / ' + str(self.projection_room.total_seats)
         revenue = str(self.event.revenue) + ' €'
+        if self.event.debate:
+            debate = 'Yes'
+        else:
+            debate = 'No'
+        if self.event.presentation:
+            presentation = 'Yes'
+        else:
+            presentation = 'No'
+
         self.textvar['name'].set(self.event.name)
         self.textvar['projection_type'].set(self.event.projection_type)
         self.textvar['location'].set(self.projection_room.location)
@@ -104,11 +122,12 @@ class ShowEventPage(ttk.Frame):
         self.textvar['seats_left'].set(seats_left)
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
-        self.textvar['responsible'].set(self.responsible.name)
+        self.textvar['manager'].set(self.manager.name)
+        self.textvar['debate'].set(debate)
+        self.textvar['presentation'].set(presentation)
+        self.textvar['status'].set(self.event.status.capitalize())
         self.display_members()
         self.display_pricelist()
-        #print(self.members)
-
 
     def timetable(self):
         pass
@@ -128,14 +147,8 @@ class ShowEventPage(ttk.Frame):
     def display_members(self):
         self.members_tree.delete(*self.members_tree.get_children())
 
-        #print('Members')
-        #print(len(self.members))
         for i, team in enumerate(self.members):
-            #log.info('iid : %d, member : %s' % (i, team.member.name))
             self.members_tree.insert('', 'end', iid=str(i), text=team.member.name, tags=('even' if i % 2 else 'odd',))
-
-    def display_event_information(self):
-        pass
 
     def set_event(self, event):
         self.event = event
@@ -146,8 +159,8 @@ class ShowEventPage(ttk.Frame):
     def set_categories(self, categories):
         self.categories = categories
 
-    def set_responsible(self, responsible):
-        self.responsible = responsible
+    def set_manager(self, manager):
+        self.manager = manager
 
     def set_members(self, members):
         self.members = members

@@ -13,12 +13,14 @@ from gui.events_page import EventsPage
 from gui.show_event_page import ShowEventPage
 from gui.ticketing_page import TicketingPage
 from gui.timetable_page import TimetablePage
+from gui.new_vacation_page import NewVacationPage
 from models.category import Category
 from models.event import Event
 from models.events_category import EventsCategory
 from models.projection_room import ProjectionRoom
 from models.team import Team
 from models.user import User
+from models.vacation import Vacation
 
 db = SqliteDatabase("db/app.db")
 
@@ -110,7 +112,7 @@ class App(Tk):
 
         if is_connected:
             pmenu.add_command(label="Timetable", command=partial(self.pop_timetable, self.current_user.name))
-            pmenu.add_command(label="New vacation")
+            pmenu.add_command(label="New vacation", command=self.pop_vacation_page)
             pmenu.add_command(label="Log out", command=partial(self.show_frame, "ConnectionPage"))
             pmenu.add_separator()
 
@@ -364,6 +366,17 @@ class App(Tk):
         teams = Team.select().where(Team.member == user)
         return [Event.get(Event.id == team.event) for team in teams]
 
+    def pop_vacation_page(self):
+        top = Toplevel(self)
+        top.geometry('500x300')
+        top.title('New Vacation')
+
+        vacation_form = NewVacationPage(top, self)
+        vacation_form.pack(fill=BOTH, expand=True)
+
+    def new_vacation(self, vacation: dict):
+        vacation['user'] = self.current_user
+        Vacation.create(**vacation)
 
     def app_will_quit(self):
         log.info('Application will terminate')

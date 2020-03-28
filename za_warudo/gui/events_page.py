@@ -112,7 +112,7 @@ class EventsPage(ttk.Frame):
 
     def edit_event(self):
         if self.event_selected != None:
-            if self.controller.has_permission_to_edit(self.event_name):
+            if self.controller.has_permission_to_edit(self.event_name) and self.controller.get_events_status(self.event_name) != 'finished':
                 log.info('Edit of event %s' % (self.event_name))
                 self.controller.edit_event(name=self.event_name)
             else:

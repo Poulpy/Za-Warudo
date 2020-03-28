@@ -23,7 +23,8 @@ class ShowEventPage(ttk.Frame):
         pad = 10
         mut_labels = ('name', 'projection_type', 'location',
                       'date', 'seats_left', 'sold_seats',
-                      'booked_seats', 'manager')
+                      'booked_seats', 'manager', 'status', 'debate',
+                      'presentation')
 
         label = dict()
         self.textvar = dict()
@@ -88,6 +89,14 @@ class ShowEventPage(ttk.Frame):
         label['manager'].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
         value['manager'].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
 
+        label['debate'].grid(row=5, column=0, padx=pad, pady=pad, sticky=W)
+        value['debate'].grid(row=5, column=1, padx=pad, pady=pad, sticky=E)
+        label['status'].grid(row=5, column=2, padx=pad, pady=pad, sticky=W)
+        value['status'].grid(row=5, column=3, padx=pad, pady=pad, sticky=W)
+
+        label['presentation'].grid(row=6, column=0, padx=pad, pady=pad, sticky=W)
+        value['presentation'].grid(row=6, column=1, padx=pad, pady=pad, sticky=E)
+
     def display_events_information(self):
         # day-month-year begin_hour - end_hour
         date = self.event.begin.strftime("%d-%m-%Y %H")
@@ -97,6 +106,15 @@ class ShowEventPage(ttk.Frame):
         seats_left = str(self.projection_room.total_seats - self.event.booked_seats - self.event.sold_seats)
         seats_left += ' / ' + str(self.projection_room.total_seats)
         revenue = str(self.event.revenue) + ' €'
+        if self.event.debate:
+            debate = 'Yes'
+        else:
+            debate = 'No'
+        if self.event.presentation:
+            presentation = 'Yes'
+        else:
+            presentation = 'No'
+
         self.textvar['name'].set(self.event.name)
         self.textvar['projection_type'].set(self.event.projection_type)
         self.textvar['location'].set(self.projection_room.location)
@@ -105,6 +123,9 @@ class ShowEventPage(ttk.Frame):
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
         self.textvar['manager'].set(self.manager.name)
+        self.textvar['debate'].set(debate)
+        self.textvar['presentation'].set(presentation)
+        self.textvar['status'].set(self.event.status.capitalize())
         self.display_members()
         self.display_pricelist()
         #print(self.members)

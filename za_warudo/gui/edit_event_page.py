@@ -99,7 +99,7 @@ class EditEventPage(ttk.Frame):
         self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
         members_scrollbar.configure(command=self.members_tree.yview)
 
-        self.members_tree.column("Events")#, width=50)
+        self.members_tree.column("Events", anchor='center')#, width=50)
         self.members_tree.heading("#0", text="Name")
         self.members_tree.heading("Events", text="Events")
 

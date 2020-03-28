@@ -335,6 +335,11 @@ class App(Tk):
 
         return self.current_user == event.manager
 
+    def get_events_status(self, event_name: str) -> str:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return event.status
 
     def has_permission_to_edit(self, event_name: str) -> bool:
         event = Event.get(Event.name == event_name)

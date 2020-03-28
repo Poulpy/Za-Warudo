@@ -329,6 +329,18 @@ class App(Tk):
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
 
+    def has_permission_to_delete(self, event_name: str) -> bool:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return self.current_user == event.responsible
+
+
+    def check_permission_to_edit(self, event_name: str) -> bool:
+        event = Event.get(Event.name == event_name)
+        if event == None: return False
+
+        return Team.select().where((Team.member == self.current_user) & (Team.event == event)).count() == 1
 
     def app_will_quit(self):
         log.info('Application will terminate')

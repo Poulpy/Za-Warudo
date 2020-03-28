@@ -26,8 +26,11 @@ class EventsPage(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
         self.event_selected = None
+        pad = 5
 
+        self.notification_text = StringVar()
         title = ttk.Label(self, text="Events", font=("TkDefaultFont", "15"))
+        notification = ttk.Label(self, textvariable=self.notification_text)
 
         # Creation of of an event : clicking on that button
         # will redirect the user on the edit event frame
@@ -79,10 +82,13 @@ class EventsPage(ttk.Frame):
         delete_button.grid(row=4, column=1, sticky=(W+E), pady=5, padx=5)
         ticket_button.grid(row=5, column=1, sticky=(W+E), pady=5, padx=5)
 
+        notification.grid(row=6, column=0, columnspan=2, sticky=W, padx=pad, pady=pad)
+
         self.grid_columnconfigure(0, weight=2)
 
     def select_event(self, event=None):
         self.event_selected = event.widget.selection()
+        self.event_name = self.events_tree.item(self.event_selected)['text']
 
     def display_events(self):
         '''
@@ -106,27 +112,36 @@ class EventsPage(ttk.Frame):
 
     def edit_event(self):
         if self.event_selected != None:
-            log.info('Edit of event %s' % (self.events_tree.item(self.event_selected)['text']))
-            self.controller.edit_event(name=self.events_tree.item(self.event_selected)['text'])
+            if self.controller.check_permission_to_edit(self.event_name):
+                log.info('Edit of event %s' % (self.event_name))
+                self.controller.edit_event(name=self.event_name)
+            else:
+                self.notification_text.set("You don't have the permission to edit this event")
             self.event_selected = None
+        else:
+            self.notification_text.set('No event selected')
 
     def confirm_delete(self):
         '''
         Pop up window to confirm an event deletion
         '''
         if self.event_selected != None:
-            log.info('Confirm delete of event %s' % (self.events_tree.item(self.event_selected)['text']))
-            rst = messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
-            print(rst)
-            if rst == 'yes':
-                print(self.controller.delete_event(event_name=self.events_tree.item(self.event_selected)['text']))
-                self.controller.update_events_page()
+            if self.controller.has_permission_to_delete(self.event_name):
+                log.info('Confirm delete of event %s' % (self.events_tree.item(self.event_selected)['text']))
+                rst = messagebox.askquestion("Confirm", "Are you sure you want to delete this event ?")
+                if rst == 'yes':
+                    self.controller.update_events_page()
+            else:
+                self.notification_text.set("You don't have the permission to delete this event. Please contact the manager")
+        else:
+            self.notification_text.set('No event selected')
 
     def link_to_ticketing_page(self):
         if self.event_selected != None:
             self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
             self.event_selected = None
         else:
+            self.notification_text.set('No event selected')
             log.info('No item selected')
 
     def link_to_show_page(self):
@@ -134,6 +149,7 @@ class EventsPage(ttk.Frame):
             self.controller.go_to_show_event_page(event_name=self.events_tree.item(self.event_selected)['text'])
             self.event_selected = None
         else:
+            self.notification_text.set('No event selected')
             log.info('No item selected')
 
 

@@ -23,7 +23,7 @@ class ShowEventPage(ttk.Frame):
         pad = 10
         mut_labels = ('name', 'projection_type', 'location',
                       'date', 'seats_left', 'sold_seats',
-                      'booked_seats', 'responsible')
+                      'booked_seats', 'manager')
 
         label = dict()
         self.textvar = dict()
@@ -85,8 +85,8 @@ class ShowEventPage(ttk.Frame):
 
         label['date'].grid(row=4, column=0, padx=pad, pady=pad, sticky=W)
         value['date'].grid(row=4, column=1, padx=pad, pady=pad, sticky=E)
-        label['responsible'].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
-        value['responsible'].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
+        label['manager'].grid(row=4, column=2, padx=pad, pady=pad, sticky=W)
+        value['manager'].grid(row=4, column=3, padx=pad, pady=pad, sticky=W)
 
     def display_events_information(self):
         # day-month-year begin_hour - end_hour
@@ -104,7 +104,7 @@ class ShowEventPage(ttk.Frame):
         self.textvar['seats_left'].set(seats_left)
         self.textvar['sold_seats'].set(self.event.sold_seats)
         self.textvar['booked_seats'].set(self.event.booked_seats)
-        self.textvar['responsible'].set(self.responsible.name)
+        self.textvar['manager'].set(self.manager.name)
         self.display_members()
         self.display_pricelist()
         #print(self.members)
@@ -146,8 +146,8 @@ class ShowEventPage(ttk.Frame):
     def set_categories(self, categories):
         self.categories = categories
 
-    def set_responsible(self, responsible):
-        self.responsible = responsible
+    def set_manager(self, manager):
+        self.manager = manager
 
     def set_members(self, members):
         self.members = members

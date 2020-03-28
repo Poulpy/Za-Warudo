@@ -112,12 +112,11 @@ class EventsPage(ttk.Frame):
 
     def edit_event(self):
         if self.event_selected != None:
-            if self.controller.check_permission_to_edit(self.event_name):
+            if self.controller.has_permission_to_edit(self.event_name):
                 log.info('Edit of event %s' % (self.event_name))
                 self.controller.edit_event(name=self.event_name)
             else:
                 self.notification_text.set("You don't have the permission to edit this event")
-            self.event_selected = None
         else:
             self.notification_text.set('No event selected')
 
@@ -138,8 +137,10 @@ class EventsPage(ttk.Frame):
 
     def link_to_ticketing_page(self):
         if self.event_selected != None:
-            self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
-            self.event_selected = None
+            if self.controller.has_permission_to_edit(self.event_name):
+                self.controller.go_to_ticket_page(event_name=self.events_tree.item(self.event_selected)['text'])
+            else:
+                self.notification_text.set("You don't have the permission to edit this event")
         else:
             self.notification_text.set('No event selected')
             log.info('No item selected')
@@ -147,7 +148,6 @@ class EventsPage(ttk.Frame):
     def link_to_show_page(self):
         if self.event_selected != None:
             self.controller.go_to_show_event_page(event_name=self.events_tree.item(self.event_selected)['text'])
-            self.event_selected = None
         else:
             self.notification_text.set('No event selected')
             log.info('No item selected')

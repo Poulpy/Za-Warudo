@@ -237,7 +237,7 @@ class App(Tk):
         '''
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
-        event['responsible'] = self.current_user.id
+        event['manager'] = self.current_user.id
         event_created = Event.create(**event)
 
         return event_created.id
@@ -245,7 +245,7 @@ class App(Tk):
     def update_event(self, event: dict, event_id: int) -> int:
         event['projection_room'] = ProjectionRoom.get(ProjectionRoom.location == event['projection_room']).id
         event['begin'] = datetime.strptime(event['begin'], "%Y-%m-%d %H:%M")
-        event['responsible'] = self.current_user.id
+        event['manager'] = self.current_user.id
         return Event.update(**event).where(Event.id == event_id).execute()
 
     def update(self, event_id: int, event: dict) -> int:
@@ -306,7 +306,7 @@ class App(Tk):
         self.frames['ShowEventPage'].set_event(event)
         self.frames['ShowEventPage'].set_projection_room(event.projection_room)
         self.frames['ShowEventPage'].set_categories(event.events_categories)
-        self.frames['ShowEventPage'].set_responsible(event.responsible)
+        self.frames['ShowEventPage'].set_manager(event.manager)
         self.frames['ShowEventPage'].set_members(self.get_events_members(event))
         self.frames['ShowEventPage'].set_members(event.teams)
         self.frames['ShowEventPage'].display_events_information()
@@ -333,14 +333,15 @@ class App(Tk):
         event = Event.get(Event.name == event_name)
         if event == None: return False
 
-        return self.current_user == event.responsible
+        return self.current_user == event.manager
 
 
-    def check_permission_to_edit(self, event_name: str) -> bool:
+    def has_permission_to_edit(self, event_name: str) -> bool:
         event = Event.get(Event.name == event_name)
         if event == None: return False
 
-        return Team.select().where((Team.member == self.current_user) & (Team.event == event)).count() == 1
+        return (Team.select().where((Team.member == self.current_user) & (Team.event == event)).count() == 1
+               or self.current_user == event.manager)
 
     def app_will_quit(self):
         log.info('Application will terminate')

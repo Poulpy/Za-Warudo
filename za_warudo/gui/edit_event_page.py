@@ -94,7 +94,7 @@ class EditEventPage(ttk.Frame):
         members_frame = ttk.Frame(self)
         members_label = ttk.Label(self, text="Add members")
         members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
-        # List of users; the responsible has to choose among them
+        # List of users; the manager has to choose among them
         # members that'll participate in the event's organisation
         self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
         members_scrollbar.configure(command=self.members_tree.yview)

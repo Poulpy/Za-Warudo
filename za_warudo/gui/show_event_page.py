@@ -5,6 +5,8 @@ from tkinter import *
 from tkinter import ttk
 import logging as log
 
+from ttkwidgets.frames import Balloon
+
 class ShowEventPage(ttk.Frame):
     '''
     Page showing details about and event
@@ -49,6 +51,8 @@ class ShowEventPage(ttk.Frame):
         members_scrollbar.configure(command=self.members_tree.yview)
         self.members_tree.pack(side=LEFT)
         members_scrollbar.pack()
+        Balloon(label['members'], text='Double click on users to see their timetable')
+        Balloon(self.members_tree, text='Double click on users to see their timetable')
 
         label['pricelist'] = ttk.Label(self, text="Price list")
         pricelist_scrollbar = ttk.Scrollbar(pricelist_frame, orient=VERTICAL)

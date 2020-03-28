@@ -1,14 +1,35 @@
+# Za Warudo
+
+Application for managing cinema club events.
+- Create events
+- Edit events
+- Delete events
+- See the timetable of users (events + vacations)
+- Manage vacations
+- Manage the ticketing of events
+
+
+
+## Install and run the application
+
+```
+pip install -r requirements.txt
+python3 za_warudo/seed.py seed
+python3 za_warudo
+```
+
+
 ### Manipulate the database
 
 ```bash
 # Seed the database
-python3 src/seed.py seed
+python3 za_warudo/seed.py seed
 # Droping the database ~ rm db/app.db
-python3 src/seed.py drop
+python3 za_warudo/seed.py drop
 # All tuples in the database
-python3 src/seed.py select
+python3 za_warudo/seed.py select
 # Some info about the tables
-python3 src/seed.py desc
+python3 za_warudo/seed.py desc
 ```
 
 
@@ -57,8 +78,6 @@ add the following lines:
 
 - unit testing tkinter
 - clean inputs after an edit or a new
-- details frame
-- ticketing frame
 
 
 

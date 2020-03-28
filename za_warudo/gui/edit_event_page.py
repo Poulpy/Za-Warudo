@@ -105,6 +105,8 @@ class EditEventPage(ttk.Frame):
 
         self.members_tree.tag_configure('odd', background="#F0F0F0")
         self.members_tree.tag_configure('even', background="#FAFAFA")
+        tkw.frames.Balloon(self.members_tree, text='Double click on users to see their timetable')
+        self.members_tree.bind('<Double-1>', self.timetable)
         self.display_members(event_id=None)
 
         # CATEGORIES
@@ -346,6 +348,13 @@ class EditEventPage(ttk.Frame):
             s = '%d%s' % (category['price'], ' €')
             self.cats_tree.insert('', 'end', iid=str(i), text=category['title'], tags=('even' if i % 2 else 'odd',), values=(s,))
             self.cats_tree.change_state(str(i), category['checked'])
+
+    def timetable(self, event=None):
+        item = self.members_tree.selection()[0]
+        user_name = self.members_tree.item(item, 'text')
+        print(user_name)
+        self.controller.pop_timetable(user_name)
+
 
     def set_edit_mode(self):
         self.edit_mode = True

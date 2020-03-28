@@ -45,6 +45,7 @@ class ShowEventPage(ttk.Frame):
         label['members'] = ttk.Label(self, text="Members")
         members_scrollbar = ttk.Scrollbar(members_frame, orient=VERTICAL)
         self.members_tree = ttk.Treeview(members_frame, selectmode='browse', yscrollcommand=members_scrollbar.set)
+        self.members_tree.bind('<Double-1>', self.timetable)
         self.members_tree.heading("#0", text="Name")
         self.members_tree.tag_configure('odd', background="#F0F0F0")
         self.members_tree.tag_configure('even', background="#FAFAFA")
@@ -133,8 +134,11 @@ class ShowEventPage(ttk.Frame):
         self.display_members()
         self.display_pricelist()
 
-    def timetable(self):
-        pass
+    def timetable(self, event=None):
+        item = self.members_tree.selection()[0]
+        user_name = self.members_tree.item(item, 'text')
+        print(user_name)
+        self.controller.pop_timetable(user_name)
 
     def back(self):
         self.controller.show_frame('EventsPage')

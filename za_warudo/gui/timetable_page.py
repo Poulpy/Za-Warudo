@@ -17,7 +17,7 @@ class TimetablePage(ttk.Frame):
         self.events = events
 
         self.events_tree = ttk.Treeview(self, columns=('Date', 'Begin', 'End'), selectmode='none')
-        self.events_tree.column("Date", width=60, anchor='center')
+        self.events_tree.column("Date", width=70, anchor='center')
         self.events_tree.column("Begin", width=50, anchor='center')
         self.events_tree.column("End", width=50, anchor='center')
         self.events_tree.heading("#0", text="Name")

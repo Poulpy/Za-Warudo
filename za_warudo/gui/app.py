@@ -351,7 +351,7 @@ class App(Tk):
 
     def pop_timetable(self, user_name: str):
         top = Toplevel(self)
-        top.geometry('400x300')
+        top.geometry('500x300')
         top.title('Timetable : ' + user_name)
 
         user = User.get(User.name == user_name)

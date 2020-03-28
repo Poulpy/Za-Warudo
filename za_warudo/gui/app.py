@@ -12,6 +12,7 @@ from gui.edit_event_page import EditEventPage
 from gui.events_page import EventsPage
 from gui.show_event_page import ShowEventPage
 from gui.ticketing_page import TicketingPage
+from gui.timetable_page import TimetablePage
 from models.category import Category
 from models.event import Event
 from models.events_category import EventsCategory
@@ -108,7 +109,7 @@ class App(Tk):
         help_menu = Menu(menubar, tearoff=0)
 
         if is_connected:
-            pmenu.add_command(label="Timetable")
+            pmenu.add_command(label="Timetable", command=partial(self.pop_timetable, self.current_user.name))
             pmenu.add_command(label="New vacation")
             pmenu.add_command(label="Log out", command=partial(self.show_frame, "ConnectionPage"))
             pmenu.add_separator()
@@ -347,6 +348,22 @@ class App(Tk):
 
         return (Team.select().where((Team.member == self.current_user) & (Team.event == event)).count() == 1
                or self.current_user == event.manager)
+
+    def pop_timetable(self, user_name: str):
+        top = Toplevel(self)
+        top.geometry('400x300')
+        top.title('Timetable : ' + user_name)
+
+        user = User.get(User.name == user_name)
+        events = self.get_events_for_member(user)
+        timetable = TimetablePage(top, events)
+        timetable.pack(fill=BOTH, expand=True)
+
+
+    def get_events_for_member(self, user: User) -> list:
+        teams = Team.select().where(Team.member == user)
+        return [Event.get(Event.id == team.event) for team in teams]
+
 
     def app_will_quit(self):
         log.info('Application will terminate')

@@ -128,8 +128,6 @@ class ShowEventPage(ttk.Frame):
         self.textvar['status'].set(self.event.status.capitalize())
         self.display_members()
         self.display_pricelist()
-        #print(self.members)
-
 
     def timetable(self):
         pass
@@ -149,14 +147,8 @@ class ShowEventPage(ttk.Frame):
     def display_members(self):
         self.members_tree.delete(*self.members_tree.get_children())
 
-        #print('Members')
-        #print(len(self.members))
         for i, team in enumerate(self.members):
-            #log.info('iid : %d, member : %s' % (i, team.member.name))
             self.members_tree.insert('', 'end', iid=str(i), text=team.member.name, tags=('even' if i % 2 else 'odd',))
-
-    def display_event_information(self):
-        pass
 
     def set_event(self, event):
         self.event = event

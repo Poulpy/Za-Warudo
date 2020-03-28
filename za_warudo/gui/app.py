@@ -1,5 +1,6 @@
 from functools import partial
 from datetime import datetime
+from datetime import timedelta
 from tkinter import *
 from tkinter import ttk
 import logging as log
@@ -357,10 +358,31 @@ class App(Tk):
         top.title('Timetable of ' + user_name)
 
         user = User.get(User.name == user_name)
-        events = self.get_events_for_member(user)
-        timetable = TimetablePage(top, events)
+        rst = []
+
+        # We add the events to the timetable
+        for event in self.get_events_for_member(user):
+            begin = event.begin.strftime("%d/%m/%Y")
+            end = (event.begin + timedelta(minutes=event.running_time)).strftime("%d/%m/%Y")
+            rst.append({'name':'Event ' + event.name, 'begin':begin, 'end':end})
+
+        # Then the vacations
+        for vacation in self.get_vacations_for_user(user):
+            begin = vacation.begin.strftime("%d/%m/%Y")
+            end = vacation.end.strftime("%d/%m/%Y")
+            rst.append({'name':'Vacation ' + vacation.reason, 'begin':begin, 'end':end})
+
+        print(rst)
+        rst.sort(key=lambda i: datetime.strptime(i['begin'], '%d/%m/%Y').day)
+        print(rst)
+
+        timetable = TimetablePage(top, rst)
         timetable.pack(fill=BOTH, expand=True)
 
+
+
+    def get_vacations_for_user(self, user: User) -> list:
+        return Vacation.select().where(Vacation.user == user)
 
     def get_events_for_member(self, user: User) -> list:
         teams = Team.select().where(Team.member == user)

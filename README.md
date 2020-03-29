@@ -10,6 +10,7 @@ Application for managing cinema club events.
 
 
 
+
 ## Install and run the application
 
 ```
@@ -17,6 +18,10 @@ pip install -r requirements.txt
 python3 za_warudo/seed.py seed
 python3 za_warudo
 ```
+
+login: admin
+
+password: admin
 
 
 ### Manipulate the database
@@ -73,6 +78,9 @@ add the following lines:
             -background [list selected $colors(-selectbg)] \
             -foreground [list selected $colors(-selectfg)]
 ```
+### Troubleshooting
+
+If the application doesn't work properly, see the logs !
 
 ### TODO
 

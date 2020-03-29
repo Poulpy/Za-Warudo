@@ -3,7 +3,7 @@ import logging as log
 import os
 import sys
 
-from peewee import SqliteDatabase
+from peewee import SqliteDatabase, OperationalError
 from playhouse.reflection import print_table_sql
 
 from models.user import User
@@ -20,16 +20,29 @@ db = SqliteDatabase("db/app.db")
 # the database
 SEED_FILES_DIR = "db/seed_files/"
 
+HELP_MSG = ('python3 za_warudo/seed.py [option]\n'
+            'Options:\n'
+            '\tseed\tcreate the tables and seed the database\n'
+            '\tdrop\tdelete all tables\n'
+            '\tselect\tsee all datas inside the database\n'
+            '\tdesc\tsee information about the fields of all tables')
+
 # All the models/tables of the database
 # TODO make it dynamic by putting the models in a package/module
 MODELS = (User, ProjectionRoom, Team, Event, Category,
           EventsCategory, Vacation)
 
+# Dict containing table names as keys and their class model as value
+TABLE_TO_MODEL = {'users': User, 'projection_rooms': ProjectionRoom,
+                  'teams': Team, 'categories': Category,
+                  'events': Event, 'events_categories': EventsCategory,
+                  'vacations': Vacation}
+
 
 def get_class(kls):
     '''
-    module, klass = kls.split('.')
-    return getattr(__import__(module), klass)
+    Return the class of a string
+    'models.user.User' returns models.user.User
     '''
     parts = kls.split('.')
     module = ".".join(parts[:-1])
@@ -55,6 +68,7 @@ def seed():
     log.info("Tables created")
     log.info("Seeding...")
 
+    # The field is_admin is useless... for now
     User.create(name="Admin", login="admin", password="admin", is_admin=True)
 
     for root, dirs, files in os.walk(SEED_FILES_DIR):
@@ -109,31 +123,59 @@ def desc():
 
     db.close()
 
-def select():
+def select_all():
     '''
     Show all datas stored in the database
-    TODO accept argument for specific table
     '''
 
-    db.connect()
+    try:
+        db.connect()
 
-    for table in MODELS:
-        for i in table.select().dicts():
+        for table in MODELS:
+            for i in table.select().dicts():
+                print(i)
+
+        db.close()
+    except OperationalError:
+        log.info('Could not select: database not created')
+
+def select(table: str):
+    '''
+    Show data for a specific table
+    '''
+    if table not in TABLE_TO_MODEL:
+        log.info('Wrong table name.')
+        log.info(list(TABLE_TO_MODEL))
+        return
+
+    try:
+        db.connect()
+
+        for i in TABLE_TO_MODEL[table].select().dicts():
             print(i)
 
-    db.close()
+        db.close()
+    except OperationalError:
+        log.info('Could not select: database not created')
+
+
 
 if __name__ == "__main__":
     log.basicConfig(filename="log/seed.txt", level=log.INFO)
     log.getLogger().addHandler(log.StreamHandler(sys.stdout))
 
-    if len(sys.argv) > 0:
+    if len(sys.argv) == 1:
+        log.info(HELP_MSG)
+    elif len(sys.argv) == 2:
         if sys.argv[1] == "seed":
             seed()
         elif sys.argv[1] == "drop":
             drop()
         elif sys.argv[1] == "select":
-            select()
+            select_all()
         elif sys.argv[1] == "desc":
             desc()
+    elif len(sys.argv) == 3:
+        if sys.argv[1] == "select":
+            select(sys.argv[2])
 

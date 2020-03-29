@@ -28,8 +28,7 @@ db = SqliteDatabase("db/app.db")
 
 class App(Tk):
     '''
-    The controller of the application
-    Stores all events handler
+    The controller of the application; Stores all events handler
     '''
 
     def __init__(self, *args, **kwargs):
@@ -216,8 +215,8 @@ class App(Tk):
 
     def check_credentials(self, login: str, password: str) -> str:
         '''
-        Event raised when the user click on the login button
-        on the connection page
+        Event raised when the user click on the login button on the
+        connection page
         '''
 
         # We search in the database the user with the corresponding login
@@ -286,9 +285,16 @@ class App(Tk):
         EventsCategory.insert_many(cats).execute()
 
     def delete_event(self, event_name: str) -> int:
+        '''
+        Delete an event
+        '''
         return Event.delete().where(Event.name == event_name).execute()
 
     def edit_event(self, name: str):
+        '''
+        Redirect the user to the edit page, where
+        the user can edit the event at will
+        '''
         event_to_edit = Event.get(Event.name == name)
         self.frames['EditEventPage'].set_edit_mode()
         self.frames['EditEventPage'].set_event(event_to_edit)
@@ -297,16 +303,29 @@ class App(Tk):
         self.show_frame('EditEventPage')
 
     def get_location(self, projection_room_id: int) -> str:
+        '''
+        Return the location of an event
+        '''
         return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).location
 
     def get_total_seats_for_event(self, projection_room_id: int) -> int:
+        '''
+        Return the total number of seats available for an event
+        '''
         return ProjectionRoom.get(ProjectionRoom.id == projection_room_id).total_seats
 
-    def get_seats_left(self, event_id):
+    def get_seats_left(self, event_id: int) -> int:
+        '''
+        Return the number of seats left (not sold nor booked) of an
+        event
+        '''
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
 
     def go_to_show_event_page(self, event_name: str):
+        '''
+        Redirect to the page showing all details about an event
+        '''
         event = Event.get(Event.name == event_name)
 
         self.frames['ShowEventPage'].set_event(event)
@@ -320,9 +339,15 @@ class App(Tk):
         self.show_frame('ShowEventPage')
 
     def get_events_members(self, event):
+        '''
+        Return all members of an event
+        '''
         return User.select().join(Team).where((User.id == Team.member) & (Team.event == event))
 
     def go_to_ticket_page(self, event_name: str):
+        '''
+        Redirect user to the ticketing page (sell and book tickets)
+        '''
         event = Event.get(Event.name == event_name)
 
         self.frames['TicketingPage'].set_event(event)
@@ -332,22 +357,36 @@ class App(Tk):
         self.show_frame('TicketingPage')
 
     def get_categories_for_event(self, event) -> list:
+        '''
+        Return the pricelist of an event
+        '''
         print(event.events_categories.dicts())
         return list(set([ec.category for ec in event.events_categories]))
 
     def has_permission_to_delete(self, event_name: str) -> bool:
+        '''
+        Check if a user has the permission the delete the event given
+        in argument
+        '''
         event = Event.get(Event.name == event_name)
         if event == None: return False
 
         return self.current_user == event.manager
 
     def get_events_status(self, event_name: str) -> str:
+        '''
+        Return the status of an event
+        '''
         event = Event.get(Event.name == event_name)
         if event == None: return False
 
         return event.status
 
     def has_permission_to_edit(self, event_name: str) -> bool:
+        '''
+        Check if a user can edit the event given in argument; It can
+        be a member, or the manager of the event
+        '''
         event = Event.get(Event.name == event_name)
         if event == None: return False
 
@@ -355,6 +394,9 @@ class App(Tk):
                or self.current_user == event.manager)
 
     def pop_timetable(self, user_name: str):
+        '''
+        Pop a window, with all the events and the vacations of a user
+        '''
         top = Toplevel(self)
         top.geometry('500x300')
         top.title('Timetable of ' + user_name)
@@ -374,9 +416,7 @@ class App(Tk):
             end = vacation.end.strftime("%d/%m/%Y")
             rst.append({'name':'Vacation ' + vacation.reason, 'begin':begin, 'end':end})
 
-        print(rst)
         rst.sort(key=lambda i: datetime.strptime(i['begin'], '%d/%m/%Y').day)
-        print(rst)
 
         timetable = TimetablePage(top, rst)
         timetable.pack(fill=BOTH, expand=True)
@@ -384,13 +424,22 @@ class App(Tk):
 
 
     def get_vacations_for_user(self, user: User) -> list:
+        '''
+        Return the vacations of a user
+        '''
         return Vacation.select().where(Vacation.user == user)
 
     def get_events_for_member(self, user: User) -> list:
+        '''
+        Return the events a user is affiliated with
+        '''
         teams = Team.select().where(Team.member == user)
         return [Event.get(Event.id == team.event) for team in teams]
 
     def pop_vacation_page(self):
+        '''
+        Pop up a form to create a vacation
+        '''
         top = Toplevel(self)
         top.geometry('500x300')
         top.title('New Vacation')
@@ -399,34 +448,32 @@ class App(Tk):
         vacation_form.pack(fill=BOTH, expand=True)
 
     def new_vacation(self, vacation: dict):
+        '''
+        Create a new vacation
+        '''
         vacation['user'] = self.current_user
         Vacation.create(**vacation)
 
     def get_events_for_user_to_be_ack(self):
+        '''
+        Return the events 'created' waiting for a member to update
+        to 'in progress'
+        '''
         teams = Team.select().join(Event).where((Team.member == self.current_user) & (Team.event.status == 'created'))
         return [Event.select().where(Event.id == team.event) for team in teams]
-        '''teams = Team.select().where((Team.member == self.current_user) & (Team.event.status == 'created'))
-        if len(teams) == 0: return
-        print('TEAMS ' + teams)
 
-        rst = []
-        for t in teams:
-            print(t.member.name + ', ' + t.event.name)
-            e = Event.get((Event.id == t.event) & (Event.status == 'created'))
-            if e != None:
-                print(e.name)
-                rst.append(e)
-        print(rst)
-        return rst
+    def ack_event(self, event_name: str):
         '''
-
-    def ack_event(self, event_name):
-        #Event.update(status='in progress').where(Event.name == event_name)
+        Change the status of an event, from 'created' to 'in progress'
+        '''
         rst = Event.get(Event.name == event_name).update(status='in progress').execute()
-        print(rst)
         log.info('Event ' + event_name + ' has now status IN PROGRESS')
 
     def app_will_quit(self):
+        '''
+        Tkinter event triggered when the app is closing; Used for
+        closing the database
+        '''
         log.info('Application will terminate')
         log.info('Closing the database')
         db.close()

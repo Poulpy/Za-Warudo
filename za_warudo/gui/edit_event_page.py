@@ -54,7 +54,7 @@ class EditEventPage(ttk.Frame):
         hour = ttk.Label(self, text="Hour")
         hour_entry = Spinbox(self, from_=0, to=24, textvariable=self.hour_text)
         # Input for the running time, in minutes
-        # TODO actually we can type anything in this s* widget
+        # TODO actually we can type anything in this widget
         # do something to prevent that by using regex
         # When clicking on the save button, there may be a label
         # if the input is wrong
@@ -99,7 +99,7 @@ class EditEventPage(ttk.Frame):
         self.members_tree = tkw.CheckboxTreeview(members_frame, columns=('Events'), selectmode='browse', yscrollcommand=members_scrollbar.set)
         members_scrollbar.configure(command=self.members_tree.yview)
 
-        self.members_tree.column("Events", anchor='center')#, width=50)
+        self.members_tree.column("Events", anchor='center')
         self.members_tree.heading("#0", text="Name")
         self.members_tree.heading("Events", text="Events")
 
@@ -201,9 +201,6 @@ class EditEventPage(ttk.Frame):
     def check_missing_or_incorrect_input(self) -> str:
         '''
         Name, day, hour, running time, must not be empty
-        p = re.compile('^(2[0-4]|1[0-9]|[1-9])$')
-        if p.match(self.hour_text.get()) == None:
-            print("Wrong hour format")
         '''
         error_msg = []
 
@@ -227,6 +224,9 @@ class EditEventPage(ttk.Frame):
             return ' '.join(['Missing or incorrect fields :', ', '.join(error_msg)])
 
     def is_event_finished(self) -> bool:
+        '''
+        Check if certain checkboxes are checked
+        '''
         return (self.room_reserved.get() == 1 and self.management.get() == 1
                 and self.equipment_reserved.get() == 1 and self.guest_attendance.get() == 1)
 
@@ -293,6 +293,9 @@ class EditEventPage(ttk.Frame):
         self.projection_room = projection_room
 
     def set_inputs(self):
+        '''
+        Set the inputs of the page for a given event
+        '''
 
         self.name.set(self.event.name)
         day = self.event.begin.strftime('%Y-%m-%d')
@@ -329,6 +332,9 @@ class EditEventPage(ttk.Frame):
         self.event_id = self.event.id
 
     def display_members(self, event_id: int=None):
+        '''
+        Fill the members treeview
+        '''
 
         self.members_tree.delete(*self.members_tree.get_children())
         users = self.controller.get_events_per_user(event_id)
@@ -338,6 +344,9 @@ class EditEventPage(ttk.Frame):
             self.members_tree.change_state(str(i), users[i]['checked'])
 
     def display_categories(self, event_id: int=None):
+        '''
+        Fill the categories treeview
+        '''
 
         # The tree is cleaned
         self.cats_tree.delete(*self.cats_tree.get_children())
@@ -350,9 +359,13 @@ class EditEventPage(ttk.Frame):
             self.cats_tree.change_state(str(i), category['checked'])
 
     def timetable(self, event=None):
+        '''
+        Pop up a timetable of a user
+        Triggered when there's a click on one of the
+        treeview's row
+        '''
         item = self.members_tree.selection()[0]
         user_name = self.members_tree.item(item, 'text')
-        print(user_name)
         self.controller.pop_timetable(user_name)
 
 

@@ -12,6 +12,7 @@ class EntryDate(ttk.Entry):
     def __init__(self, *args, **kwargs):
         if not "textvariable" in kwargs.keys(): raise ArgumentError("Must take textvariable")
         ttk.Entry.__init__(self, *args, **kwargs)
+        # Event when the input has focus
         self.bind('<FocusIn>', self.choose_date)
         self.textvariable = kwargs['textvariable']
         self.parent = args[0]

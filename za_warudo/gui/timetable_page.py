@@ -11,17 +11,18 @@ from tkcalendar import Calendar, DateEntry
 from gui.widgets import EntryDate
 
 class TimetablePage(ttk.Frame):
+    '''
+    Show the timetable of a user
+    '''
 
     def __init__(self, parent, events):
         ttk.Frame.__init__(self, parent)
         self.events = events
 
         self.events_tree = ttk.Treeview(self, columns=('Begin', 'End'), selectmode='none')
-        #self.events_tree.column("Date", width=70, anchor='center')
         self.events_tree.column("Begin", width=50, anchor='center')
         self.events_tree.column("End", width=50, anchor='center')
         self.events_tree.heading("#0", text="Name")
-        #self.events_tree.heading("Date", text="Date")
         self.events_tree.heading("Begin", text="Begin")
         self.events_tree.heading("End", text="End")
         self.display_events()

@@ -62,9 +62,7 @@ class AcknowledgePage(ttk.Frame):
 
         self.events_tree.delete(*self.events_tree.get_children())
         events = self.controller.get_events_for_user_to_be_ack()
-        print(events)
         if len(events) == 0: return
-        print(events[0])
 
         for i, event in enumerate(events[0]):
             if i % 2 == 0:
@@ -72,12 +70,17 @@ class AcknowledgePage(ttk.Frame):
             else:
                 tag = 'even'
             date = event.begin.strftime("%H:%M"),
-            hour = event.begin.strftime("%H:%M") + ':' + (event.begin + timedelta(minutes=event.running_time)).strftime("%H:%M")
+            hour = (event.begin.strftime("%H:%M"),
+                    ':',
+                    (event.begin + timedelta(minutes=event.running_time)).strftime("%H:%M"))
             self.events_tree.insert("", 'end', text=event.name, values=(date, hour), tags=(tag))
 
 
 
     def select_event(self, event=None):
+        '''
+        Tkinter event triggered when a user clicks on a row of the treeview
+        '''
         self.event_selected = event.widget.selection()
         self.event_name = self.events_tree.item(self.event_selected)['text']
 

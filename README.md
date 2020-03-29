@@ -78,6 +78,9 @@ add the following lines:
             -background [list selected $colors(-selectbg)] \
             -foreground [list selected $colors(-selectfg)]
 ```
+### Troubleshooting
+
+If the application doesn't work properly, see the logs !
 
 ### TODO
 

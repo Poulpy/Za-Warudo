@@ -28,8 +28,7 @@ db = SqliteDatabase("db/app.db")
 
 class App(Tk):
     '''
-    The controller of the application
-    Stores all events handler
+    The controller of the application; Stores all events handler
     '''
 
     def __init__(self, *args, **kwargs):
@@ -216,8 +215,8 @@ class App(Tk):
 
     def check_credentials(self, login: str, password: str) -> str:
         '''
-        Event raised when the user click on the login button
-        on the connection page
+        Event raised when the user click on the login button on the
+        connection page
         '''
 
         # We search in the database the user with the corresponding login
@@ -317,8 +316,8 @@ class App(Tk):
 
     def get_seats_left(self, event_id: int) -> int:
         '''
-        Return the number of seats left (not sold nor booked)
-        of an event
+        Return the number of seats left (not sold nor booked) of an
+        event
         '''
         event = Event.get(Event.id == event_id)
         return self.get_total_seats_for_event(event.projection_room) - event.sold_seats - event.booked_seats
@@ -347,8 +346,7 @@ class App(Tk):
 
     def go_to_ticket_page(self, event_name: str):
         '''
-        Redirect user to the ticketing page (sell and book
-        tickets)
+        Redirect user to the ticketing page (sell and book tickets)
         '''
         event = Event.get(Event.name == event_name)
 
@@ -367,8 +365,8 @@ class App(Tk):
 
     def has_permission_to_delete(self, event_name: str) -> bool:
         '''
-        Check if a user has the permission the delete
-        the event given in argument
+        Check if a user has the permission the delete the event given
+        in argument
         '''
         event = Event.get(Event.name == event_name)
         if event == None: return False
@@ -386,8 +384,8 @@ class App(Tk):
 
     def has_permission_to_edit(self, event_name: str) -> bool:
         '''
-        Check if a user can edit the event given in argument
-        It can be a member, or the manager of the event
+        Check if a user can edit the event given in argument; It can
+        be a member, or the manager of the event
         '''
         event = Event.get(Event.name == event_name)
         if event == None: return False
@@ -397,8 +395,7 @@ class App(Tk):
 
     def pop_timetable(self, user_name: str):
         '''
-        Pop a window, with all the events and the vacations
-        of a user
+        Pop a window, with all the events and the vacations of a user
         '''
         top = Toplevel(self)
         top.geometry('500x300')
@@ -459,8 +456,8 @@ class App(Tk):
 
     def get_events_for_user_to_be_ack(self):
         '''
-        Return the events 'created' waiting for a member
-        to update to 'in progress'
+        Return the events 'created' waiting for a member to update
+        to 'in progress'
         '''
         teams = Team.select().join(Event).where((Team.member == self.current_user) & (Team.event.status == 'created'))
         return [Event.select().where(Event.id == team.event) for team in teams]
@@ -474,8 +471,8 @@ class App(Tk):
 
     def app_will_quit(self):
         '''
-        Tkinter event triggered when the app is closing
-        Used for closing the database
+        Tkinter event triggered when the app is closing; Used for
+        closing the database
         '''
         log.info('Application will terminate')
         log.info('Closing the database')

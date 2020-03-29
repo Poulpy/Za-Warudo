@@ -10,6 +10,12 @@ from tkcalendar import Calendar, DateEntry
 from gui.widgets import EntryDate
 
 class NewVacationPage(ttk.Frame):
+    '''
+    Page to create a vacation:
+    begin date
+    end date
+    reason
+    '''
 
     def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
@@ -50,8 +56,19 @@ class NewVacationPage(ttk.Frame):
 
         labels['notification'].grid(row=4, column=0, columnspan=3, padx=pad, pady=pad, sticky=W)
 
+    def are_entries_empty(self) -> bool:
+        return (self.textvar['begin'].get() == ''
+                or self.textvar['end'].get() == ''
+                or self.textvar['reason'].get() == '')
+
     def save(self):
+        '''
+        Create a vacation from the input given
+        '''
         new_vacation = dict()
+        if self.are_entries_empty():
+            log.info('Inputs must not be empty!')
+            return
 
         new_vacation['begin'] = datetime.strptime(self.textvar['begin'].get(), "%Y-%m-%d")
         new_vacation['end'] = datetime.strptime(self.textvar['end'].get(), "%Y-%m-%d")

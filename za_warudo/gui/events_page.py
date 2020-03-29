@@ -114,6 +114,9 @@ class EventsPage(ttk.Frame):
             self.events_tree.insert("", 'end', text=event.name, values=values, tags=(tag))
 
     def edit_event(self):
+        '''
+        Redirect to the edit page, if an event is selected
+        '''
         if self.event_selected != None:
             if self.controller.has_permission_to_edit(self.event_name) and self.controller.get_events_status(self.event_name) != 'finished':
                 log.info('Edit of event %s' % (self.event_name))
@@ -139,6 +142,10 @@ class EventsPage(ttk.Frame):
             self.notification_text.set('No event selected')
 
     def link_to_ticketing_page(self):
+        '''
+        Redirect to the ticketing page of an event The event must be
+        'finished'
+        '''
         if self.event_selected != None:
             if self.controller.has_permission_to_edit(self.event_name):
                 if self.controller.get_events_status(self.event_name) == 'finished':
@@ -152,6 +159,9 @@ class EventsPage(ttk.Frame):
             log.info('No item selected')
 
     def link_to_show_page(self):
+        '''
+        Redirect to the details page, if an event is selected
+        '''
         if self.event_selected != None:
             self.controller.go_to_show_event_page(event_name=self.event_name)
         else:
@@ -159,6 +169,10 @@ class EventsPage(ttk.Frame):
             log.info('No item selected')
 
     def pop_ack_page(self):
+        '''
+        Pop up where the user can acknowledge events
+        acknowledge == change status
+        '''
         top = Toplevel(self)
         top.geometry('700x400')
         top.title('Change status of events')
@@ -168,6 +182,10 @@ class EventsPage(ttk.Frame):
 
 
     def display_ack_button(self):
+        '''
+        The 'acknowledge' button appears IF there are events to be
+        acknowledged by the user
+        '''
         ack_button = ttk.Button(self, text="Acknowledge", command=self.pop_ack_page)
         if len(self.controller.get_events_for_user_to_be_ack()) != 0:
             ack_button.grid(row=6, column=1, sticky=W+E, pady=5, padx=5)

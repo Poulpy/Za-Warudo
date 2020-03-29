@@ -160,7 +160,7 @@ class EventsPage(ttk.Frame):
 
     def pop_ack_page(self):
         top = Toplevel(self)
-        top.geometry('500x300')
+        top.geometry('700x400')
         top.title('Change status of events')
 
         ack_page = AcknowledgePage(top, self.controller)

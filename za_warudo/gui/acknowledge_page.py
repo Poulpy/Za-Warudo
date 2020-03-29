@@ -30,8 +30,10 @@ class AcknowledgePage(ttk.Frame):
         self.events_tree.bind('<<TreeviewSelect>>', self.select_event)
         ack_button = ttk.Button(self, text="Acknowledge", command=self.ack_event)
 
-        self.events_tree.grid(row=0, column=0, sticky=NSEW)
-        ack_button.grid(row=1, column=0, sticky=NSEW)
+        #self.events_tree.grid(row=0, column=0, sticky=NSEW)
+        #ack_button.grid(row=1, column=0, sticky=NSEW)
+        self.events_tree.pack(side=TOP, fill=BOTH, expand=True)
+        ack_button.pack()
 
     def ack_event(self):
         if self.event_selected != None:
@@ -48,8 +50,10 @@ class AcknowledgePage(ttk.Frame):
         self.events_tree.delete(*self.events_tree.get_children())
         events = self.controller.get_events_for_user_to_be_ack()
         print(events)
+        if len(events) == 0: return
+        print(events[0])
 
-        for i, event in enumerate(events):
+        for i, event in enumerate(events[0]):
             if i % 2 == 0:
                 tag = 'odd'
             else:

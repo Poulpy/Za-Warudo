@@ -403,8 +403,22 @@ class App(Tk):
         Vacation.create(**vacation)
 
     def get_events_for_user_to_be_ack(self):
-        teams = Team.select().where(Team.member == self.current_user)
-        return [Event.get((Event.id == team.event) & (Event.status == 'created')) for team in teams]
+        teams = Team.select().join(Event).where((Team.member == self.current_user) & (Team.event.status == 'created'))
+        return [Event.select().where(Event.id == team.event) for team in teams]
+        '''teams = Team.select().where((Team.member == self.current_user) & (Team.event.status == 'created'))
+        if len(teams) == 0: return
+        print('TEAMS ' + teams)
+
+        rst = []
+        for t in teams:
+            print(t.member.name + ', ' + t.event.name)
+            e = Event.get((Event.id == t.event) & (Event.status == 'created'))
+            if e != None:
+                print(e.name)
+                rst.append(e)
+        print(rst)
+        return rst
+        '''
 
     def ack_event(self, event_name):
         #Event.update(status='in progress').where(Event.name == event_name)

@@ -20,6 +20,13 @@ db = SqliteDatabase("db/app.db")
 # the database
 SEED_FILES_DIR = "db/seed_files/"
 
+HELP_MSG = ('python3 za_warudo/seed.py [option]\n'
+            'Options:\n'
+            '\tseed : create the tables and seed the database\n'
+            '\tdrop : delete all tables\n'
+            '\tselect : see all datas inside the database\n'
+            '\tdesc : see information about the fields of all tables')
+
 # All the models/tables of the database
 # TODO make it dynamic by putting the models in a package/module
 MODELS = (User, ProjectionRoom, Team, Event, Category,
@@ -127,7 +134,9 @@ if __name__ == "__main__":
     log.basicConfig(filename="log/seed.txt", level=log.INFO)
     log.getLogger().addHandler(log.StreamHandler(sys.stdout))
 
-    if len(sys.argv) > 0:
+    if len(sys.argv) == 1:
+        print(HELP_MSG)
+    else:
         if sys.argv[1] == "seed":
             seed()
         elif sys.argv[1] == "drop":

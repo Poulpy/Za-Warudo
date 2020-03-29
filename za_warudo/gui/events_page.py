@@ -138,7 +138,10 @@ class EventsPage(ttk.Frame):
     def link_to_ticketing_page(self):
         if self.event_selected != None:
             if self.controller.has_permission_to_edit(self.event_name):
-                self.controller.go_to_ticket_page(event_name=self.event_name)
+                if self.controller.get_events_status(self.event_name) == 'finished':
+                    self.controller.go_to_ticket_page(event_name=self.event_name)
+                else:
+                    self.notification_text.set('This event is not yet finished')
             else:
                 self.notification_text.set("You don't have the permission to edit this event")
         else:

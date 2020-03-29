@@ -9,6 +9,7 @@ import logging as log
 from tkcalendar import Calendar, DateEntry
 
 from gui.widgets import EntryDate
+from gui.acknowledge_page import AcknowledgePage
 
 # TODO put in module frames
 class EventsPage(ttk.Frame):
@@ -70,6 +71,8 @@ class EventsPage(ttk.Frame):
         self.events_tree.tag_configure('even', background="#FAFAFA")
 
         self.events_tree.bind('<<TreeviewSelect>>', self.select_event)
+
+
 
         title.grid(row=0, column=0, sticky=(W+N))
         new_event_button.grid(row=0, column=1, sticky=(W+E), pady=5, padx=5)
@@ -138,7 +141,10 @@ class EventsPage(ttk.Frame):
     def link_to_ticketing_page(self):
         if self.event_selected != None:
             if self.controller.has_permission_to_edit(self.event_name):
-                self.controller.go_to_ticket_page(event_name=self.event_name)
+                if self.controller.get_events_status(self.event_name) == 'finished':
+                    self.controller.go_to_ticket_page(event_name=self.event_name)
+                else:
+                    self.notification_text.set('This event is not yet finished')
             else:
                 self.notification_text.set("You don't have the permission to edit this event")
         else:
@@ -152,5 +158,17 @@ class EventsPage(ttk.Frame):
             self.notification_text.set('No event selected')
             log.info('No item selected')
 
+    def pop_ack_page(self):
+        top = Toplevel(self)
+        top.geometry('700x400')
+        top.title('Change status of events')
 
+        ack_page = AcknowledgePage(top, self.controller)
+        ack_page.pack(fill=BOTH, expand=True)
+
+
+    def display_ack_button(self):
+        ack_button = ttk.Button(self, text="Acknowledge", command=self.pop_ack_page)
+        if len(self.controller.get_events_for_user_to_be_ack()) != 0:
+            ack_button.grid(row=6, column=1, sticky=W+E, pady=5, padx=5)
 

@@ -14,9 +14,8 @@ Application for managing cinema club events.
 ## Install and run the application
 
 ```
-pip install -r requirements.txt
-python3 za_warudo/seed.py seed
-python3 za_warudo
+make install
+make run
 ```
 
 login: admin
@@ -41,7 +40,7 @@ python3 za_warudo/seed.py desc
 ### Execute the app
 
 ```
-python3 za_warudo
+make run
 ```
 
 

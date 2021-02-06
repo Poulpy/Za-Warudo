@@ -83,8 +83,5 @@ If the application doesn't work properly, see the logs !
 
 ### TODO
 
-- unit testing tkinter
-- clean inputs after an edit or a new
-
 
 
